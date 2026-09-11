@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * SAAS FINANCE DESIGN SYSTEM STANDARDS & DARK MODE CONFIGURATION
+ * =================================================================
+ * Light & Dark Mode tokens via CSS variables & Tailwind 'dark:' modifier.
+ */
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;      /* Light Gray #F8F9FA */
+    --surface: 0 0% 100%;           /* White #FFFFFF */
+    --primary: 0 100% 37.6%;        /* Enterprise Red #C00000 */
+    --primary-hover: 0 100% 31.4%;  /* #A00000 */
+    --primary-light: 0 100% 98%;    /* #FFF5F5 */
+    --border: 214.3 31.8% 91.4%;    /* Slate-200 */
+    --text-main: 222.2 84% 4.9%;    /* Slate-900 */
+    --text-muted: 215.4 16.3% 46.9%;/* Slate-500 */
+  }
+
+  .dark {
+    --background: 222 47% 7%;       /* Slate-950 #090D16 */
+    --surface: 222 47% 11%;         /* Slate-900 #0F172A */
+    --primary: 0 100% 45%;          /* Rich Vibrant Red for Dark Contrast */
+    --primary-hover: 0 100% 38%;
+    --primary-light: 0 50% 12%;     /* Dark Red Tint */
+    --border: 217.2 32.6% 17.5%;    /* Slate-800 */
+    --text-main: 210 40% 98%;       /* Slate-50 */
+    --text-muted: 215 20.2% 65.1%;  /* Slate-400 */
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--text-main));
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  /* Standard Surface Card with Dark Mode Support */
+  .card-surface {
+    @apply bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-card dark:shadow-none transition-all duration-200;
+  }
+
+  /* Standard Input / Select Controls with Dark Mode Support */
+  .input-field {
+    @apply w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md px-3 py-2 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150;
+  }
+
+  /* Primary Button Standard */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-primary hover:bg-primary-hover active:bg-primary-active text-white text-xs font-semibold shadow-subtle transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  /* Secondary Outline Button Standard with Dark Mode Support */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80 active:bg-slate-100 text-slate-700 dark:text-slate-200 text-xs font-semibold shadow-subtle transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  /* Status Badge Base */
+  .badge-base {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors duration-150;
+  }
+}
+
+/* Custom Scrollbar with Dark Mode Adaptation */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Flatpickr Wrapper & Custom Styling */
+.flatpickr-wrapper {
+  width: 100% !important;
+  display: block !important;
+}
+
