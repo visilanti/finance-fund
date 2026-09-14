@@ -23,17 +23,17 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-white hover:bg-primary-hover active:bg-primary-active border border-transparent shadow-subtle",
+    "bg-primary text-white hover:bg-primary-hover active:bg-primary-active border border-transparent shadow-subtle dark:shadow-none",
   secondary:
-    "bg-slate-100 text-slate-800 hover:bg-slate-200 border border-transparent",
+    "bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700/50",
   outline:
-    "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-2xs",
+    "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-2xs dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:border-slate-600 dark:shadow-none",
   ghost:
-    "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+    "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100",
   danger:
-    "bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 border border-transparent shadow-subtle",
+    "bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 border border-transparent shadow-subtle dark:bg-rose-600 dark:hover:bg-rose-700",
   link:
-    "bg-transparent text-primary underline-offset-4 hover:underline p-0 h-auto",
+    "bg-transparent text-primary underline-offset-4 hover:underline p-0 h-auto dark:text-red-400",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

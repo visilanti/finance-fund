@@ -43,8 +43,8 @@ export function ResponsiveDrawer({
   showSwipeHandle = true,
   className,
 }: ResponsiveDrawerProps) {
-  const isMobile = useMediaQuery("(max-width: 768px)")
-  const computedDirection = direction ?? (isMobile ? "down" : "right")
+  const isMobileOrTab = useMediaQuery("(max-width: 1024px)")
+  const computedDirection = direction ?? (isMobileOrTab ? "down" : "right")
 
   return (
     <Drawer
@@ -63,8 +63,10 @@ export function ResponsiveDrawer({
 
       <DrawerContent
         className={cn(
-          computedDirection === "right" && "sm:max-w-md w-full",
-          computedDirection === "left" && "sm:max-w-md w-full",
+          (computedDirection === "down" || computedDirection === "up") &&
+            "w-full max-w-full mx-auto min-h-[300px] min-h-[40vh] max-h-[90dvh]",
+          (computedDirection === "right" || computedDirection === "left") &&
+            "h-full w-full min-w-[min(420px,100vw)] sm:min-w-[420px] max-w-[520px]",
           className
         )}
       >

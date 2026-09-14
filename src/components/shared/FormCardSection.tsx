@@ -26,10 +26,10 @@ export function FormCardSection({
       )}
     >
       {/* Step Header Bar */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+      <div className="flex items-center justify-between pb-3">
         <div className="flex items-center gap-3">
           {stepNumber !== undefined && (
-            <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950/60 text-primary dark:text-red-400 flex items-center justify-center font-bold text-xs shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-primary dark:bg-primary/60 text-white dark:text-white flex items-center justify-center font-bold text-xs shrink-0">
               {stepNumber}
             </div>
           )}

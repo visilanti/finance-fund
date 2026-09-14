@@ -22,9 +22,6 @@ export function MetricCard({
   valueClass = "text-slate-900 dark:text-slate-100",
   className,
 }: MetricCardProps) {
-  // Extract text color from iconBgClass if present (e.g. text-emerald-600)
-  const iconTextColor = iconBgClass?.match(/text-[a-z0-9/-]+/g)?.join(" ");
-
   return (
     <div
       className={cn(
@@ -39,8 +36,13 @@ export function MetricCard({
         </span>
 
         {Icon && (
-          <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-            <Icon className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+          <div
+            className={cn(
+              "w-7 h-7 rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 flex items-center justify-center shrink-0 transition-colors",
+              iconBgClass
+            )}
+          >
+            <Icon className="w-3.5 h-3.5" />
           </div>
         )}
       </div>
@@ -56,7 +58,7 @@ export function MetricCard({
           </span>
         )}
         {subtitle && (
-          <span className="text-xs text-slate-400 dark:text-slate-100 inline-flex items-center gap-1 shrink-0">
+          <span className="text-xs text-slate-400 dark:text-slate-400 inline-flex items-center gap-1 shrink-0">
             {subtitle}
           </span>
         )}

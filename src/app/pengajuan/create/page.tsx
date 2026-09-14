@@ -8,22 +8,15 @@ import { MainLayoutShell } from "@/components/layout/MainLayoutShell";
 import { RoleType } from "@/components/layout/Sidebar";
 import { usePengajuanForm } from "@/features/pengajuan/hooks/usePengajuanForm";
 import { useJaldisForm } from "@/features/pengajuan/hooks/useJaldisForm";
-import { FormPengajuanShell } from "@/features/pengajuan/components/FormPengajuanShell";
-import { FormJaldisShell } from "@/features/pengajuan/components/FormJaldisShell";
+import { FormPengajuanShell } from "@/features/pengajuan/components/forms/FormPengajuanShell";
+import { FormJaldisShell } from "@/features/pengajuan/components/forms/FormJaldisShell";
 
 // ─── Label lookup ────────────────────────────────────────────────
 const PAGE_TITLE_MAP: Record<string, string> = {
-  rka: "Buat Pengajuan Dana RKA",
-  insidental: "Buat Pengajuan Dana Insidental",
-  reimbursement: "Buat Pengajuan Dana Reimbursement",
-  jaldis: "Buat Kwitansi Perjalanan Dinas",
-};
-
-const BREADCRUMB_MAP: Record<string, string> = {
-  rka: "Form Pengajuan RKA",
-  insidental: "Form Pengajuan Insidental",
-  reimbursement: "Form Pengajuan Reimbursement",
-  jaldis: "Form Perjalanan Dinas",
+  rka: "Pengajuan Dana RKA",
+  insidental: "Pengajuan Dana Insidental",
+  reimbursement: "Pengajuan Dana Reimbursement",
+  jaldis: "Kwitansi Perjalanan Dinas",
 };
 
 // ─── Jaldis sub-page ─────────────────────────────────────────────
@@ -38,7 +31,7 @@ function CreateJaldisContent({ role }: { role: RoleType }) {
       initialRole={role}
       activePath="/pengajuan/create"
       pageTitle={PAGE_TITLE_MAP.jaldis}
-      breadcrumbs={[{ label: BREADCRUMB_MAP.jaldis }]}
+      // breadcrumbs={[{ label: BREADCRUMB_MAP.jaldis }]}
     >
       <FormJaldisShell form={form} />
     </MainLayoutShell>
@@ -70,15 +63,15 @@ function CreatePengajuanContent() {
       initialRole={currentRole}
       activePath="/pengajuan/create"
       pageTitle={PAGE_TITLE_MAP[pengajuanType] ?? PAGE_TITLE_MAP.rka}
-      breadcrumbs={[{ label: BREADCRUMB_MAP[pengajuanType] ?? BREADCRUMB_MAP.rka }]}
+      // breadcrumbs={[{ label: BREADCRUMB_MAP[pengajuanType] ?? BREADCRUMB_MAP.rka }]}
     >
       <FormPengajuanShell form={form} type={pengajuanType} />
     </MainLayoutShell>
   );
 }
 
-function CreatePageRouter() {
-  const searchParams = useSearchParams();
+export default function CreatePengajuanPage() {
+ const searchParams = useSearchParams();
   const typeParam = searchParams.get("type");
   const [currentRole] = useState<RoleType>("divisi");
 
@@ -87,17 +80,5 @@ function CreatePageRouter() {
   }
 
   return <CreatePengajuanContent />;
-}
-
-export default function CreatePengajuanPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="p-6 text-xs text-slate-500">Memuat form pengajuan...</div>
-      }
-    >
-      <CreatePageRouter />
-    </Suspense>
-  );
 }
 

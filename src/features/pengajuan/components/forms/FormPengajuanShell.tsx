@@ -1,15 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { UsePengajuanFormReturn } from "../hooks/usePengajuanForm";
+import { UsePengajuanFormReturn } from "@/features/pengajuan/hooks/usePengajuanForm";
 import { FormCardSection } from "@/components/shared/FormCardSection";
 import { FileUploadZone } from "@/components/shared/FileUploadZone";
+import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
+import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { FormItemsTable } from "./FormItemsTable";
 import { FormInsidentalItemsTable } from "./FormInsidentalItemsTable";
 import { FormStickyFooter } from "./FormStickyFooter";
 import { RKAMatrixDrawer } from "./RKAMatrixDrawer";
-import { Input } from "@/components/ui/Input";
-import { DatePicker } from "@/components/ui/DatePicker";
 
 interface FormPengajuanShellProps {
   form: UsePengajuanFormReturn;
@@ -27,6 +28,13 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
     rka: "RKA",
     insidental: "Insidental",
     reimbursement: "Reimbursement",
+  };
+
+  const BREADCRUMB_MAP: Record<string, string> = {
+    rka: "Form RKA",
+    insidental: "Form Insidental",
+    reimbursement: "Form Reimbursement",
+    jaldis: "Form Perjalanan Dinas",
   };
 
   const displayTypeLabel = typeLabelMap[type || "rka"] || "RKA";
@@ -49,9 +57,18 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
     setInvoiceFiles((prev) => prev.filter((_, i) => i !== index));
   };
   return (
-    <div className="relative pb-24 space-y-6">
+    <div className="relative pb-28 space-y-6">
+      <Breadcrumb
+        items={[
+          {
+            label: "List Pengajuan",
+            href: `/pengajuan?type=${type}`,
+          },
+          { label: BREADCRUMB_MAP[type] || "Form Pengajuan" },
+        ]}
+      />
       <FormCardSection
-        stepNumber={1}
+        // stepNumber={1}
         title="Informasi Pengajuan"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -59,6 +76,7 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
             <Input
               label="Nomor Pengajuan"
               isRequired
+              value={form.nomorPengajuan}
               onChange={(e) => form.setNomorPengajuan(e.target.value)}
               placeholder="Contoh: 001/PJ/2026"
             />
@@ -69,6 +87,7 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
               id="tanggalPengajuan"
               label="Tanggal Pengajuan"
               isRequired
+              value={form.tanggalPengajuan}
               onChange={(_, dateStr) => form.setTanggalPengajuan(dateStr as string)}
               placeholder="Pilih tanggal pengajuan..."
             />
@@ -79,6 +98,7 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
               id="tanggalHarapan"
               label="Harapan Cair"
               isRequired
+              value={form.tanggalHarapan}
               onChange={(_, dateStr) => form.setTanggalHarapan(dateStr as string)}
               placeholder="Pilih tanggal harapan cair..."
             />
@@ -124,13 +144,14 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
 
       {/* KARTU 3: Rekening Tujuan & Vendor */}
       <FormCardSection
-        stepNumber={3}
+        // stepNumber={3}
         title="Info Rekening Tujuan"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Input
               label="Bank Tujuan"
+              value={form.namaBank}
               onChange={(e) => form.setNamaBank(e.target.value)}
               placeholder="Bank Mandiri / BCA / BNI"
             />
@@ -157,14 +178,13 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
       </FormCardSection>
 
       <FormCardSection
-        stepNumber={4}
+        // stepNumber={4}
         title="Tanda Tangan & Pengesahan"
       >
         <FileUploadZone
           label="Upload / Tarik TTD di Sini"
           sublabel="Format PNG/JPG Transparan (Maks 2MB)"
           accept="image/*"
-          multiple
           onFileSelect={handleTtdSelect}
           previewUrl={ttdPreviewUrl}
           onClearPreview={() => setTtdPreviewUrl(null)}
@@ -173,21 +193,21 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
         <Input
           label="Nama Terang Pemohon"
           placeholder="Masukkan nama pemohon..."
-          value={form.namaPemilikRekening}
-          onChange={(e) => form.setNamaPemilikRekening(e.target.value)}
+          value={form.namaPemohon}
+          onChange={(e) => form.setNamaPemohon(e.target.value)}
         />
       </FormCardSection>
 
       {isReimbursement && (
         <FormCardSection
-          stepNumber={5}
+          // stepNumber={5}
           title="Upload Invoice"
           description="Unggah satu atau beberapa file invoice Anda"
         >
           <FileUploadZone
             label="Upload / Tarik Invoice di Sini"
             sublabel="Format PDF/DOC/DOCX (Maks 10MB per file)"
-            accept="image/*"
+            accept="image/*,.pdf,.doc,.docx"
             multiple
             onFileSelect={handleInvoiceSelect}
             files={invoiceFiles}

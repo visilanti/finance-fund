@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { MasterDataTableShell, ColumnDef, StatusBadge } from "@/components/shared/MasterDataTableShell";
-import { PengajuanDetailDrawer } from "@/features/pengajuan/components/PengajuanDetailDrawer";
+import { PengajuanDetailDrawer } from "./PengajuanDetailDrawer";
 import { PengajuanDanaItem } from "@/features/pengajuan/types";
 import { formatIDR } from "@/lib/utils";
 import { Eye } from "lucide-react";
@@ -38,18 +38,18 @@ export function PengajuanTableSection({ initialData }: PengajuanTableSectionProp
       ),
     },
     {
-      key: "judul",
+      key: "kegiatan",
       header: "Judul Pengajuan",
       width: "auto",
       cell: (item) => (
         <div className="max-w-md">
-          <div className="font-semibold text-slate-800 dark:text-slate-200 line-clamp-1">{item.judul}</div>
+          <div className="font-semibold text-slate-800 dark:text-slate-200 line-clamp-1">{item.kegiatan}</div>
           <div className="text-[11px] font-medium text-slate-400 dark:text-slate-400 mt-0.5 flex items-center gap-1.5">
             <span className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] shrink-0">
               {item.divisi}
             </span>
             <span>•</span>
-            <span className="truncate">{item.coa}</span>
+            <span className="truncate">{item.kelompok || "Umum"}</span>
           </div>
         </div>
       ),
@@ -78,7 +78,7 @@ export function PengajuanTableSection({ initialData }: PengajuanTableSectionProp
     },
     {
       key: "status",
-      header: "Status & Posisi",
+      header: "Status",
       width: "180px",
       align: "center",
       cell: (item) => (

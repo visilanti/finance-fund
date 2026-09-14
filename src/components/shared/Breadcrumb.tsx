@@ -23,9 +23,9 @@ export function Breadcrumb({ items = [], className }: BreadcrumbProps) {
       {/* Root / Home link */}
       <Link
         href="/dashboard"
-        className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors flex items-center gap-1 text-[11px] font-medium"
+        className="text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-slate-300 transition-colors flex items-center gap-1 text-[11px] font-medium"
       >
-        <Home className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+        <Home className="w-3.5 h-3.5 text-slate-400 hover:text-primary dark:text-slate-500" />
       </Link>
 
       {items.map((item, index) => {
@@ -35,13 +35,13 @@ export function Breadcrumb({ items = [], className }: BreadcrumbProps) {
           <React.Fragment key={index}>
             <ChevronRight className="w-3 h-3 text-slate-300 dark:text-slate-600 shrink-0" />
             {isLast || !item.href ? (
-              <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[140px] sm:max-w-xs">
+              <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[140px] sm:max-w-xs">
                 {item.label}
               </span>
             ) : (
               <Link
                 href={item.href}
-                className="text-[11px] font-medium text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors truncate max-w-[120px] sm:max-w-xs"
+                className="text-[12px] font-medium text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors truncate max-w-[120px] sm:max-w-xs"
               >
                 {item.label}
               </Link>

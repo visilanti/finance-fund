@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ChevronDown, Coins, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
+import { ChevronDown, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -35,8 +35,8 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
     activePath && activePath.includes("?")
       ? activePath
       : activePath && queryStr
-      ? `${activePath}?${queryStr}`
-      : fullPath || activePath || "/dashboard";
+        ? `${activePath}?${queryStr}`
+        : fullPath || activePath || "/dashboard";
 
   const {
     isMobileOpen,
@@ -85,15 +85,17 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
         )}
       >
         <div className={cn("flex items-center gap-3", isDesktopCollapsed && "justify-center w-full")}>
-          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-white font-bold shadow-subtle shrink-0">
-            <Coins className="w-5 h-5 text-white" />
-          </div>
+          <img
+            src="/images/logo.png"
+            alt="FinanceHubs Logo"
+            className="w-9 h-9 object-contain shrink-0"
+          />
           {!isDesktopCollapsed && (
             <div>
               <h1 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-none tracking-tight">
-                FINANCE<span className="text-primary">HUBS</span>
+                CASHOUT<span className="text-primary">HUBS</span>
               </h1>
-              <p className="text-[11px] text-slate-400 dark:text-slate-400 font-medium mt-0.5">SaaS Fund Management</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-400 font-medium mt-0.5">Finance Fund Management</p>
             </div>
           )}
         </div>
@@ -181,8 +183,8 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
                                 isActive
                                   ? "text-primary dark:text-red-400"
                                   : isSubOpen
-                                  ? "text-slate-600 dark:text-slate-300"
-                                  : "text-slate-400 dark:text-slate-500"
+                                    ? "text-slate-600 dark:text-slate-300"
+                                    : "text-slate-400 dark:text-slate-500"
                               )}
                             />
                           )}

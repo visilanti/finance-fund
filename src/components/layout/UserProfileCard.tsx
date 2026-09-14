@@ -78,7 +78,7 @@ export function UserProfileCard({
         )}
       >
         <div className="relative shrink-0">
-          <div className="w-8 h-8 rounded-full bg-primary/10 dark:bg-primary/20 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs">
+          <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white font-bold text-sm">
             {getInitials(userName)}
           </div>
           <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
@@ -106,10 +106,9 @@ export function UserProfileCard({
       {/* Dropdown Popover Menu */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl dark:shadow-2xl z-50 py-2.5 animate-in fade-in zoom-in-95 duration-150">
-          {/* User Info Header Header */}
           <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800/80 flex items-start gap-3">
             <div className="relative shrink-0">
-              <div className="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/20 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm">
+              <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-sm">
                 {getInitials(userName)}
               </div>
               <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />

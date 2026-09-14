@@ -37,6 +37,8 @@ export interface UsePengajuanFormReturn {
   setNoRekening: (v: string) => void;
   namaPemilikRekening: string;
   setNamaPemilikRekening: (v: string) => void;
+  namaPemohon: string;
+  setNamaPemohon: (v: string) => void;
   namaVendor: string;
   setNamaVendor: (v: string) => void;
 
@@ -91,6 +93,7 @@ export function usePengajuanForm(
   const [namaBank, setNamaBank] = useState<string>("Bank Mandiri");
   const [noRekening, setNoRekening] = useState<string>("");
   const [namaPemilikRekening, setNamaPemilikRekening] = useState<string>("");
+  const [namaPemohon, setNamaPemohon] = useState<string>("");
   const [namaVendor, setNamaVendor] = useState<string>("");
   const [catatan, setCatatan] = useState<string>("");
 
@@ -247,6 +250,8 @@ export function usePengajuanForm(
     setNoRekening,
     namaPemilikRekening,
     setNamaPemilikRekening,
+    namaPemohon,
+    setNamaPemohon,
     namaVendor,
     setNamaVendor,
     catatan,

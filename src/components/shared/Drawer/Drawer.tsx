@@ -52,10 +52,10 @@ export function Drawer({
   className,
 }: DrawerProps) {
   const isDrawerOpen = isOpen ?? open ?? false;
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobileOrTab = useMediaQuery("(max-width: 1024px)");
 
-  // Compute direction: support responsive overrides for mobile & desktop
-  const computedDirection = isMobile
+  // Compute direction: Mobile & Tab (<=1024px) defaults to bottom sheet ("down"), Desktop (>1024px) defaults to side panel ("right")
+  const computedDirection = isMobileOrTab
     ? (mobileSwipeDirection ?? (swipeDirection && !desktopSwipeDirection ? swipeDirection : "down"))
     : (desktopSwipeDirection ?? swipeDirection ?? "right");
 
@@ -66,6 +66,14 @@ export function Drawer({
     }
   };
 
+  const isYAxis = computedDirection === "down" || computedDirection === "up";
+
+  // Desktop Side Panel (>1024px): min-width 420px, max-width 520px, full height
+  // Mobile & Tab Bottom Sheet (<=1024px): direction "down", full width (w-full max-w-full), min-height 280-320px, max-height 90dvh
+  const responsiveMaxWidth = isYAxis
+    ? "w-full max-w-full mx-auto"
+    : maxWidthClass || "w-full min-w-[min(420px,100vw)] sm:min-w-[420px] max-w-[520px]";
+
   return (
     <UiDrawer
       open={isDrawerOpen}
@@ -75,9 +83,11 @@ export function Drawer({
     >
       <DrawerContent
         className={cn(
-          (computedDirection === "right" || computedDirection === "left") &&
-            "h-full w-full sm:max-w-md",
-          maxWidthClass,
+          isYAxis && "w-full max-w-full mx-auto min-h-[300px] min-h-[40vh] max-h-[90dvh]",
+          !isYAxis &&
+            (computedDirection === "right" || computedDirection === "left") &&
+            "h-full w-full min-w-[min(420px,100vw)] sm:min-w-[420px] max-w-[520px]",
+          responsiveMaxWidth,
           className
         )}
       >

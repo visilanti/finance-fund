@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Plus, Trash2 } from "lucide-react";
-import { PengajuanItemDetail } from "../services/pengajuanService.types";
+import { PengajuanItemDetail } from "@/features/pengajuan/services/pengajuanService.types";
 import { FormCardSection } from "@/components/shared/FormCardSection";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -56,7 +56,7 @@ export function FormItemsTable({
 }: FormItemsTableProps) {
   return (
     <FormCardSection
-      stepNumber={2}
+      // stepNumber={2}
       title="Detail Item Kegiatan"
       action={
         <button
@@ -65,7 +65,7 @@ export function FormItemsTable({
           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold shadow-subtle transition-all cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5 text-primary dark:text-red-400" />
-          <span>Tambah Item</span>
+          <span>Tambah</span>
         </button>
       }
     >

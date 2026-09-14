@@ -1,0 +1,170 @@
+"use client";
+
+import React, { useState } from "react";
+import { UseJaldisFormReturn } from "@/features/pengajuan/hooks/useJaldisForm";
+import { FormCardSection } from "@/components/shared/FormCardSection";
+import { FileUploadZone } from "@/components/shared/FileUploadZone";
+import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
+import { Breadcrumb } from "@/components/shared/Breadcrumb";
+import { FormStickyFooter } from "./FormStickyFooter";
+import { FormJaldisRincianTable } from "./FormJaldisRincianTable";
+
+interface FormJaldisShellProps {
+  form: UseJaldisFormReturn;
+}
+
+export function FormJaldisShell({ form }: FormJaldisShellProps) {
+  const [ttdPreviewUrl, setTtdPreviewUrl] = useState<string | null>(null);
+
+  const handleTtdSelect = (files: FileList | null) => {
+    if (files && files[0]) {
+      setTtdPreviewUrl(URL.createObjectURL(files[0]));
+    }
+  };
+
+  return (
+    <div className="relative pb-28 space-y-6">
+      <Breadcrumb
+        items={[
+          {
+            label: "List Pengajuan",
+            href: "/pengajuan?type=jaldis",
+          },
+          {
+            label: "Form Perjalanan Dinas",
+          },
+        ]}
+      />
+      <FormCardSection
+        // stepNumber={1}
+        title="Informasi Kwitansi"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Input
+              label="No. Kwitansi"
+              isRequired
+              value={form.noKwitansi}
+              onChange={(e) => form.setNoKwitansi(e.target.value)}
+              placeholder="Contoh: KW-JALDIS/001/2026"
+            />
+          </div>
+
+          <div>
+            <DatePicker
+              id="tanggalKwitansi"
+              label="Tanggal Kwitansi"
+              isRequired
+              value={form.tanggal}
+              onChange={(_, dateStr) => form.setTanggal(dateStr as string)}
+              placeholder="Pilih tanggal kwitansi..."
+            />
+          </div>
+
+          <div>
+            <Input
+              label="Diberikan Kepada (Nama Penerima)"
+              isRequired
+              value={form.diberikanKepada}
+              onChange={(e) => form.setDiberikanKepada(e.target.value)}
+              placeholder="Masukkan nama penerima dana..."
+            />
+          </div>
+
+          <div>
+            <Input
+              label="Divisi / Unit Kerja"
+              isRequired
+              value={form.divisi}
+              disabled
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <Input
+              label="Untuk Pembayaran (Tujuan Dinas)"
+              isRequired
+              value={form.untukPembayaran}
+              onChange={(e) => form.setUntukPembayaran(e.target.value)}
+              placeholder="Contoh: Perjalanan dinas survei lokasi cabang Surabaya..."
+            />
+          </div>
+
+          <div>
+            <Input
+              label="Nominal Anggaran (Rp)"
+              variant="number"
+              min={0}
+              value={form.batasAnggaran || ""}
+              onChange={(e) => form.setBatasAnggaran(Number(e.target.value))}
+              placeholder="Masukkan nominal batas anggaran..."
+            />
+          </div>
+
+          <div>
+            <Input
+              label="Terbilang"
+              value={form.terbilangBatas}
+              disabled
+              placeholder="Otomatis terisi dari nominal anggaran..."
+              className="bg-slate-100 dark:bg-slate-800/80 font-medium"
+            />
+          </div>
+        </div>
+      </FormCardSection>
+
+      <FormJaldisRincianTable
+        items={form.items}
+        onAddItem={form.addItem}
+        onRemoveItem={form.removeItem}
+        onUpdateItem={form.updateItem}
+        totalJumlah={form.totalJumlah}
+      />
+
+      <FormCardSection
+        // stepNumber={3}
+        title="Tanda Tangan & Pengesahan"
+      >
+        <FileUploadZone
+          label="Upload / Tarik TTD Penerima"
+          sublabel="Format PNG/JPG Transparan (Maks 2MB)"
+          accept="image/*"
+          onFileSelect={handleTtdSelect}
+          previewUrl={ttdPreviewUrl}
+          onClearPreview={() => setTtdPreviewUrl(null)}
+        />
+
+        <Input
+          label="Nama Terang Penerima"
+          value={form.diberikanKepada}
+          onChange={(e) => form.setDiberikanKepada(e.target.value)}
+          placeholder="Masukkan nama terang penerima..."
+        />
+      </FormCardSection>
+
+      <FormCardSection
+        title="Bukti / Lampiran Kwitansi"
+        description="Unggah bukti fisik (tiket, hotel, nota) perjalanan dinas"
+      >
+        <FileUploadZone
+          label="Upload / Tarik Lampiran di Sini"
+          sublabel="Format PDF/DOC/DOCX/Gambar (Maks 10MB per file)"
+          multiple
+          onFileSelect={form.addLampiran}
+          files={form.lampiranFiles}
+          onRemoveFile={form.removeLampiran}
+        />
+      </FormCardSection>
+
+      <FormStickyFooter
+        totalNominal={form.totalJumlah}
+        isOverBudget={form.isOverBudget}
+        isSubmitting={form.isSubmitting}
+        showRkaButton={false}
+        onSubmitDraft={() => form.handleSubmit(true)}
+        onSubmitFinal={() => form.handleSubmit(false)}
+      />
+    </div>
+  );
+}

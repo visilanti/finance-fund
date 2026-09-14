@@ -4,10 +4,24 @@ import React, { useState } from "react";
 import { Search, Filter, ArrowUpDown, Download, RefreshCw, Plus, SlidersHorizontal, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Drawer } from "@/components/shared/Drawer/Drawer";
+import { Button } from "../ui/Button";
+import { Label } from "../ui/Label";
+import { DatePicker } from "../ui/DatePicker";
+import { Input } from "../ui/Input";
 
 export interface FilterOption {
   label: string;
   value: string;
+}
+
+export interface DateRangeFilter {
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface NominalRangeFilter {
+  minNominal?: number | string;
+  maxNominal?: number | string;
 }
 
 export interface TableToolbarProps {
@@ -30,6 +44,10 @@ export interface TableToolbarProps {
   totalRecords?: number;
   selectedCount?: number;
   bulkActions?: React.ReactNode;
+  dateRangeFilter?: DateRangeFilter;
+  onDateRangeFilterChange?: (dateRange: DateRangeFilter) => void;
+  nominalRangeFilter?: NominalRangeFilter;
+  onNominalRangeFilterChange?: (nominalRange: NominalRangeFilter) => void;
 }
 
 export function TableToolbar({
@@ -52,27 +70,48 @@ export function TableToolbar({
   totalRecords,
   selectedCount = 0,
   bulkActions,
+  dateRangeFilter,
+  onDateRangeFilterChange,
+  nominalRangeFilter,
+  onNominalRangeFilterChange,
 }: TableToolbarProps) {
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const hasFilterSection = Boolean(
-    (onStatusFilterChange && statusOptions.length > 0) || filterDrawerContent
+    (onStatusFilterChange && statusOptions.length > 0) ||
+    onDateRangeFilterChange ||
+    onNominalRangeFilterChange ||
+    filterDrawerContent
+  );
+
+  const isDateFilterActive = Boolean(dateRangeFilter?.startDate || dateRangeFilter?.endDate);
+  const isNominalFilterActive = Boolean(
+    (nominalRangeFilter?.minNominal !== undefined && nominalRangeFilter?.minNominal !== "") ||
+    (nominalRangeFilter?.maxNominal !== undefined && nominalRangeFilter?.maxNominal !== "")
   );
 
   const isFilterActive =
-    (activeFilterCount ?? 0) > 0 || (Boolean(statusFilter) && statusFilter !== "all");
+    (activeFilterCount ?? 0) > 0 ||
+    (Boolean(statusFilter) && statusFilter !== "all") ||
+    isDateFilterActive ||
+    isNominalFilterActive;
 
   const calculatedActiveCount =
-    activeFilterCount ?? (statusFilter && statusFilter !== "all" ? 1 : 0);
+    activeFilterCount ??
+    ((statusFilter && statusFilter !== "all" ? 1 : 0) +
+      (isDateFilterActive ? 1 : 0) +
+      (isNominalFilterActive ? 1 : 0));
 
   const handleReset = () => {
     onStatusFilterChange?.("all");
+    onDateRangeFilterChange?.({ startDate: "", endDate: "" });
+    onNominalRangeFilterChange?.({ minNominal: "", maxNominal: "" });
     onResetFilters?.();
   };
 
   return (
     <>
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-t-xl border border-slate-200/80 dark:border-slate-800 border-b-0 space-y-3 transition-colors">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-t-xl space-y-3 transition-colors">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           {/* Left: Combined Search Bar & Filter Drawer Trigger */}
           <div className="flex items-center flex-1 max-w-md">
@@ -136,36 +175,34 @@ export function TableToolbar({
             )}
 
             {onRefresh && (
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={onRefresh}
                 title="Refresh Data"
-                className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg transition-colors cursor-pointer"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </button>
+                leftIcon={<RefreshCw className="w-4 h-4" />}
+              />
             )}
 
             {onExport && (
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={onExport}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium shadow-subtle transition-all duration-150 cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                <span>Export</span>
-              </button>
+                title="Export Data"
+                leftIcon={<Download className="w-4 h-4" />}
+              />
             )}
 
             {onAddNew && (
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={onAddNew}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-primary-hover text-white rounded-lg text-xs font-semibold shadow-subtle transition-all duration-150 cursor-pointer"
+                leftIcon={<Plus className="w-4 h-4" />}
               >
-                <Plus className="w-3.5 h-3.5" />
-                <span>{addNewLabel}</span>
-              </button>
+                {addNewLabel}
+              </Button>
             )}
           </div>
         </div>
@@ -204,44 +241,106 @@ export function TableToolbar({
               : filterDrawerContent
           ) : (
             <div className="space-y-4">
+              {onDateRangeFilterChange && (
+                <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <Label variant="bold">Rentang Tanggal</Label>
+                  <DatePicker
+                    id="filterDateRange"
+                    mode="range"
+                    placeholder="Pilih Rentang Tanggal..."
+                    value={
+                      dateRangeFilter?.startDate && dateRangeFilter?.endDate
+                        ? `${dateRangeFilter.startDate} to ${dateRangeFilter.endDate}`
+                        : dateRangeFilter?.startDate || ""
+                    }
+                    onChange={(selectedDates, dateStr) => {
+                      if (selectedDates && selectedDates.length === 2) {
+                        const parts = (dateStr as string).split(" to ");
+                        onDateRangeFilterChange({
+                          startDate: parts[0] || "",
+                          endDate: parts[1] || parts[0] || "",
+                        });
+                      } else if (selectedDates && selectedDates.length === 1) {
+                        const parts = (dateStr as string).split(" to ");
+                        onDateRangeFilterChange({
+                          startDate: parts[0] || "",
+                          endDate: "",
+                        });
+                      } else if (!dateStr) {
+                        onDateRangeFilterChange({
+                          startDate: "",
+                          endDate: "",
+                        });
+                      }
+                    }}
+                  />
+                </div>
+              )}
+
+              {onNominalRangeFilterChange && (
+                <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <Label variant="bold">Rentang Nominal (Rp)</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input
+                      variant="number"
+                      placeholder="Min Rp..."
+                      value={nominalRangeFilter?.minNominal ?? ""}
+                      onChange={(e) =>
+                        onNominalRangeFilterChange({
+                          ...nominalRangeFilter,
+                          minNominal: e.target.value !== "" ? Number(e.target.value) : "",
+                        })
+                      }
+                    />
+                    <Input
+                      variant="number"
+                      placeholder="Maks Rp..."
+                      value={nominalRangeFilter?.maxNominal ?? ""}
+                      onChange={(e) =>
+                        onNominalRangeFilterChange({
+                          ...nominalRangeFilter,
+                          maxNominal: e.target.value !== "" ? Number(e.target.value) : "",
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              )}
+
               {statusOptions.length > 0 && onStatusFilterChange && (
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">
-                    Status Posisi
-                  </label>
-                  <div className="space-y-1.5">
-                    <button
-                      type="button"
+                <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <Label variant="bold">Status Posisi</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
                       onClick={() => onStatusFilterChange("all")}
+                      variant="ghost"
                       className={cn(
-                        "w-full text-left px-3.5 py-2.5 rounded-lg text-xs font-medium border transition-all cursor-pointer flex items-center justify-between",
+                        "w-full justify-between px-3.5 py-2.5 h-auto text-xs font-medium border transition-all cursor-pointer",
                         (!statusFilter || statusFilter === "all")
                           ? "bg-primary/5 dark:bg-primary/20 border-primary text-primary font-bold shadow-2xs"
                           : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                       )}
+                      rightIcon={(!statusFilter || statusFilter === "all") ? <Check className="w-4 h-4 text-primary" /> : undefined}
                     >
-                      <span>Semua Status</span>
-                      {(!statusFilter || statusFilter === "all") && (
-                        <Check className="w-4 h-4 text-primary" />
-                      )}
-                    </button>
+                      <span className="flex-1 text-left">Semua Status</span>
+                    </Button>
                     {statusOptions.map((opt) => {
                       const isSelected = statusFilter === opt.value;
                       return (
-                        <button
+                        <Button
                           key={opt.value}
-                          type="button"
                           onClick={() => onStatusFilterChange(opt.value)}
+                          variant="ghost"
                           className={cn(
-                            "w-full text-left px-3.5 py-2.5 rounded-lg text-xs font-medium border transition-all cursor-pointer flex items-center justify-between",
+                            "w-full justify-between px-3.5 py-2.5 h-auto text-xs font-medium border transition-all cursor-pointer",
                             isSelected
                               ? "bg-primary/5 dark:bg-primary/20 border-primary text-primary font-bold shadow-2xs"
                               : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                           )}
+                          rightIcon={isSelected ? <Check className="w-4 h-4 text-primary" /> : undefined}
                         >
-                          <span>{opt.label}</span>
-                          {isSelected && <Check className="w-4 h-4 text-primary" />}
-                        </button>
+                          <span className="flex-1 text-left">{opt.label}</span>
+                        </Button>
                       );
                     })}
                   </div>
@@ -254,3 +353,4 @@ export function TableToolbar({
     </>
   );
 }
+

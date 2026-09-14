@@ -102,7 +102,7 @@ export function DatePicker({
     const options: flatpickr.Options.Options = {
       mode: isCustomRange ? "range" : mode || "single",
       static: true,
-      monthSelectorType: "static",
+      monthSelectorType: "dropdown",
       dateFormat: "Y-m-d",
       disableMobile: true, // Memaksa Flatpickr menggunakan custom popup kalender di HP
       onChange: isCustomRange
@@ -144,6 +144,15 @@ export function DatePicker({
       }
     };
   }, [mode, id, defaultDate]);
+
+  useEffect(() => {
+    const inputEl = inputRef.current || document.getElementById(id);
+    if (!inputEl) return;
+    const fp = (inputEl as any)._flatpickr;
+    if (fp && value !== undefined && value !== fp.input.value) {
+      fp.setDate(value, false);
+    }
+  }, [value, id]);
 
   return (
     <div className={cn("w-full space-y-1", className)}>
