@@ -2,23 +2,17 @@
 
 import React, { useState, useMemo } from "react";
 import { MasterDataTableShell, ColumnDef, StatusBadge } from "@/components/shared/MasterDataTableShell";
-import { PengajuanDetailDrawer } from "@/features/pengajuan/components/tables/PengajuanDetailDrawer";
+import { PengajuanDetailDrawer } from "@/features/pengajuan/components/drawer";
 import { PengajuanDanaItem } from "@/features/pengajuan/types";
 import { DateRangeFilter, NominalRangeFilter } from "@/components/shared/TableToolbar";
 import { formatIDR } from "@/lib/utils";
-import { Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { STATUS_OPTIONS } from "@/lib/constants";
+import { Eye } from "lucide-react";
 
 interface JaldisTableSectionProps {
   initialData: PengajuanDanaItem[];
 }
-
-const STATUS_OPTIONS = [
-  { label: "Proses Approval", value: "menunggu" },
-  { label: "Disetujui", value: "disetujui" },
-  { label: "Diproses Finance", value: "diproses" },
-  { label: "Ditolak", value: "ditolak" },
-];
 
 export function JaldisTableSection({ initialData }: JaldisTableSectionProps) {
   const router = useRouter();
@@ -81,7 +75,7 @@ export function JaldisTableSection({ initialData }: JaldisTableSectionProps) {
     },
     {
       key: "divisi",
-      header: "Divisi / Unit",
+      header: "Divisi",
       width: "160px",
       cell: (item) => (
         <span className="inline-block px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-semibold">
@@ -110,7 +104,7 @@ export function JaldisTableSection({ initialData }: JaldisTableSectionProps) {
         <div className="flex flex-col items-center">
           <StatusBadge status={item.status} />
           <span className="text-[10px] text-slate-400 dark:text-slate-400 font-normal mt-1 whitespace-nowrap">
-            {item.approverNext}
+            {item.currentStep}
           </span>
         </div>
       ),

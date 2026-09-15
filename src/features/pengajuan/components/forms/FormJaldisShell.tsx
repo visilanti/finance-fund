@@ -57,7 +57,7 @@ export function FormJaldisShell({ form }: FormJaldisShellProps) {
               label="Tanggal Kwitansi"
               isRequired
               value={form.tanggal}
-              onChange={(_, dateStr) => form.setTanggal(dateStr as string)}
+              onChange={(_: Date[], dateStr: string) => form.setTanggal(dateStr as string)}
               placeholder="Pilih tanggal kwitansi..."
             />
           </div>
@@ -74,7 +74,7 @@ export function FormJaldisShell({ form }: FormJaldisShellProps) {
 
           <div>
             <Input
-              label="Divisi / Unit Kerja"
+              label="Divisi"
               isRequired
               value={form.divisi}
               disabled
@@ -162,8 +162,7 @@ export function FormJaldisShell({ form }: FormJaldisShellProps) {
         isOverBudget={form.isOverBudget}
         isSubmitting={form.isSubmitting}
         showRkaButton={false}
-        onSubmitDraft={() => form.handleSubmit(true)}
-        onSubmitFinal={() => form.handleSubmit(false)}
+        onSubmitFinal={() => form.handleSubmit()}
       />
     </div>
   );

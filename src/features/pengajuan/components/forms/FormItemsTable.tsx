@@ -7,37 +7,12 @@ import { FormCardSection } from "@/components/shared/FormCardSection";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { formatIDR } from "@/lib/utils";
-
-const KELOMPOK_OPTIONS = [
-  "Operasional",
-  "Pengadaan & Sarpras",
-  "Pemeliharaan",
-  "Pengembangan SDM",
-  "Kegiatan Siswa/Akademik",
-];
-
-const KEGIATAN_RKA_OPTIONS = [
-  "Pengadaan Hardware IT & Server",
-  "Maintenance Jaringan & Internet",
-  "Bahan Ajar & Modul Pembelajaran",
-  "Operasional Listrik & Kebersihan",
-  "Pelatihan & Workshop Guru",
-];
-
-const BULAN_OPTIONS = [
-  "Januari",
-  "Februari",
-  "Maret",
-  "April",
-  "Mei",
-  "Juni",
-  "Juli",
-  "Agustus",
-  "September",
-  "Oktober",
-  "November",
-  "Desember",
-];
+import {
+  BULAN_OPTIONS,
+  KELOMPOK_OPTIONS,
+  KEGIATAN_RKA_OPTIONS,
+} from "@/lib/constants";
+import DatePicker from "@/components/ui/DatePicker";
 
 interface FormItemsTableProps {
   items: PengajuanItemDetail[];
@@ -90,24 +65,31 @@ export function FormItemsTable({
 
                 <td className="px-3 py-2.5">
                   <Select
+                    value={item.kelompok || ""}
                     onChange={(val) => onUpdateItem(idx, "kelompok", val)}
                     options={KELOMPOK_OPTIONS}
+                    placeholder="Pilih Kelompok..."
                     isSearchable={false}
                   />
                 </td>
 
                 <td className="px-3 py-2.5">
                   <Select
+                    value={item.kegiatanRka || ""}
                     onChange={(val) => onUpdateItem(idx, "kegiatanRka", val)}
                     options={KEGIATAN_RKA_OPTIONS}
+                    placeholder="Pilih Kegiatan RKA..."
                     isSearchable={true}
                   />
                 </td>
 
                 <td className="px-3 py-2.5">
-                  <Select
-                    options={BULAN_OPTIONS}
-                    isSearchable={true}
+                  <DatePicker
+                    id={`bulan-${idx}`}
+                    mode="monthly"
+                    value={item.bulan || ""}
+                    onChange={(_: Date[], dateStr: string) => onUpdateItem(idx, "bulan", dateStr)}
+                    placeholder="Pilih Bulan..."
                   />
                 </td>
 
@@ -123,6 +105,7 @@ export function FormItemsTable({
                   <Input
                     variant="number"
                     min={0}
+                    value={item.nominalPengajuan || ""}
                     onChange={(e) => onUpdateItem(idx, "nominalPengajuan", Number(e.target.value))}
                     placeholder="0"
                     className="text-right font-semibold"

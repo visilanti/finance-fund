@@ -253,7 +253,7 @@ export function TableToolbar({
                         ? `${dateRangeFilter.startDate} to ${dateRangeFilter.endDate}`
                         : dateRangeFilter?.startDate || ""
                     }
-                    onChange={(selectedDates, dateStr) => {
+                    onChange={(selectedDates: Date[], dateStr: string) => {
                       if (selectedDates && selectedDates.length === 2) {
                         const parts = (dateStr as string).split(" to ");
                         onDateRangeFilterChange({

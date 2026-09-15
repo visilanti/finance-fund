@@ -56,9 +56,13 @@ export interface UsePengajuanFormReturn {
   isRkaDrawerOpen: boolean;
   setIsRkaDrawerOpen: (open: boolean) => void;
 
+  // Revision & Edit Mode
+  alasan: string | null;
+  isEditMode: boolean;
+
   // Actions
   isSubmitting: boolean;
-  handleSubmit: (asDraft?: boolean) => Promise<void>;
+  handleSubmit: () => Promise<void>;
 }
 
 export function usePengajuanForm(
@@ -71,26 +75,35 @@ export function usePengajuanForm(
   const [coaOptions, setCoaOptions] = useState<COAOption[]>([]);
   const [selectedCoaCode, setSelectedCoaCode] = useState<string>("");
 
-  // Form Fields
-  const [nomorPengajuan, setNomorPengajuan] = useState<string>("001/PJ/2026");
+  // Form Fields (Empty by default for Create mode)
+  const [nomorPengajuan, setNomorPengajuan] = useState<string>("");
   const [judul, setJudul] = useState<string>("");
   const [divisi, setDivisi] = useState<string>("IT & Infrastructure");
   const [tanggalPengajuan, setTanggalPengajuan] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
-  const [tanggalKebutuhan, setTanggalKebutuhan] = useState<string>(
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
-  );
-  const [tanggalHarapan, setTanggalHarapan] = useState<string>(
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
-  );
+  const [tanggalKebutuhan, setTanggalKebutuhan] = useState<string>("");
+  const [tanggalHarapan, setTanggalHarapan] = useState<string>("");
   const [urgensi, setUrgensi] = useState<"normal" | "urgent" | "emergency">("normal");
 
-  // Dynamic Item List
-  const [items, setItems] = useState<PengajuanItemDetail[]>([]);
+  // Dynamic Item List (Start with 1 blank item row)
+  const [items, setItems] = useState<PengajuanItemDetail[]>([
+    {
+      kelompok: "",
+      kegiatanRka: "",
+      bulan: "",
+      budgetRka: 0,
+      nominalPengajuan: 0,
+      subtotal: 0,
+      namaItem: "",
+      volume: 1,
+      satuan: "Unit",
+      hargaSatuan: 0,
+    },
+  ]);
 
-  // Vendor & Bank Account Details
-  const [namaBank, setNamaBank] = useState<string>("Bank Mandiri");
+  // Vendor & Bank Account Details (Empty by default for Create mode)
+  const [namaBank, setNamaBank] = useState<string>("");
   const [noRekening, setNoRekening] = useState<string>("");
   const [namaPemilikRekening, setNamaPemilikRekening] = useState<string>("");
   const [namaPemohon, setNamaPemohon] = useState<string>("");
@@ -101,7 +114,11 @@ export function usePengajuanForm(
   const [isRkaDrawerOpen, setIsRkaDrawerOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Fetch COA Options on mount
+  // Revision & Edit Mode State
+  const [alasan, setAlasan] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+
+  // Fetch COA Options & Edit Data on mount
   useEffect(() => {
     service.getCOAOptions().then((options) => {
       setCoaOptions(options);
@@ -109,6 +126,30 @@ export function usePengajuanForm(
         setSelectedCoaCode(options[0].code);
       }
     });
+
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const editId = searchParams.get("editId") || searchParams.get("id");
+      if (editId) {
+        setIsEditMode(true);
+        service.getPengajuanById(editId).then((data) => {
+          if (data) {
+            if (data.nomorPengajuan || data.kode) setNomorPengajuan(data.nomorPengajuan || data.kode || "");
+            if (data.judul) setJudul(data.judul);
+            if (data.divisi) setDivisi(data.divisi);
+            if (data.coaCode) setSelectedCoaCode(data.coaCode);
+            if (data.tanggalPengajuan) setTanggalPengajuan(data.tanggalPengajuan);
+            if (data.tanggalHarapan) setTanggalHarapan(data.tanggalHarapan);
+            if (data.items && data.items.length > 0) setItems(data.items);
+            if (data.namaBank) setNamaBank(data.namaBank);
+            if (data.noRekening) setNoRekening(data.noRekening);
+            if (data.namaPemilikRekening) setNamaPemilikRekening(data.namaPemilikRekening);
+            if (data.catatan) setCatatan(data.catatan);
+            if (data.alasan) setAlasan(data.alasan);
+          }
+        });
+      }
+    }
   }, [service]);
 
   // Active selected COA object
@@ -178,8 +219,8 @@ export function usePengajuanForm(
   };
 
   // Submit Handler
-  const handleSubmit = async (asDraft = false) => {
-    if (!asDraft && (!nomorPengajuan.trim() || !selectedCoaCode || items.length === 0)) {
+  const handleSubmit = async () => {
+    if (!nomorPengajuan.trim() || !selectedCoaCode || items.length === 0) {
       alert("Mohon lengkapi nomor pengajuan, COA, dan minimal 1 rincian item.");
       return;
     }
@@ -202,7 +243,7 @@ export function usePengajuanForm(
         namaPemilikRekening,
         namaVendor,
         catatan,
-        status: asDraft ? "draft" : "menunggu",
+        status: "menunggu",
       };
 
       const result = await service.createPengajuan(payload);
@@ -211,11 +252,7 @@ export function usePengajuanForm(
       if (onSuccess) {
         onSuccess(result);
       } else {
-        alert(
-          asDraft
-            ? `Draft pengajuan berhasil disimpan!`
-            : `Pengajuan ${result.kode} berhasil dikirim ke Manager!`
-        );
+        alert(`Pengajuan ${result.kode} berhasil dikirim ke Manager!`);
       }
     } catch (err: any) {
       setIsSubmitting(false);
@@ -262,6 +299,8 @@ export function usePengajuanForm(
     isOverBudget,
     isRkaDrawerOpen,
     setIsRkaDrawerOpen,
+    alasan,
+    isEditMode,
     isSubmitting,
     handleSubmit,
   };

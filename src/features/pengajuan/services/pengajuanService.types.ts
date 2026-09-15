@@ -56,7 +56,8 @@ export interface PengajuanPayload {
   catatan?: string;
   lampiranFiles?: string[];
   
-  status?: "draft" | "menunggu" | "disetujui" | "ditolak" | "diproses";
+  status?: "draft" | "menunggu" | "disetujui" | "ditolak" | "diproses" | "selesai";
+  alasan?: string;
 }
 
 export interface PengajuanMetricsSummary {

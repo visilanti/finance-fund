@@ -12,6 +12,8 @@ import { FormInsidentalItemsTable } from "./FormInsidentalItemsTable";
 import { FormStickyFooter } from "./FormStickyFooter";
 import { RKAMatrixDrawer } from "./RKAMatrixDrawer";
 
+import { AlertCircle } from "lucide-react";
+
 interface FormPengajuanShellProps {
   form: UsePengajuanFormReturn;
   type?: "rka" | "insidental" | "reimbursement";
@@ -56,6 +58,7 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
   const handleRemoveInvoice = (index: number) => {
     setInvoiceFiles((prev) => prev.filter((_, i) => i !== index));
   };
+
   return (
     <div className="relative pb-28 space-y-6">
       <Breadcrumb
@@ -67,6 +70,23 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
           { label: BREADCRUMB_MAP[type] || "Form Pengajuan" },
         ]}
       />
+
+      {/* Revision Rejection Banner if applicable */}
+      {form.alasan && (
+        <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl space-y-1.5 text-rose-900 dark:text-rose-200">
+          <div className="flex items-center gap-2 font-bold text-sm text-rose-700 dark:text-rose-300">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            <span>Revisi: Pengajuan Ditolak Sebelumnya</span>
+          </div>
+          <div className="text-xs text-rose-800 dark:text-rose-300 bg-white/70 dark:bg-rose-900/30 p-2.5 rounded-lg border border-rose-200/60 dark:border-rose-800/40">
+            <span className="font-semibold text-rose-900 dark:text-rose-200 block text-[10px] uppercase tracking-wider mb-0.5">
+              Catatan Penolakan:
+            </span>
+            "{form.alasan}"
+          </div>
+        </div>
+      )}
+
       <FormCardSection
         // stepNumber={1}
         title="Informasi Pengajuan"
@@ -88,7 +108,7 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
               label="Tanggal Pengajuan"
               isRequired
               value={form.tanggalPengajuan}
-              onChange={(_, dateStr) => form.setTanggalPengajuan(dateStr as string)}
+              onChange={(_: Date[], dateStr: string) => form.setTanggalPengajuan(dateStr as string)}
               placeholder="Pilih tanggal pengajuan..."
             />
           </div>
@@ -99,14 +119,14 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
               label="Harapan Cair"
               isRequired
               value={form.tanggalHarapan}
-              onChange={(_, dateStr) => form.setTanggalHarapan(dateStr as string)}
+              onChange={(_: Date[], dateStr: string) => form.setTanggalHarapan(dateStr as string)}
               placeholder="Pilih tanggal harapan cair..."
             />
           </div>
 
           <div>
             <Input
-              label="Divisi / Unit Kerja"
+              label="Divisi"
               isRequired
               value={form.divisi}
               disabled
@@ -222,8 +242,7 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
         isSubmitting={form.isSubmitting}
         showRkaButton={isRka}
         onOpenRkaDrawer={() => form.setIsRkaDrawerOpen(true)}
-        onSubmitDraft={() => form.handleSubmit(true)}
-        onSubmitFinal={() => form.handleSubmit(false)}
+        onSubmitFinal={() => form.handleSubmit()}
       />
 
       {isRka && (

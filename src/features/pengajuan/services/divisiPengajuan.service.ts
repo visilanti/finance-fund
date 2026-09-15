@@ -12,7 +12,7 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     kelompok: "Belanja Modal (CAPEX)",
     nominal: 45000000,
     status: "menunggu",
-    approverNext: "Manager IT (Budi Santoso)",
+    currentStep: "manager",
     jenis: "RKA"
   },
   {
@@ -24,7 +24,7 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     kelompok: "Belanja Operasional (OPEX)",
     nominal: 78500000,
     status: "disetujui",
-    approverNext: "Selesai (Siap Dicairkan)",
+    currentStep: "selesai",
     jenis: "RKA"
   },
   {
@@ -35,7 +35,7 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     divisi: "Marketing & Business",
     nominal: 5100000,
     status: "diproses",
-    approverNext: "Finance (Pencairan Transfer)",
+    currentStep: "finance",
     jenis: "Reimbursement"
   },
   {
@@ -46,7 +46,7 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     divisi: "IT & Infrastructure",
     nominal: 8600000,
     status: "menunggu",
-    approverNext: "Manager SDM & Treasury",
+    currentStep: "manager",
     jenis: "Perjalanan"
   },
   {
@@ -57,7 +57,7 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     divisi: "General Affairs",
     nominal: 22000000,
     status: "menunggu",
-    approverNext: "Bendahara Yayasan",
+    currentStep: "bendahara",
     jenis: "Insidental"
   },
   {
@@ -69,7 +69,7 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     divisi: "HR & People Ops",
     nominal: 18500000,
     status: "disetujui",
-    approverNext: "Selesai (Siap Dicairkan)",
+    currentStep: "selesai",
     jenis: "RKA"
   },
   {
@@ -80,7 +80,7 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     divisi: "General Affairs",
     nominal: 3250000,
     status: "disetujui",
-    approverNext: "Selesai (Siap Dicairkan)",
+    currentStep: "selesai",
     jenis: "Reimbursement"
   },
   {
@@ -91,8 +91,33 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     divisi: "Marketing & Business",
     nominal: 4200000,
     status: "diproses",
-    approverNext: "Finance (Pencairan Transfer)",
+    currentStep: "finance",
     jenis: "Perjalanan"
+  },
+  {
+    id: "9",
+    kode: "009/PJ-RKA/IT/2026",
+    tanggal: "02 Mar 2026",
+    kegiatan: "Pengadaan Server Storage NAS Backup 64TB",
+    divisi: "IT & Infrastructure",
+    kelompok: "Belanja Modal (CAPEX)",
+    nominal: 35000000,
+    status: "ditolak",
+    currentStep: "manager",
+    jenis: "RKA",
+    alasan: "Nominal pengajuan melebihi sisa plafon RKA Q1. Mohon revisi rincian item atau ajukan di Q2."
+  },
+  {
+    id: "10",
+    kode: "010/REIMB/GA/2026",
+    tanggal: "01 Mar 2026",
+    kegiatan: "Reimbursement Pembelian Sparepart Genset Operasional",
+    divisi: "General Affairs",
+    nominal: 12500000,
+    status: "ditolak",
+    currentStep: "bendahara",
+    jenis: "Reimbursement",
+    alasan: "Bukti kwitansi fisik belum dibubuhi stempel resmi toko vendor dan nomor rekening tujuan belum terverifikasi."
   }
 ];
 
@@ -194,40 +219,71 @@ export class DivisiPengajuanService implements IPengajuanService {
   }
 
   async getPengajuanById(id: string): Promise<PengajuanPayload | null> {
-    const mockPayload: PengajuanPayload = {
-      id,
-      kode: "REQ-2026-001",
-      divisi: "IT & Infrastructure",
-      coaCode: "5.1.02.01",
-      judul: "Pengadaan Workstation High-Spec Core i9 untuk Dev Team",
-      tanggalKebutuhan: "2026-03-25",
-      urgensi: "normal",
-      items: [
-        {
-          id: "item-1",
-          namaItem: "Laptop Developer Core i9 32GB RAM",
-          volume: 2,
-          satuan: "Unit",
-          hargaSatuan: 20000000,
-          subtotal: 40000000,
-        },
-        {
-          id: "item-2",
-          namaItem: "Monitor 4K 27-Inch Ergonomic",
-          volume: 2,
-          satuan: "Unit",
-          hargaSatuan: 2500000,
-          subtotal: 5000000,
-        },
-      ],
-      totalNominal: 45000000,
-      namaBank: "Bank Mandiri",
-      noRekening: "1370019283741",
-      namaPemilikRekening: "PT Tech Solusindo Utama",
-      namaVendor: "PT Tech Solusindo Utama",
-      catatan: "Kebutuhan mendesak untuk onboarding 2 senior software engineer.",
-      status: "menunggu",
-    };
+    const foundItem = MOCK_PENGAJUAN_LIST.find((item) => item.id === id);
+
+    const mockPayload: PengajuanPayload = foundItem
+      ? {
+          id: foundItem.id,
+          kode: foundItem.kode,
+          nomorPengajuan: foundItem.kode,
+          divisi: foundItem.divisi,
+          coaCode: "5.1.02.01",
+          judul: foundItem.kegiatan,
+          tanggalPengajuan: foundItem.tanggal,
+          tanggalKebutuhan: foundItem.harapanRealisasi || "2026-03-25",
+          tanggalHarapan: foundItem.harapanRealisasi || "2026-03-25",
+          urgensi: "normal",
+          items: [
+            {
+              id: "item-1",
+              kegiatanRka: foundItem.kegiatan,
+              kelompok: foundItem.kelompok || "Operasional",
+              bulan: "Maret",
+              budgetRka: Math.round(foundItem.nominal * 1.2),
+              nominalPengajuan: foundItem.nominal,
+              subtotal: foundItem.nominal,
+              namaItem: foundItem.kegiatan,
+              volume: 1,
+              satuan: "Unit",
+              hargaSatuan: foundItem.nominal,
+            },
+          ],
+          totalNominal: foundItem.nominal,
+          namaBank: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.namaBank : undefined) || "Bank Mandiri",
+          noRekening: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.nomorRekening : undefined) || "1370019283741",
+          namaPemilikRekening: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.namaPemilikRekening : undefined) || "Divisi " + foundItem.divisi,
+          namaVendor: "Vendor Solusi Utama",
+          catatan: "Kebutuhan operasional divisi.",
+          status: foundItem.status,
+          alasan: foundItem.alasan,
+        }
+      : {
+          id,
+          kode: "REQ-2026-001",
+          nomorPengajuan: "001/PJ/2026",
+          divisi: "IT & Infrastructure",
+          coaCode: "5.1.02.01",
+          judul: "Pengadaan Workstation High-Spec Core i9 untuk Dev Team",
+          tanggalKebutuhan: "2026-03-25",
+          urgensi: "normal",
+          items: [
+            {
+              id: "item-1",
+              namaItem: "Laptop Developer Core i9 32GB RAM",
+              volume: 2,
+              satuan: "Unit",
+              hargaSatuan: 20000000,
+              subtotal: 40000000,
+            },
+          ],
+          totalNominal: 45000000,
+          namaBank: "Bank Mandiri",
+          noRekening: "1370019283741",
+          namaPemilikRekening: "PT Tech Solusindo Utama",
+          namaVendor: "PT Tech Solusindo Utama",
+          catatan: "Kebutuhan mendesak untuk onboarding 2 senior software engineer.",
+          status: "menunggu",
+        };
 
     const res = await apiClient<PengajuanPayload>(`/pengajuan/${id}`, {
       mockData: mockPayload,

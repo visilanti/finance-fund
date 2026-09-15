@@ -7,12 +7,14 @@ import { Calendar as CalendarIcon, AlertCircle } from "lucide-react";
 import Hook = flatpickr.Options.Hook;
 import DateOption = flatpickr.Options.DateOption;
 import { Label } from "./Label";
+import { Select } from "./Select";
 import { cn } from "@/lib/utils";
+import { BULAN_OPTIONS } from "@/lib/constants";
 
 export type DatePickerProps = {
   id: string;
   mode?: "single" | "multiple" | "range" | "time" | "weekly" | "monthly";
-  onChange?: Hook | Hook[];
+  onChange?: Hook | Hook[] | ((selectedDates: Date[], dateStr: string, instance: flatpickr.Instance | null) => void);
   defaultDate?: DateOption;
   label?: string;
   placeholder?: string;
@@ -71,6 +73,31 @@ export function DatePicker({
   disabled,
   value,
 }: DatePickerProps) {
+  // Jika mode monthly, gunakan komponen Select dengan opsi bulan global
+  if (mode === "monthly") {
+    const monthPlaceholder = placeholder === "Pilih tanggal..." ? "Pilih bulan..." : placeholder;
+    return (
+      <Select
+        id={id}
+        label={label}
+        value={value}
+        disabled={disabled}
+        isRequired={isRequired}
+        error={error}
+        placeholder={monthPlaceholder}
+        options={[...BULAN_OPTIONS]}
+        isSearchable={true}
+        className={className}
+        onChange={(val: any) => {
+          const selectedStr = typeof val === "string" ? val : val?.target?.value || "";
+          if (onChange) {
+            const handlers = Array.isArray(onChange) ? onChange : [onChange];
+            handlers.forEach((h: any) => h([], selectedStr, null as any));
+          }
+        }}
+      />
+    );
+  }
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Menandai bahwa onChange saat ini dipicu oleh setDate() internal kita,
@@ -89,8 +116,7 @@ export function DatePicker({
     }
 
     const isWeekly = mode === "weekly";
-    const isMonthly = mode === "monthly";
-    const isCustomRange = isWeekly || isMonthly;
+    const isCustomRange = isWeekly;
 
     const emit = (selectedDates: Date[], dateStr: string, instance: flatpickr.Instance) => {
       const currentOnChange = onChangeRef.current;

@@ -11,7 +11,6 @@ interface FormStickyFooterProps {
   isSubmitting?: boolean;
   showRkaButton?: boolean;
   onOpenRkaDrawer?: () => void;
-  onSubmitDraft: () => void;
   onSubmitFinal: () => void;
   className?: string;
 }
@@ -22,7 +21,6 @@ export function FormStickyFooter({
   isSubmitting = false,
   showRkaButton = false,
   onOpenRkaDrawer,
-  onSubmitDraft,
   onSubmitFinal,
   className,
 }: FormStickyFooterProps) {
@@ -70,18 +68,6 @@ export function FormStickyFooter({
               Cek Plafon RKA
             </Button>
           )}
-
-          {/* Draft Save */}
-          <Button
-            type="button"
-            variant="secondary"
-            size="md"
-            onClick={onSubmitDraft}
-            isLoading={isSubmitting}
-            leftIcon={<Save className="w-4 h-4" />}
-          >
-            Simpan Draft
-          </Button>
 
           {/* Final Submit */}
           <Button

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { numberToTerbilang } from "@/lib/utils";
 
 export interface JaldisItem {
   no: number;
@@ -44,27 +45,7 @@ export interface UseJaldisFormReturn {
 
   // Actions
   isSubmitting: boolean;
-  handleSubmit: (asDraft?: boolean) => void;
-}
-
-function numberToTerbilang(n: number): string {
-  if (n === 0) return "Nol";
-  const satuan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan",
-    "Sepuluh", "Sebelas", "Dua Belas", "Tiga Belas", "Empat Belas", "Lima Belas",
-    "Enam Belas", "Tujuh Belas", "Delapan Belas", "Sembilan Belas"];
-
-  function baca(x: number): string {
-    if (x < 20) return satuan[x];
-    if (x < 100) return satuan[Math.floor(x / 10) + 10 - 10] === "" ? "" : `${satuan[Math.floor(x / 10) + 10 - 10]} Puluh${x % 10 !== 0 ? " " + satuan[x % 10] : ""}`;
-    if (x < 200) return `Seratus${x % 100 !== 0 ? " " + baca(x % 100) : ""}`;
-    if (x < 1000) return `${satuan[Math.floor(x / 100)]} Ratus${x % 100 !== 0 ? " " + baca(x % 100) : ""}`;
-    if (x < 2000) return `Seribu${x % 1000 !== 0 ? " " + baca(x % 1000) : ""}`;
-    if (x < 1000000) return `${baca(Math.floor(x / 1000))} Ribu${x % 1000 !== 0 ? " " + baca(x % 1000) : ""}`;
-    if (x < 1000000000) return `${baca(Math.floor(x / 1000000))} Juta${x % 1000000 !== 0 ? " " + baca(x % 1000000) : ""}`;
-    return `${baca(Math.floor(x / 1000000000))} Miliar${x % 1000000000 !== 0 ? " " + baca(x % 1000000000) : ""}`;
-  }
-
-  return baca(Math.round(n)) + " Rupiah";
+  handleSubmit: () => void;
 }
 
 export function useJaldisForm(
@@ -134,8 +115,8 @@ export function useJaldisForm(
     [batasAnggaran, totalJumlah]
   );
 
-  const handleSubmit = (asDraft = false) => {
-    if (!asDraft && (!noKwitansi.trim() || !diberikanKepada.trim())) {
+  const handleSubmit = () => {
+    if (!noKwitansi.trim() || !diberikanKepada.trim()) {
       alert("Mohon lengkapi No. Kwitansi dan nama penerima.");
       return;
     }
@@ -143,7 +124,7 @@ export function useJaldisForm(
     setTimeout(() => {
       setIsSubmitting(false);
       if (onSuccess) {
-        onSuccess({ kode: noKwitansi || "JALDIS-DRAFT" });
+        onSuccess({ kode: noKwitansi || "JALDIS-001" });
       }
     }, 800);
   };

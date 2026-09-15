@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { MasterDataTableShell, ColumnDef, StatusBadge } from "@/components/shared/MasterDataTableShell";
-import { PengajuanDetailDrawer } from "./PengajuanDetailDrawer";
+import { PengajuanDetailDrawer } from "@/features/pengajuan/components/drawer";
 import { PengajuanDanaItem } from "@/features/pengajuan/types";
 import { formatIDR } from "@/lib/utils";
+import { STATUS_OPTIONS } from "@/lib/constants";
 import { Eye } from "lucide-react";
 
 interface PengajuanTableSectionProps {
@@ -84,7 +85,7 @@ export function PengajuanTableSection({ initialData }: PengajuanTableSectionProp
       cell: (item) => (
         <div className="flex flex-col items-center">
           <StatusBadge status={item.status} />
-          <span className="text-[10px] text-slate-400 dark:text-slate-400 font-normal mt-1 whitespace-nowrap">{item.approverNext}</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-400 font-normal mt-1 whitespace-nowrap">{item.currentStep}</span>
         </div>
       ),
     },
@@ -110,12 +111,7 @@ export function PengajuanTableSection({ initialData }: PengajuanTableSectionProp
           searchPlaceholder: "Cari kode, judul, atau jenis pengajuan...",
           statusFilter,
           onStatusFilterChange: setStatusFilter,
-          statusOptions: [
-            { label: "Proses Approval", value: "menunggu" },
-            { label: "Disetujui", value: "disetujui" },
-            { label: "Diproses Finance", value: "diproses" },
-            { label: "Ditolak", value: "ditolak" },
-          ],
+          statusOptions: STATUS_OPTIONS,
           onExport: () => alert("Exporting data rekap pengajuan..."),
           onRefresh: () => alert("Memperbarui data pengajuan..."),
           onAddNew: () => (window.location.href = "/pengajuan/create"),

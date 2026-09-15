@@ -15,6 +15,7 @@ const STATUS_MAP: Record<string, { variant: BadgeVariant; defaultLabel: string }
   ditolak: { variant: "error", defaultLabel: "Ditolak" },
   menunggu: { variant: "warning", defaultLabel: "Proses Approval" },
   diproses: { variant: "info", defaultLabel: "Diproses Finance" },
+  selesai: { variant: "success", defaultLabel: "Selesai" },
 };
 
 export function StatusBadge({
