@@ -84,7 +84,7 @@ export function PengajuanTableSection({ initialData }: PengajuanTableSectionProp
       align: "center",
       cell: (item) => (
         <div className="flex flex-col items-center">
-          <StatusBadge status={item.status} />
+          <StatusBadge status={item.currentStatus} />
           <span className="text-[10px] text-slate-400 dark:text-slate-400 font-normal mt-1 whitespace-nowrap">{item.currentStep}</span>
         </div>
       ),
@@ -92,7 +92,7 @@ export function PengajuanTableSection({ initialData }: PengajuanTableSectionProp
   ];
 
   const filteredData = initialData.filter((item) => {
-    if (statusFilter !== "all" && item.status !== statusFilter) return false;
+    if (statusFilter !== "all" && item.currentStatus !== statusFilter) return false;
     return true;
   });
 

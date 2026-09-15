@@ -103,7 +103,7 @@ export function FormItemsTable({
 
                 <td className="px-3 py-2.5 text-right">
                   <Input
-                    variant="number"
+                    variant="currency"
                     min={0}
                     value={item.nominalPengajuan || ""}
                     onChange={(e) => onUpdateItem(idx, "nominalPengajuan", Number(e.target.value))}

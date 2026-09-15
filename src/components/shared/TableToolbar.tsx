@@ -282,7 +282,7 @@ export function TableToolbar({
                   <Label variant="bold">Rentang Nominal (Rp)</Label>
                   <div className="grid grid-cols-2 gap-2">
                     <Input
-                      variant="number"
+                      variant="currency"
                       placeholder="Min Rp..."
                       value={nominalRangeFilter?.minNominal ?? ""}
                       onChange={(e) =>
@@ -293,7 +293,7 @@ export function TableToolbar({
                       }
                     />
                     <Input
-                      variant="number"
+                      variant="currency"
                       placeholder="Maks Rp..."
                       value={nominalRangeFilter?.maxNominal ?? ""}
                       onChange={(e) =>

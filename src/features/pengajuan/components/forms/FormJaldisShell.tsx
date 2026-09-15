@@ -9,6 +9,8 @@ import { DatePicker } from "@/components/ui/DatePicker";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { FormStickyFooter } from "./FormStickyFooter";
 import { FormJaldisRincianTable } from "./FormJaldisRincianTable";
+import { Button } from "@/components/ui/Button";
+import { Printer } from "lucide-react";
 
 interface FormJaldisShellProps {
   form: UseJaldisFormReturn;
@@ -20,6 +22,23 @@ export function FormJaldisShell({ form }: FormJaldisShellProps) {
   const handleTtdSelect = (files: FileList | null) => {
     if (files && files[0]) {
       setTtdPreviewUrl(URL.createObjectURL(files[0]));
+    }
+  };
+
+  const handlePrintKwitansi = () => {
+    const kwitansiUrl = "/images/kwitansi_jaldis.jpeg";
+    const win = window.open(kwitansiUrl, "_blank");
+    if (win) {
+      win.onload = () => {
+        win.print();
+      };
+    } else {
+      const link = document.createElement("a");
+      link.href = kwitansiUrl;
+      link.download = "kwitansi_jaldis.jpeg";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   };
 
@@ -94,7 +113,7 @@ export function FormJaldisShell({ form }: FormJaldisShellProps) {
           <div>
             <Input
               label="Nominal Anggaran (Rp)"
-              variant="number"
+              variant="currency"
               min={0}
               value={form.batasAnggaran || ""}
               onChange={(e) => form.setBatasAnggaran(Number(e.target.value))}
@@ -123,7 +142,6 @@ export function FormJaldisShell({ form }: FormJaldisShellProps) {
       />
 
       <FormCardSection
-        // stepNumber={3}
         title="Tanda Tangan & Pengesahan"
       >
         <FileUploadZone
@@ -144,8 +162,18 @@ export function FormJaldisShell({ form }: FormJaldisShellProps) {
       </FormCardSection>
 
       <FormCardSection
-        title="Bukti / Lampiran Kwitansi"
-        description="Unggah bukti fisik (tiket, hotel, nota) perjalanan dinas"
+        title="Lampiran Kwitansi"
+        description="Download kwitansi dan upload"
+        action={
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Printer className="w-3.5 h-3.5" />}
+            onClick={handlePrintKwitansi}
+          >
+            <span className="hidden md:inline">Download </span>Template
+          </Button>
+        }
       >
         <FileUploadZone
           label="Upload / Tarik Lampiran di Sini"

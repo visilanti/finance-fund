@@ -17,13 +17,10 @@ export function RejectionBanner({ currentStep, alasan }: RejectionBannerProps) {
             Ditolak oleh {STEP_ROLE_LABEL_MAP[currentStep] || currentStep}
           </span>
         </div>
-        <span className="text-[10px] font-semibold bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-300 px-2 py-0.5 rounded-full">
-          Status: Ditolak
-        </span>
       </div>
       <div className="text-[11px] leading-relaxed text-rose-800 dark:text-rose-300 bg-white/70 dark:bg-rose-900/30 p-2.5 rounded-lg border border-rose-200/60 dark:border-rose-800/40">
         <span className="font-semibold text-rose-900 dark:text-rose-200 block text-[10px] uppercase tracking-wider mb-0.5">
-          Alasan / Catatan Penolakan:
+          Alasan:
         </span>
         "{alasan || "Spesifikasi atau dokumen belum memenuhi syarat, harap lakukan revisi."}"
       </div>

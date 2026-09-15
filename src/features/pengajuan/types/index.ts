@@ -40,8 +40,16 @@ export interface InformasiKwitansi {
 }
 
 export type StepType = "manager" | "bendahara" | "finance" | "lpj" | "selesai";
+export type StatusType = "disetujui" | "ditolak" | "menunggu" | "diproses" | "selesai";
 
-// 1. Kumpulkan semua properti yang sama ke dalam Base Interface
+export interface RiwayatStep {
+  step: StepType;
+  status: StatusType;
+  tanggalUpdate: string;
+  catatan?: string;
+  diupdateOleh?: string;
+}
+
 export interface PengajuanDanaBase {
   id: string;
   kode: string;
@@ -50,9 +58,9 @@ export interface PengajuanDanaBase {
   divisi: string;
   kelompok?: string;
   nominal: number;
-  status: "disetujui" | "ditolak" | "menunggu" | "diproses" | "selesai";
-  alasan?: string;
+  currentStatus: StatusType;
   currentStep: StepType;
+  riwayatStep?: RiwayatStep[];
   harapanRealisasi?: string;
   pengesahan?: Pengesahan;
   buktiLpjUrl?: string;
@@ -60,21 +68,18 @@ export interface PengajuanDanaBase {
   tanggalUploadLpj?: string;
 }
 
-// 2. Extend Base Interface untuk tipe RKA
 export interface PengajuanDanaItemRKA extends PengajuanDanaBase {
   jenis: "RKA";
   itemsRka?: DetailItemRKA[];
   rekeningTujuan?: RekeningTujuan;
 }
 
-// 3. Extend Base Interface untuk tipe Insidental
 export interface PengajuanDanaItemInsidental extends PengajuanDanaBase {
   jenis: "Insidental";
   itemsInsidental?: DetailItemInsidental[];
   rekeningTujuan?: RekeningTujuan;
 }
 
-// 4. Extend Base Interface untuk tipe Reimbursement
 export interface PengajuanDanaItemReimbursement extends PengajuanDanaBase {
   jenis: "Reimbursement";
   itemsReimbursement?: DetailItemReimbursement[];
@@ -82,15 +87,13 @@ export interface PengajuanDanaItemReimbursement extends PengajuanDanaBase {
   buktiPembayaranUrl?: string;
 }
 
-// 5. Extend Base Interface untuk tipe Jaldis
 export interface PengajuanDanaItemJaldis extends PengajuanDanaBase {
-  jenis: "Perjalanan";
+  jenis: "Jaldis";
   itemsJaldis?: DetailItemJaldis[];
   informasiKwitansi?: InformasiKwitansi;
   buktiKwitansiUrl?: string;
 }
 
-// 6. Discriminated Union type untuk semua jenis PengajuanDanaItem
 export type PengajuanDanaItem =
   | PengajuanDanaItemRKA
   | PengajuanDanaItemInsidental

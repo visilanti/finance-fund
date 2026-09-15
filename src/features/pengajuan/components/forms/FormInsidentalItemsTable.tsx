@@ -86,7 +86,7 @@ export function FormInsidentalItemsTable({
 
                   <td className="px-3 py-2.5 text-right">
                     <Input
-                      variant="number"
+                      variant="currency"
                       min={0}
                       value={biaya || ""}
                       onChange={(e) => onUpdateItem(idx, "biaya", Number(e.target.value))}

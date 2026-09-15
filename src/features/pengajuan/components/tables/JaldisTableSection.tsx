@@ -23,8 +23,8 @@ export function JaldisTableSection({ initialData }: JaldisTableSectionProps) {
 
   const filteredData = useMemo(() => {
     return initialData.filter((item) => {
-      const matchType = item.jenis === "Perjalanan";
-      const matchStatus = statusFilter === "all" || item.status === statusFilter;
+      const matchType = item.jenis === "Jaldis";
+      const matchStatus = statusFilter === "all" || item.currentStatus === statusFilter;
       const matchStart = !dateRangeFilter.startDate || new Date(item.tanggal) >= new Date(dateRangeFilter.startDate);
       const matchEnd = !dateRangeFilter.endDate || new Date(item.tanggal) <= new Date(dateRangeFilter.endDate);
 
@@ -102,7 +102,7 @@ export function JaldisTableSection({ initialData }: JaldisTableSectionProps) {
       align: "center",
       cell: (item) => (
         <div className="flex flex-col items-center">
-          <StatusBadge status={item.status} />
+          <StatusBadge status={item.currentStatus} />
           <span className="text-[10px] text-slate-400 dark:text-slate-400 font-normal mt-1 whitespace-nowrap">
             {item.currentStep}
           </span>

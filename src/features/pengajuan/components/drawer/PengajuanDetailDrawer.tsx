@@ -57,21 +57,21 @@ export function PengajuanDetailDrawer({
     displayItem.jenis === "RKA" && displayItem.itemsRka
       ? displayItem.itemsRka
       : [
-          {
-            kelompok: displayItem.kelompok || "Belanja Modal (CAPEX)",
-            kegiatanRka: displayItem.kegiatan,
-            bulan: "Maret 2026",
-            budget: Math.round(displayItem.nominal * 1.15),
-            nominal: displayItem.nominal,
-          },
-        ];
+        {
+          kelompok: displayItem.kelompok || "Belanja Modal (CAPEX)",
+          kegiatanRka: displayItem.kegiatan,
+          bulan: "Maret 2026",
+          budget: Math.round(displayItem.nominal * 1.15),
+          nominal: displayItem.nominal,
+        },
+      ];
 
   const reimbItems: DetailItemReimbursement[] =
     displayItem.jenis === "Reimbursement" && displayItem.itemsReimbursement
       ? displayItem.itemsReimbursement
       : displayItem.jenis === "Insidental" && displayItem.itemsInsidental
-      ? displayItem.itemsInsidental
-      : [
+        ? displayItem.itemsInsidental
+        : [
           {
             keterangan: displayItem.kegiatan,
             volume: 1,
@@ -81,22 +81,22 @@ export function PengajuanDetailDrawer({
         ];
 
   const jaldisItems: DetailItemJaldis[] =
-    displayItem.jenis === "Perjalanan" && displayItem.itemsJaldis
+    displayItem.jenis === "Jaldis" && displayItem.itemsJaldis
       ? displayItem.itemsJaldis
       : [
-          { uraian: "Tiket Pesawat & Transportasi Lokal", jumlah: Math.round(displayItem.nominal * 0.45) },
-          { uraian: "Akomodasi & Penginapan Hotel", jumlah: Math.round(displayItem.nominal * 0.35) },
-          { uraian: "Uang Saku & Uang Makan Harian", jumlah: Math.round(displayItem.nominal * 0.20) },
-        ];
+        { uraian: "Tiket Pesawat & Transportasi Lokal", jumlah: Math.round(displayItem.nominal * 0.45) },
+        { uraian: "Akomodasi & Penginapan Hotel", jumlah: Math.round(displayItem.nominal * 0.35) },
+        { uraian: "Uang Saku & Uang Makan Harian", jumlah: Math.round(displayItem.nominal * 0.20) },
+      ];
 
   const rekening =
-    displayItem.jenis !== "Perjalanan" && displayItem.rekeningTujuan
+    displayItem.jenis !== "Jaldis" && displayItem.rekeningTujuan
       ? displayItem.rekeningTujuan
       : {
-          namaBank: "Bank Mandiri",
-          nomorRekening: "137-00-1892019-4",
-          namaPemilikRekening: "Divisi " + displayItem.divisi,
-        };
+        namaBank: "Bank Mandiri",
+        nomorRekening: "137-00-1892019-4",
+        namaPemilikRekening: "Divisi " + displayItem.divisi,
+      };
 
   const pengesahan = displayItem.pengesahan || {
     namaTerang: "Drs. Hendra Wijaya, M.M.",
@@ -105,13 +105,15 @@ export function PengajuanDetailDrawer({
   const buktiUrl =
     (displayItem.jenis === "Reimbursement"
       ? displayItem.buktiPembayaranUrl
-      : displayItem.jenis === "Perjalanan"
-      ? displayItem.buktiKwitansiUrl
-      : "#") || "#";
+      : displayItem.jenis === "Jaldis"
+        ? displayItem.buktiKwitansiUrl
+        : "#") || "#";
 
   const isSelesai =
-    displayItem.status?.toLowerCase() === "selesai" ||
+    displayItem.currentStatus?.toLowerCase() === "selesai" ||
     displayItem.currentStep?.toLowerCase() === "selesai";
+
+  const rejectionCatatan = displayItem.riwayatStep?.find((r) => r.status === "ditolak")?.catatan;
 
   return (
     <Drawer
@@ -125,8 +127,8 @@ export function PengajuanDetailDrawer({
         </h3>
       }
       footerActions={
-        displayItem.status === "ditolak" ? (
-          <div className="flex items-center gap-2 w-full">
+        displayItem.currentStatus === "ditolak" ? (
+          <div className="flex items-center justify-end gap-2 w-full">
             <Button
               variant="outline"
               size="md"
@@ -158,8 +160,8 @@ export function PengajuanDetailDrawer({
     >
       <div className="space-y-4 text-xs">
         {/* Rejection Alert Banner if status is ditolak */}
-        {displayItem.status === "ditolak" && (
-          <RejectionBanner currentStep={displayItem.currentStep} alasan={displayItem.alasan} />
+        {displayItem.currentStatus === "ditolak" && (
+          <RejectionBanner currentStep={displayItem.currentStep} alasan={rejectionCatatan} />
         )}
 
         {/* Informasi Utama Pengajuan */}
@@ -184,8 +186,8 @@ export function PengajuanDetailDrawer({
           </div>
           <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2.5">
             <span className="text-slate-500 dark:text-slate-400 font-medium">Status Pengajuan</span>
-            <span className="font-semibold capitalize text-slate-800 dark:text-slate-200">          
-              <StatusBadge status={item.status} />
+            <span className="font-semibold capitalize text-slate-800 dark:text-slate-200">
+              <StatusBadge status={displayItem.currentStatus} />
             </span>
           </div>
         </Card>
@@ -222,7 +224,7 @@ export function PengajuanDetailDrawer({
           />
         )}
 
-        {displayItem.jenis === "Perjalanan" && (
+        {displayItem.jenis === "Jaldis" && (
           <DrawerJaldisContent
             items={jaldisItems}
             pengesahan={pengesahan}

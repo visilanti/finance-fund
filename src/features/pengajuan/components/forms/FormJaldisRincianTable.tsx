@@ -6,6 +6,7 @@ import { JaldisItem } from "@/features/pengajuan/hooks/useJaldisForm";
 import { FormCardSection } from "@/components/shared/FormCardSection";
 import { Input } from "@/components/ui/Input";
 import { formatIDR } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
 
 interface FormJaldisRincianTableProps {
   items: JaldisItem[];
@@ -24,17 +25,16 @@ export function FormJaldisRincianTable({
 }: FormJaldisRincianTableProps) {
   return (
     <FormCardSection
-      // stepNumber={2}
       title="Rincian Biaya"
       action={
-        <button
-          type="button"
+        <Button
+          size="sm"
+          variant="outline"
           onClick={onAddItem}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold shadow-subtle transition-all cursor-pointer"
+          leftIcon={<Plus className="w-3.5 h-3.5" />}
         >
-          <Plus className="w-3.5 h-3.5 text-primary dark:text-red-400" />
-          <span>Tambah</span>
-        </button>
+          Tambah
+        </Button>
       }
     >
       {/* Dynamic Item Table */}
@@ -65,7 +65,7 @@ export function FormJaldisRincianTable({
 
                 <td className="px-3 py-2.5 text-right">
                   <Input
-                    variant="number"
+                    variant="currency"
                     min={0}
                     value={item.jumlah || ""}
                     onChange={(e) => onUpdateItem(idx, "jumlah", Number(e.target.value))}

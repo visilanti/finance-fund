@@ -2,7 +2,7 @@
 
 import React, { useState, forwardRef } from "react";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatIDR } from "@/lib/utils";
 import { Label } from "./Label";
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -12,7 +12,40 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   helperText?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  variant?: "text" | "number" | "email" | "password";
+  variant?: "text" | "number" | "email" | "password" | "currency";
+}
+
+/**
+ * Helper to format a number or numeric string as formatted IDR currency string (e.g. 1500000 -> "Rp 1.500.000").
+ */
+export function formatCurrencyString(val: string | number | readonly string[] | undefined | null): string {
+  if (val === undefined || val === null || val === "") return "";
+  const rawDigits = String(val).replace(/\D/g, "");
+  if (!rawDigits) return "";
+  const num = parseInt(rawDigits, 10);
+  if (isNaN(num)) return "";
+  return formatIDR(num);
+}
+
+/**
+ * Helper to count how many digits exist in a formatted string up to targetDigitCount
+ * and return the corresponding string index for cursor placement.
+ */
+function getCursorPosFromDigits(formatted: string, targetDigitCount: number): number {
+  if (targetDigitCount <= 0) {
+    const firstDigitIdx = formatted.search(/\d/);
+    return firstDigitIdx !== -1 ? firstDigitIdx : 0;
+  }
+  let digitCount = 0;
+  for (let i = 0; i < formatted.length; i++) {
+    if (/\d/.test(formatted[i])) {
+      digitCount++;
+    }
+    if (digitCount === targetDigitCount) {
+      return i + 1;
+    }
+  }
+  return formatted.length;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -29,6 +62,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       className,
       id,
       disabled,
+      value,
+      onChange,
       ...props
     },
     ref
@@ -37,11 +72,76 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
 
     const isPasswordType = variant === "password" || type === "password";
+    const isCurrencyType = variant === "currency";
+
     const computedType = isPasswordType
       ? showPassword
         ? "text"
         : "password"
+      : isCurrencyType
+      ? "text"
       : type || variant;
+
+    const displayValue = isCurrencyType
+      ? value !== undefined
+        ? formatCurrencyString(value)
+        : undefined
+      : value;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (isCurrencyType) {
+        const inputEl = e.target;
+        const originalValue = inputEl.value;
+        const selectionStart = inputEl.selectionStart || 0;
+
+        let digitsBeforeCursor = 0;
+        for (let i = 0; i < selectionStart; i++) {
+          if (/\d/.test(originalValue[i])) {
+            digitsBeforeCursor++;
+          }
+        }
+
+        const rawDigits = originalValue.replace(/\D/g, "");
+        const formatted = formatCurrencyString(rawDigits);
+
+        const clonedTarget = Object.create(inputEl);
+        Object.defineProperty(clonedTarget, "value", {
+          value: rawDigits,
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        });
+
+        const syntheticEvent = Object.create(e);
+        Object.defineProperty(syntheticEvent, "target", {
+          value: clonedTarget,
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        });
+        Object.defineProperty(syntheticEvent, "currentTarget", {
+          value: clonedTarget,
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        });
+
+        onChange?.(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
+
+        requestAnimationFrame(() => {
+          if (inputEl && document.activeElement === inputEl) {
+            const newPos = getCursorPosFromDigits(formatted, digitsBeforeCursor);
+            try {
+              inputEl.setSelectionRange(newPos, newPos);
+            } catch {
+              // ignore potential selection range errors
+            }
+          }
+        });
+      } else {
+        onChange?.(e);
+      }
+    };
 
     return (
       <div className="w-full space-y-1">
@@ -62,7 +162,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             type={computedType}
+            inputMode={isCurrencyType ? (props.inputMode || "numeric") : props.inputMode}
             disabled={disabled}
+            value={displayValue}
+            onChange={handleChange}
             className={cn(
               "w-full px-3 py-2 text-xs font-medium bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-slate-800 transition-all duration-150",
               leftIcon && "pl-9",
@@ -107,3 +210,4 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 );
 
 Input.displayName = "Input";
+

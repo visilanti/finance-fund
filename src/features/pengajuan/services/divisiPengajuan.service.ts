@@ -11,9 +11,10 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     divisi: "IT & Infrastructure",
     kelompok: "Belanja Modal (CAPEX)",
     nominal: 45000000,
-    status: "menunggu",
+    currentStatus: "menunggu",
     currentStep: "manager",
-    jenis: "RKA"
+    jenis: "RKA",
+    riwayatStep: []
   },
   {
     id: "2",
@@ -23,9 +24,15 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     divisi: "Cloud Engineering",
     kelompok: "Belanja Operasional (OPEX)",
     nominal: 78500000,
-    status: "disetujui",
+    currentStatus: "disetujui",
     currentStep: "selesai",
-    jenis: "RKA"
+    jenis: "RKA",
+    riwayatStep: [
+      { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-08T09:00:00Z", diupdateOleh: "Ahmad Subagja, M.Kom." },
+      { step: "bendahara", status: "disetujui", tanggalUpdate: "2026-03-08T11:30:00Z", diupdateOleh: "Dra. Hj. Siti Rahmah" },
+      { step: "finance", status: "disetujui", tanggalUpdate: "2026-03-08T14:15:00Z", diupdateOleh: "Dewi Lestari, S.E." },
+      { step: "selesai", status: "selesai", tanggalUpdate: "2026-03-08T16:00:00Z", diupdateOleh: "Drs. Hendra Wijaya, M.M." }
+    ]
   },
   {
     id: "3",
@@ -34,9 +41,13 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     kegiatan: "Reimbursement Jamuan Client Enterprise - Bank Nusantara",
     divisi: "Marketing & Business",
     nominal: 5100000,
-    status: "diproses",
+    currentStatus: "diproses",
     currentStep: "finance",
-    jenis: "Reimbursement"
+    jenis: "Reimbursement",
+    riwayatStep: [
+      { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-07T09:00:00Z", diupdateOleh: "Budi Santoso, S.T." },
+      { step: "bendahara", status: "disetujui", tanggalUpdate: "2026-03-07T13:00:00Z", diupdateOleh: "Dra. Hj. Siti Rahmah" }
+    ]
   },
   {
     id: "4",
@@ -45,9 +56,10 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     kegiatan: "Perjalanan Dinas Audit Datacenter Surabaya",
     divisi: "IT & Infrastructure",
     nominal: 8600000,
-    status: "menunggu",
+    currentStatus: "menunggu",
     currentStep: "manager",
-    jenis: "Perjalanan"
+    jenis: "Jaldis",
+    riwayatStep: []
   },
   {
     id: "5",
@@ -56,9 +68,12 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     kegiatan: "Perbaikan Darurat AC Central Ruang Server Utama",
     divisi: "General Affairs",
     nominal: 22000000,
-    status: "menunggu",
+    currentStatus: "menunggu",
     currentStep: "bendahara",
-    jenis: "Insidental"
+    jenis: "Insidental",
+    riwayatStep: [
+      { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-04T10:00:00Z", diupdateOleh: "Andi Pratama, S.T." }
+    ]
   },
   {
     id: "6",
@@ -68,9 +83,15 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     kelompok: "Pengembangan SDM",
     divisi: "HR & People Ops",
     nominal: 18500000,
-    status: "disetujui",
+    currentStatus: "disetujui",
     currentStep: "selesai",
-    jenis: "RKA"
+    jenis: "RKA",
+    riwayatStep: [
+      { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-03T09:00:00Z", diupdateOleh: "Rina Wulandari, S.Psi." },
+      { step: "bendahara", status: "disetujui", tanggalUpdate: "2026-03-03T11:00:00Z", diupdateOleh: "Dra. Hj. Siti Rahmah" },
+      { step: "finance", status: "disetujui", tanggalUpdate: "2026-03-03T15:00:00Z", diupdateOleh: "Dewi Lestari, S.E." },
+      { step: "selesai", status: "selesai", tanggalUpdate: "2026-03-03T17:00:00Z", diupdateOleh: "Drs. Hendra Wijaya, M.M." }
+    ]
   },
   {
     id: "7",
@@ -79,9 +100,15 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     kegiatan: "Reimbursement Pembelian Material Kebersihan & Protocol Health",
     divisi: "General Affairs",
     nominal: 3250000,
-    status: "disetujui",
+    currentStatus: "disetujui",
     currentStep: "selesai",
-    jenis: "Reimbursement"
+    jenis: "Reimbursement",
+    riwayatStep: [
+      { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-02T09:30:00Z", diupdateOleh: "Andi Pratama, S.T." },
+      { step: "bendahara", status: "disetujui", tanggalUpdate: "2026-03-02T11:45:00Z", diupdateOleh: "Dra. Hj. Siti Rahmah" },
+      { step: "finance", status: "disetujui", tanggalUpdate: "2026-03-02T14:20:00Z", diupdateOleh: "Dewi Lestari, S.E." },
+      { step: "selesai", status: "selesai", tanggalUpdate: "2026-03-02T16:30:00Z", diupdateOleh: "Drs. Hendra Wijaya, M.M." }
+    ]
   },
   {
     id: "8",
@@ -90,9 +117,13 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     kegiatan: "Perjalanan Dinas Kickoff Project Bandung Client",
     divisi: "Marketing & Business",
     nominal: 4200000,
-    status: "diproses",
+    currentStatus: "diproses",
     currentStep: "finance",
-    jenis: "Perjalanan"
+    jenis: "Jaldis",
+    riwayatStep: [
+      { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-01T09:00:00Z", diupdateOleh: "Budi Santoso, S.T." },
+      { step: "bendahara", status: "disetujui", tanggalUpdate: "2026-03-01T11:00:00Z", diupdateOleh: "Dra. Hj. Siti Rahmah" }
+    ]
   },
   {
     id: "9",
@@ -102,10 +133,18 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     divisi: "IT & Infrastructure",
     kelompok: "Belanja Modal (CAPEX)",
     nominal: 35000000,
-    status: "ditolak",
+    currentStatus: "ditolak",
     currentStep: "manager",
     jenis: "RKA",
-    alasan: "Nominal pengajuan melebihi sisa plafon RKA Q1. Mohon revisi rincian item atau ajukan di Q2."
+    riwayatStep: [
+      {
+        step: "manager",
+        status: "ditolak",
+        tanggalUpdate: "2026-03-02T10:00:00Z",
+        catatan: "Nominal pengajuan melebihi sisa plafon RKA Q1. Mohon revisi rincian item atau ajukan di Q2.",
+        diupdateOleh: "Ahmad Subagja, M.Kom."
+      }
+    ]
   },
   {
     id: "10",
@@ -114,10 +153,19 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     kegiatan: "Reimbursement Pembelian Sparepart Genset Operasional",
     divisi: "General Affairs",
     nominal: 12500000,
-    status: "ditolak",
+    currentStatus: "ditolak",
     currentStep: "bendahara",
     jenis: "Reimbursement",
-    alasan: "Bukti kwitansi fisik belum dibubuhi stempel resmi toko vendor dan nomor rekening tujuan belum terverifikasi."
+    riwayatStep: [
+      { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-01T09:00:00Z", diupdateOleh: "Andi Pratama, S.T." },
+      {
+        step: "bendahara",
+        status: "ditolak",
+        tanggalUpdate: "2026-03-01T14:30:00Z",
+        catatan: "Bukti kwitansi fisik belum dibubuhi stempel resmi toko vendor dan nomor rekening tujuan belum terverifikasi.",
+        diupdateOleh: "Dra. Hj. Siti Rahmah"
+      }
+    ]
   }
 ];
 
@@ -223,67 +271,67 @@ export class DivisiPengajuanService implements IPengajuanService {
 
     const mockPayload: PengajuanPayload = foundItem
       ? {
-          id: foundItem.id,
-          kode: foundItem.kode,
-          nomorPengajuan: foundItem.kode,
-          divisi: foundItem.divisi,
-          coaCode: "5.1.02.01",
-          judul: foundItem.kegiatan,
-          tanggalPengajuan: foundItem.tanggal,
-          tanggalKebutuhan: foundItem.harapanRealisasi || "2026-03-25",
-          tanggalHarapan: foundItem.harapanRealisasi || "2026-03-25",
-          urgensi: "normal",
-          items: [
-            {
-              id: "item-1",
-              kegiatanRka: foundItem.kegiatan,
-              kelompok: foundItem.kelompok || "Operasional",
-              bulan: "Maret",
-              budgetRka: Math.round(foundItem.nominal * 1.2),
-              nominalPengajuan: foundItem.nominal,
-              subtotal: foundItem.nominal,
-              namaItem: foundItem.kegiatan,
-              volume: 1,
-              satuan: "Unit",
-              hargaSatuan: foundItem.nominal,
-            },
-          ],
-          totalNominal: foundItem.nominal,
-          namaBank: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.namaBank : undefined) || "Bank Mandiri",
-          noRekening: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.nomorRekening : undefined) || "1370019283741",
-          namaPemilikRekening: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.namaPemilikRekening : undefined) || "Divisi " + foundItem.divisi,
-          namaVendor: "Vendor Solusi Utama",
-          catatan: "Kebutuhan operasional divisi.",
-          status: foundItem.status,
-          alasan: foundItem.alasan,
-        }
+        id: foundItem.id,
+        kode: foundItem.kode,
+        nomorPengajuan: foundItem.kode,
+        divisi: foundItem.divisi,
+        coaCode: "5.1.02.01",
+        judul: foundItem.kegiatan,
+        tanggalPengajuan: foundItem.tanggal,
+        tanggalKebutuhan: foundItem.harapanRealisasi || "2026-03-25",
+        tanggalHarapan: foundItem.harapanRealisasi || "2026-03-25",
+        urgensi: "normal",
+        items: [
+          {
+            id: "item-1",
+            kegiatanRka: foundItem.kegiatan,
+            kelompok: foundItem.kelompok || "Operasional",
+            bulan: "Maret",
+            budgetRka: Math.round(foundItem.nominal * 1.2),
+            nominalPengajuan: foundItem.nominal,
+            subtotal: foundItem.nominal,
+            namaItem: foundItem.kegiatan,
+            volume: 1,
+            satuan: "Unit",
+            hargaSatuan: foundItem.nominal,
+          },
+        ],
+        totalNominal: foundItem.nominal,
+        namaBank: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.namaBank : undefined) || "Bank Mandiri",
+        noRekening: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.nomorRekening : undefined) || "1370019283741",
+        namaPemilikRekening: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.namaPemilikRekening : undefined) || "Divisi " + foundItem.divisi,
+        namaVendor: "Vendor Solusi Utama",
+        catatan: "Kebutuhan operasional divisi.",
+        status: foundItem.currentStatus,
+        alasan: foundItem.riwayatStep?.find((r) => r.status === "ditolak")?.catatan,
+      }
       : {
-          id,
-          kode: "REQ-2026-001",
-          nomorPengajuan: "001/PJ/2026",
-          divisi: "IT & Infrastructure",
-          coaCode: "5.1.02.01",
-          judul: "Pengadaan Workstation High-Spec Core i9 untuk Dev Team",
-          tanggalKebutuhan: "2026-03-25",
-          urgensi: "normal",
-          items: [
-            {
-              id: "item-1",
-              namaItem: "Laptop Developer Core i9 32GB RAM",
-              volume: 2,
-              satuan: "Unit",
-              hargaSatuan: 20000000,
-              subtotal: 40000000,
-            },
-          ],
-          totalNominal: 45000000,
-          namaBank: "Bank Mandiri",
-          noRekening: "1370019283741",
-          namaPemilikRekening: "PT Tech Solusindo Utama",
-          namaVendor: "PT Tech Solusindo Utama",
-          catatan: "Kebutuhan mendesak untuk onboarding 2 senior software engineer.",
-          status: "menunggu",
-        };
+        id,
+        kode: "REQ-2026-001",
+        nomorPengajuan: "001/PJ/2026",
+        divisi: "IT & Infrastructure",
+        coaCode: "5.1.02.01",
+        judul: "Pengadaan Workstation High-Spec Core i9 untuk Dev Team",
+        tanggalKebutuhan: "2026-03-25",
+        urgensi: "normal",
+        items: [
+          {
+            id: "item-1",
+            namaItem: "Laptop Developer Core i9 32GB RAM",
+            volume: 2,
+            satuan: "Unit",
+            hargaSatuan: 20000000,
+            subtotal: 40000000,
+          },
+        ],
+        totalNominal: 45000000,
+        namaBank: "Bank Mandiri",
+        noRekening: "1370019283741",
+        namaPemilikRekening: "PT Tech Solusindo Utama",
+        namaVendor: "PT Tech Solusindo Utama",
+        catatan: "Kebutuhan mendesak untuk onboarding 2 senior software engineer.",
+        status: "menunggu",
+      };
 
     const res = await apiClient<PengajuanPayload>(`/pengajuan/${id}`, {
       mockData: mockPayload,
