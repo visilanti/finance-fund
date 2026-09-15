@@ -42,7 +42,7 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <MainLayoutShell
-      pageTitle={`Daftar Pengajuan Dana ${displayTypeLabel}`}
+      pageTitle={`Pengajuan Dana ${displayTypeLabel}`}
       initialRole="divisi"
       activePath={`/pengajuan?type=${currentType}`}
     >

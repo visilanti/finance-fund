@@ -19,7 +19,7 @@ export function MainLayoutShell({
   children,
   initialRole = "divisi",
   activePath = "/dashboard",
-  pageTitle = "Daftar Pengajuan Dana",
+  pageTitle = "Pengajuan Dana",
   pageSubtitle,
   breadcrumbs,
   headerActions,
