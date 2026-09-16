@@ -75,22 +75,22 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
     );
   };
 
-  const renderNavContent = () => (
+  const renderNavContent = (isCollapsed: boolean = false) => (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 select-none transition-colors duration-150">
       {/* Brand Header */}
       <div
         className={cn(
           "h-16 flex items-center border-b border-slate-100 dark:border-slate-800 shrink-0 transition-all",
-          isDesktopCollapsed ? "justify-center px-0" : "justify-between px-5"
+          isCollapsed ? "justify-center px-0" : "justify-between px-5"
         )}
       >
-        <div className={cn("flex items-center gap-3", isDesktopCollapsed && "justify-center w-full")}>
+        <div className={cn("flex items-center gap-3", isCollapsed && "justify-center w-full")}>
           <img
             src="/images/logo.png"
             alt="FinanceHubs Logo"
             className="w-9 h-9 object-contain shrink-0"
           />
-          {!isDesktopCollapsed && (
+          {!isCollapsed && (
             <div>
               <h1 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-none tracking-tight">
                 CASHOUT<span className="text-primary">HUBS</span>
@@ -128,7 +128,7 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
           return (
             <div key={group.title}>
               {/* Category Header: UPPERCASE 10px (Hidden on desktop collapsed) */}
-              {!isDesktopCollapsed && (
+              {!isCollapsed && (
                 <h2 className="text-2xs font-semibold text-slate-400 dark:text-slate-500 tracking-wider px-3 mb-2 uppercase">
                   {group.title}
                 </h2>
@@ -156,26 +156,26 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
                           onClick={() => toggleSubmenu(item.id)}
                           className={cn(
                             "w-full flex items-center text-xs font-medium rounded-lg transition-all duration-150 group",
-                            isDesktopCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2",
+                            isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2",
                             isActive
                               ? "bg-red-50/80 dark:bg-red-950/40 text-primary dark:text-red-400 font-semibold"
                               : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50/80 dark:hover:bg-slate-800/60"
                           )}
-                          title={isDesktopCollapsed ? item.label : undefined}
+                          title={isCollapsed ? item.label : undefined}
                         >
-                          <div className={cn("flex items-center", isDesktopCollapsed ? "justify-center w-full" : "gap-2.5 min-w-0")}>
+                          <div className={cn("flex items-center", isCollapsed ? "justify-center w-full" : "gap-2.5 min-w-0")}>
                             <Icon
                               className={cn(
                                 "w-4 h-4 shrink-0 transition-colors",
                                 isActive ? "text-primary dark:text-red-400" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300"
                               )}
                             />
-                            {!isDesktopCollapsed && (
+                            {!isCollapsed && (
                               <span className="truncate">{item.label}</span>
                             )}
                           </div>
 
-                          {!isDesktopCollapsed && (
+                          {!isCollapsed && (
                             <ChevronDown
                               className={cn(
                                 "w-3.5 h-3.5 transition-transform duration-200 shrink-0",
@@ -191,7 +191,7 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
                         </button>
 
                         {/* Sub-menu Child Items (Accordion) */}
-                        {isSubOpen && !isDesktopCollapsed && (
+                        {isSubOpen && !isCollapsed && (
                           <div className="pl-4 space-y-1 border-l border-slate-200/60 dark:border-slate-800 ml-4 py-0.5">
                             {visibleChildren.map((child) => {
                               const isChildItemActive = isPathActive(child.path);
@@ -238,26 +238,26 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
                       key={item.id}
                       href={item.path || "#"}
                       onClick={closeMobile}
-                      title={isDesktopCollapsed ? item.label : undefined}
+                      title={isCollapsed ? item.label : undefined}
                       className={cn(
                         "relative flex items-center text-xs font-medium rounded-lg transition-all duration-150 group cursor-pointer",
-                        isDesktopCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2",
+                        isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2",
                         isActive
                           ? "bg-red-50/80 dark:bg-red-950/40 text-primary dark:text-red-400 font-semibold before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-5 before:bg-primary dark:before:bg-red-400 before:rounded-r-full"
                           : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50/80 dark:hover:bg-slate-800/60"
                       )}
                     >
-                      <div className={cn("flex items-center", isDesktopCollapsed ? "justify-center w-full" : "gap-2.5 min-w-0")}>
+                      <div className={cn("flex items-center", isCollapsed ? "justify-center w-full" : "gap-2.5 min-w-0")}>
                         <Icon
                           className={cn(
                             "w-4 h-4 shrink-0 transition-colors",
                             isActive ? "text-primary dark:text-red-400" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300"
                           )}
                         />
-                        {!isDesktopCollapsed && <span className="truncate">{item.label}</span>}
+                        {!isCollapsed && <span className="truncate">{item.label}</span>}
                       </div>
 
-                      {!isDesktopCollapsed && item.badge !== undefined && (
+                      {!isCollapsed && item.badge !== undefined && (
                         <span
                           className={cn(
                             "px-2 py-0.5 rounded-full text-[10px] font-bold",
@@ -277,7 +277,7 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
       </div>
 
       {/* User Role Switcher & Bottom Section */}
-      {!isDesktopCollapsed && (
+      {!isCollapsed && (
         <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-950/40 shrink-0">
           <div className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 shadow-subtle">
             <div className="text-[10px] font-medium text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
@@ -317,7 +317,7 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
 
           {/* Slide-over Mobile Sidebar Content */}
           <div className="fixed inset-y-0 left-0 w-72 bg-white dark:bg-slate-900 shadow-2xl animate-in slide-in-from-left duration-200 z-10">
-            {renderNavContent()}
+            {renderNavContent(false)}
           </div>
         </div>
       )}
@@ -343,7 +343,7 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
           )}
         </button>
 
-        {renderNavContent()}
+        {renderNavContent(isDesktopCollapsed)}
       </aside>
     </>
   );
