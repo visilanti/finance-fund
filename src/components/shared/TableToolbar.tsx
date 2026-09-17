@@ -14,6 +14,16 @@ export interface FilterOption {
   value: string;
 }
 
+export interface FilterOptionGroup {
+  id: string;
+  title: string;
+  options: FilterOption[];
+  value?: string;
+  onChange?: (value: string) => void;
+  allValue?: string;
+  allLabel?: string;
+}
+
 export interface DateRangeFilter {
   startDate?: string;
   endDate?: string;
@@ -28,9 +38,7 @@ export interface TableToolbarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   searchPlaceholder?: string;
-  statusFilter?: string;
-  onStatusFilterChange?: (status: string) => void;
-  statusOptions?: FilterOption[];
+  filterOptionGroups?: FilterOptionGroup[];
   filterDrawerContent?: React.ReactNode | ((props: { close: () => void }) => React.ReactNode);
   activeFilterCount?: number;
   onResetFilters?: () => void;
@@ -54,9 +62,7 @@ export function TableToolbar({
   searchQuery,
   onSearchChange,
   searchPlaceholder = "Cari data...",
-  statusFilter,
-  onStatusFilterChange,
-  statusOptions = [],
+  filterOptionGroups,
   filterDrawerContent,
   activeFilterCount,
   onResetFilters,
@@ -77,8 +83,10 @@ export function TableToolbar({
 }: TableToolbarProps) {
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
+  const hasFilterOptionGroups = Boolean(filterOptionGroups && filterOptionGroups.length > 0);
+
   const hasFilterSection = Boolean(
-    (onStatusFilterChange && statusOptions.length > 0) ||
+    hasFilterOptionGroups ||
     onDateRangeFilterChange ||
     onNominalRangeFilterChange ||
     filterDrawerContent
@@ -90,20 +98,31 @@ export function TableToolbar({
     (nominalRangeFilter?.maxNominal !== undefined && nominalRangeFilter?.maxNominal !== "")
   );
 
+  const activeGroupsCount = filterOptionGroups
+    ? filterOptionGroups.filter((g) => {
+        const allVal = g.allValue ?? "all";
+        return Boolean(g.value && g.value !== allVal);
+      }).length
+    : 0;
+
   const isFilterActive =
     (activeFilterCount ?? 0) > 0 ||
-    (Boolean(statusFilter) && statusFilter !== "all") ||
+    activeGroupsCount > 0 ||
     isDateFilterActive ||
     isNominalFilterActive;
 
   const calculatedActiveCount =
     activeFilterCount ??
-    ((statusFilter && statusFilter !== "all" ? 1 : 0) +
+    (activeGroupsCount +
       (isDateFilterActive ? 1 : 0) +
       (isNominalFilterActive ? 1 : 0));
 
   const handleReset = () => {
-    onStatusFilterChange?.("all");
+    if (filterOptionGroups && filterOptionGroups.length > 0) {
+      filterOptionGroups.forEach((g) => {
+        g.onChange?.(g.allValue ?? "all");
+      });
+    }
     onDateRangeFilterChange?.({ startDate: "", endDate: "" });
     onNominalRangeFilterChange?.({ minNominal: "", maxNominal: "" });
     onResetFilters?.();
@@ -240,9 +259,9 @@ export function TableToolbar({
               ? filterDrawerContent({ close: () => setIsFilterDrawerOpen(false) })
               : filterDrawerContent
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-5">
               {onDateRangeFilterChange && (
-                <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div className="space-y-2">
                   <Label variant="bold">Rentang Tanggal</Label>
                   <DatePicker
                     id="filterDateRange"
@@ -278,7 +297,7 @@ export function TableToolbar({
               )}
 
               {onNominalRangeFilterChange && (
-                <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div className="space-y-2">
                   <Label variant="bold">Rentang Nominal (Rp)</Label>
                   <div className="grid grid-cols-2 gap-2">
                     <Input
@@ -307,45 +326,59 @@ export function TableToolbar({
                 </div>
               )}
 
-              {statusOptions.length > 0 && onStatusFilterChange && (
-                <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <Label variant="bold">Status Posisi</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      onClick={() => onStatusFilterChange("all")}
-                      variant="ghost"
-                      className={cn(
-                        "w-full justify-between px-3.5 py-2.5 h-auto text-xs font-medium border transition-all cursor-pointer",
-                        (!statusFilter || statusFilter === "all")
-                          ? "bg-primary/5 dark:bg-primary/20 border-primary text-primary font-bold shadow-2xs"
-                          : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      )}
-                      rightIcon={(!statusFilter || statusFilter === "all") ? <Check className="w-4 h-4 text-primary" /> : undefined}
-                    >
-                      <span className="flex-1 text-left">Semua Status</span>
-                    </Button>
-                    {statusOptions.map((opt) => {
-                      const isSelected = statusFilter === opt.value;
-                      return (
-                        <Button
-                          key={opt.value}
-                          onClick={() => onStatusFilterChange(opt.value)}
-                          variant="ghost"
-                          className={cn(
-                            "w-full justify-between px-3.5 py-2.5 h-auto text-xs font-medium border transition-all cursor-pointer",
-                            isSelected
-                              ? "bg-primary/5 dark:bg-primary/20 border-primary text-primary font-bold shadow-2xs"
-                              : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                          )}
-                          rightIcon={isSelected ? <Check className="w-4 h-4 text-primary" /> : undefined}
-                        >
-                          <span className="flex-1 text-left">{opt.label}</span>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+              {/* Multi Filter Option Groups */}
+              {hasFilterOptionGroups &&
+                filterOptionGroups?.map((group) => {
+                  const allVal = group.allValue ?? "all";
+                  const currentValue = group.value || allVal;
+                  const hasAllOption = group.options.some((opt) => opt.value === allVal);
+                  const shouldRenderDefaultAll = !hasAllOption && group.allLabel !== null;
+                  const defaultAllLabel = group.allLabel || `Semua ${group.title}`;
+
+                  return (
+                    <div key={group.id} className="space-y-2">
+                      <Label variant="bold">{group.title}</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {shouldRenderDefaultAll && (
+                          <Button
+                            onClick={() => group.onChange?.(allVal)}
+                            variant="ghost"
+                            className={cn(
+                              "w-full justify-between px-3.5 py-2.5 h-auto text-xs font-medium border transition-all cursor-pointer",
+                              currentValue === allVal
+                                ? "bg-primary/5 dark:bg-primary/20 border-primary text-primary font-bold shadow-2xs"
+                                : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            )}
+                            rightIcon={currentValue === allVal ? <Check className="w-4 h-4 text-primary" /> : undefined}
+                          >
+                            <span className="flex-1 text-left">{defaultAllLabel}</span>
+                          </Button>
+                        )}
+                        {group.options.map((opt) => {
+                          const isSelected = currentValue === opt.value;
+                          return (
+                            <Button
+                              key={opt.value}
+                              onClick={() => group.onChange?.(opt.value)}
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-between px-3.5 py-2.5 h-auto text-xs font-medium border transition-all cursor-pointer",
+                                isSelected
+                                  ? "bg-primary/5 dark:bg-primary/20 border-primary text-primary font-bold shadow-2xs"
+                                  : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                              )}
+                              rightIcon={isSelected ? <Check className="w-4 h-4 text-primary" /> : undefined}
+                            >
+                              <span className="flex-1 text-left">{opt.label}</span>
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+
+
             </div>
           )}
         </Drawer>

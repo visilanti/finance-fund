@@ -31,15 +31,16 @@ function formatFileSize(bytes?: number | string): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function getFileIcon(filename: string, fileType?: string) {
+function getFileIcon(filename: string, fileType?: string, className?: string) {
   const ext = filename.split(".").pop()?.toLowerCase() || "";
+  const iconClass = className || "w-4 h-4";
   if (fileType?.startsWith("image/") || ["jpg", "jpeg", "png", "webp", "gif", "svg"].includes(ext)) {
-    return <ImageIcon className="w-4 h-4 text-emerald-500 shrink-0" />;
+    return <ImageIcon className={cn("text-emerald-500 shrink-0", iconClass)} />;
   }
   if (["pdf", "doc", "docx", "txt", "rtf"].includes(ext) || fileType?.includes("pdf")) {
-    return <FileText className="w-4 h-4 text-blue-500 shrink-0" />;
+    return <FileText className={cn("text-blue-500 shrink-0", iconClass)} />;
   }
-  return <File className="w-4 h-4 text-slate-400 shrink-0" />;
+  return <File className={cn("text-slate-400 shrink-0", iconClass)} />;
 }
 
 export function FileUploadZone({
@@ -54,6 +55,7 @@ export function FileUploadZone({
   onRemoveFile,
   className,
 }: FileUploadZoneProps) {
+  // Mode 1: Pratinjau gambar eksplisit via previewUrl
   if (previewUrl) {
     return (
       <div
@@ -66,7 +68,7 @@ export function FileUploadZone({
           <div className="p-2 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200/80 dark:border-slate-700 w-full flex items-center justify-center min-h-[90px]">
             <img
               src={previewUrl}
-              alt="Preview Tanda Tangan"
+              alt="Preview File"
               className="max-h-24 object-contain mx-auto transition-transform group-hover:scale-105"
             />
           </div>
@@ -76,7 +78,54 @@ export function FileUploadZone({
               type="button"
               onClick={onClearPreview}
               className="absolute top-4 right-4 p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900 transition-colors z-20 cursor-pointer shadow-xs"
-              title="Hapus / Ganti TTD"
+              title="Hapus / Ganti File"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Mode 2: Single file (multiple = false) non-image seperti PDF, mengisi posisi dropzone yang sama
+  if (!multiple && files.length > 0) {
+    const file = files[0];
+    const fileName = file.name;
+    const fileSize = formatFileSize("size" in file ? file.size : undefined);
+    const fileType = "type" in file ? file.type : undefined;
+
+    return (
+      <div
+        className={cn(
+          "relative border-2 border-slate-200 dark:border-slate-700 rounded-xl p-4 text-center bg-white dark:bg-slate-900 shadow-subtle group",
+          className
+        )}
+      >
+        <div className="relative flex flex-col items-center justify-center py-2">
+          <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200/80 dark:border-slate-700 w-full flex flex-col items-center justify-center min-h-[90px]">
+            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-700/70 shadow-xs mb-1.5">
+              {getFileIcon(fileName, fileType, "w-7 h-7")}
+            </div>
+            <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 max-w-sm truncate px-2" title={fileName}>
+              {fileName}
+            </p>
+            {fileSize && (
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 font-medium">
+                {fileSize}
+              </p>
+            )}
+          </div>
+
+          {(onRemoveFile || onClearPreview) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (onRemoveFile) onRemoveFile(0);
+                if (onClearPreview) onClearPreview();
+              }}
+              className="absolute top-4 right-4 p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900 transition-colors z-20 cursor-pointer shadow-xs"
+              title="Hapus / Ganti File"
             >
               <Trash2 className="w-4 h-4" />
             </button>

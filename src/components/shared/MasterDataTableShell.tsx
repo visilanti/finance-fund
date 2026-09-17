@@ -2,11 +2,11 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Inbox, Eye, Edit3, Trash2, ArrowUpDown } from "lucide-react";
-import { TableToolbar, TableToolbarProps } from "./TableToolbar";
+import { TableToolbar, TableToolbarProps, FilterOptionGroup, DateRangeFilter } from "./TableToolbar";
 import { StatusBadge, StatusBadgeProps } from "./StatusBadge";
 import { cn } from "@/lib/utils";
 
-export { StatusBadge, type StatusBadgeProps };
+export { StatusBadge, type StatusBadgeProps, type FilterOptionGroup, type DateRangeFilter };
 
 export interface ColumnDef<T> {
   key: string;
