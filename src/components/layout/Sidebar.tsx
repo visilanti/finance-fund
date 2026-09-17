@@ -45,7 +45,13 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
     toggleDesktopCollapsed,
     toggleSubmenu,
     isSubmenuOpen,
+    isHovered,
+    setIsHovered,
   } = useSidebarStore();
+
+  React.useEffect(() => {
+    setIsHovered(false);
+  }, [pathname, searchParams, setIsHovered]);
 
   const isPathActive = (targetPath?: string) => {
     if (!targetPath) return false;
@@ -111,7 +117,14 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
       </div>
 
       {/* Navigation List */}
-      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+      <div
+        onMouseEnter={() => {
+          if (isDesktopCollapsed) {
+            setIsHovered(true);
+          }
+        }}
+        className="flex-1 overflow-y-auto py-4 px-3 space-y-6"
+      >
         {NAV_GROUPS.map((group) => {
           // Filter items based on user role
           const visibleItems = group.items.filter((item) => {
@@ -278,7 +291,14 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
 
       {/* User Role Switcher & Bottom Section */}
       {!isCollapsed && (
-        <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-950/40 shrink-0">
+        <div
+          onMouseEnter={() => {
+            if (isDesktopCollapsed) {
+              setIsHovered(true);
+            }
+          }}
+          className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-950/40 shrink-0"
+        >
           <div className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 shadow-subtle">
             <div className="text-[10px] font-medium text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
               <span>Simulasi Role</span>
@@ -324,9 +344,14 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
 
       {/* DESKTOP STICKY SIDEBAR */}
       <aside
+        onMouseLeave={() => {
+          if (isHovered) {
+            setIsHovered(false);
+          }
+        }}
         className={cn(
           "hidden md:flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 h-screen shrink-0 relative group z-30 transition-all duration-200",
-          isDesktopCollapsed ? "w-20" : "w-64"
+          isDesktopCollapsed && !isHovered ? "w-20" : "w-64"
         )}
       >
         {/* Floating Toggle Button Melayang di Antara Sidebar & Header */}
@@ -334,16 +359,16 @@ function SidebarContent({ currentRole, onRoleChange, activePath }: SidebarProps)
           type="button"
           onClick={toggleDesktopCollapsed}
           className="hidden md:flex absolute -right-3.5 top-6 z-40 w-7 h-7 rounded-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 shadow-md text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-600 hover:scale-110 active:scale-95 items-center justify-center transition-all cursor-pointer"
-          title={isDesktopCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
+          title={isDesktopCollapsed && !isHovered ? "Buka Sidebar" : "Tutup Sidebar"}
         >
-          {isDesktopCollapsed ? (
+          {isDesktopCollapsed && !isHovered ? (
             <PanelLeftOpen className="w-3.5 h-3.5" />
           ) : (
             <PanelLeftClose className="w-3.5 h-3.5" />
           )}
         </button>
 
-        {renderNavContent(isDesktopCollapsed)}
+        {renderNavContent(isDesktopCollapsed && !isHovered)}
       </aside>
     </>
   );
