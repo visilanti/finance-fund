@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
 import { Drawer } from "@/components/shared/Drawer";
-import { LPJBase } from "@/features/lpj/types";
+import { LPJBase, DetailItemLPJ } from "@/features/lpj/types";
 import { formatIDR } from "@/lib/utils";
 import { Printer, Download, ExternalLink, FileText, Upload, Receipt, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -18,9 +17,34 @@ export interface LPJDetailDrawerProps {
 export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawerProps) {
   if (!item) return null;
 
-  const items = item.rincian?.item || [];
-  const totalDebit = items.reduce((acc, curr) => acc + (curr.debit || 0), 0);
-  const totalKredit = items.reduce((acc, curr) => acc + (curr.kredit || 0), 0);
+  const rawItems = item.rincian?.item || [];
+  const items: DetailItemLPJ[] = rawItems.length > 0
+    ? (rawItems.some((it) => it.keterangan?.toLowerCase().startsWith("pencairan dana"))
+        ? rawItems
+        : [
+            {
+              tanggal: item.tanggalCair,
+              noKwitansi: "-",
+              keterangan: `Pencairan Dana — ${item.jenis}`,
+              debit: item.saldoAwal,
+              kredit: 0,
+            },
+            ...rawItems,
+          ])
+    : [];
+
+  const totalDebit = item.saldoAwal;
+  const totalKredit = items.reduce((acc, curr) => acc + (Number(curr.kredit) || 0), 0);
+
+  let running = 0;
+  const runningSaldos = items.map((it, idx) => {
+    if (idx === 0) {
+      running = Number(it.debit) || item.saldoAwal;
+    } else {
+      running = running + (Number(it.debit) || 0) - (Number(it.kredit) || 0);
+    }
+    return running;
+  });
 
   const getStatusBadgeProps = (status: string) => {
     switch (status) {
@@ -44,7 +68,7 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
     if (!item.LpjUrl) return;
     const link = document.createElement("a");
     link.href = item.LpjUrl;
-    link.download = `LPJ-${item.idPengajuan.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
+    link.download = `LPJ-${item.noPengajuan.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -57,7 +81,7 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
       maxWidthClass="max-w-[560px] min-w-[min(480px,100vw)]"
       title={
         <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mt-0.5 truncate">
-          Detail LPJ - {item.idPengajuan}
+          Detail LPJ - {item.noPengajuan}
         </h3>
       }
       subtitle={
@@ -77,14 +101,18 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
           </Button>
 
           <div className="flex items-center gap-2">
-            {isUploadAllowed && onOpenUpload && (
+            {isUploadAllowed && (
               <Button
                 variant="primary"
                 size="md"
                 leftIcon={<Upload className="w-3.5 h-3.5" />}
                 onClick={() => {
                   onClose();
-                  onOpenUpload(item);
+                  if (onOpenUpload) {
+                    onOpenUpload(item);
+                  } else {
+                    window.location.href = `/lpj/create?id=${item.id}`;
+                  }
                 }}
               >
                 Upload LPJ
@@ -114,9 +142,9 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
         {/* Informasi Utama Pengajuan */}
         <Card variant="secondary" className="p-3.5 space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-slate-500 dark:text-slate-400 font-medium">ID Pengajuan</span>
+            <span className="text-slate-500 dark:text-slate-400 font-medium">Nomor Pengajuan</span>
             <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">
-              {item.idPengajuan}
+              {item.noPengajuan}
             </span>
           </div>
           <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2.5">
@@ -194,6 +222,7 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
                     <th className="p-2.5 font-semibold">Keterangan</th>
                     <th className="p-2.5 font-semibold text-right">Debit</th>
                     <th className="p-2.5 font-semibold text-right">Kredit</th>
+                    <th className="p-2.5 font-semibold text-right">Saldo</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -211,8 +240,11 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
                       <td className="p-2.5 text-right font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">
                         {it.debit > 0 ? formatIDR(it.debit) : "-"}
                       </td>
-                      <td className="p-2.5 text-right font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                      <td className="p-2.5 text-right font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">
                         {it.kredit > 0 ? formatIDR(it.kredit) : "-"}
+                      </td>
+                      <td className="p-2.5 text-right font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                        {formatIDR(runningSaldos[idx])}
                       </td>
                     </tr>
                   ))}
@@ -225,6 +257,9 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
                     </td>
                     <td className="p-2.5 text-right text-slate-900 dark:text-slate-100 whitespace-nowrap">
                       {formatIDR(totalKredit)}
+                    </td>
+                    <td className="p-2.5 text-right font-extrabold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                      {formatIDR(runningSaldos[runningSaldos.length - 1] ?? item.saldoAwal)}
                     </td>
                   </tr>
                 </tfoot>
@@ -247,7 +282,7 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
                 </div>
                 <div className="min-w-0">
                   <p className="font-semibold text-slate-800 dark:text-slate-200 text-xs truncate">
-                    {`Dokumen_LPJ_${item.idPengajuan.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`}
+                    {`Dokumen_LPJ_${item.noPengajuan.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`}
                   </p>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
                     Berkas Laporan Pertanggungjawaban Resmi

@@ -3,7 +3,8 @@ export type JenisLPJ = "RKA" | "Insidental" | "Reimbursement" | "Jaldis" | strin
 
 //get info utama lpj untuk semua jenis
 export interface InfoLPJ {
-  idPengajuan: string;
+  id: string;
+  noPengajuan: string;
   tanggalCair: string;
   jenis: JenisLPJ;
   saldoAwal: number;
@@ -21,7 +22,8 @@ export interface DetailItemLPJ {
 
 //buat get dan insert by id 
 export interface LPJBase {
-  idPengajuan: string;
+  id: string;
+  noPengajuan: string;
   tanggalCair: string;
   jenis: JenisLPJ;
   saldoAwal: number;

@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { MasterDataTableShell, ColumnDef, StatusBadge } from "@/components/shared/MasterDataTableShell";
+import { MasterDataTableShell, ColumnDef, StatusBadge, DateRangeFilter } from "@/components/shared/MasterDataTableShell";
 import { InfoLPJ, LPJBase, StatusLPJ } from "@/features/lpj/types";
 import { LPJDetailDrawer } from "./LPJDetailDrawer";
 import { formatIDR, cn } from "@/lib/utils";
 import { Eye, Upload } from "lucide-react";
 import { lpjService } from "../services/lpj.service";
+import { useRouter } from "next/navigation";
 
 interface LPJTableSectionProps {
   initialData?: InfoLPJ[];
@@ -20,10 +21,33 @@ const LPJ_STATUS_OPTIONS = [
   { label: "Ditolak", value: "ditolak" },
 ];
 
+const JENIS_LPJ_OPTIONS = [
+  { label: "Semua Jenis", value: "all" },
+  { label: "RKA", value: "rka" },
+  { label: "Insidental", value: "insidental" },
+  { label: "Reimbursement", value: "reimbursement" },
+  { label: "Jaldis", value: "jaldis" },
+];
+
+function parseItemDate(dateStr: string): Date | null {
+  if (!dateStr) return null;
+  const normalized = dateStr
+    .replace(/\bMei\b/gi, "May")
+    .replace(/\bAgu(stus)?\b/gi, "Aug")
+    .replace(/\bAgs\b/gi, "Aug")
+    .replace(/\bOkt(ober)?\b/gi, "Oct")
+    .replace(/\bDes(ember)?\b/gi, "Dec");
+  const parsed = new Date(normalized);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
 export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
+  const router = useRouter();
   const [data, setData] = useState<InfoLPJ[]>(initialData);
   const [isLoading, setIsLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [jenisFilter, setJenisFilter] = useState<string>("all");
+  const [dateRangeFilter, setDateRangeFilter] = useState<DateRangeFilter>({ startDate: "", endDate: "" });
   const [selectedItemDetail, setSelectedItemDetail] = useState<LPJBase | null>(null);
 
   // Muat data jika initialData kosong
@@ -47,7 +71,7 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
 
   const handleViewDetail = async (info: InfoLPJ) => {
     try {
-      const detail = await lpjService.getLPJDetail(info.idPengajuan);
+      const detail = await lpjService.getLPJDetail(info.id || info.noPengajuan);
       if (detail) {
         setSelectedItemDetail(detail);
       }
@@ -74,8 +98,8 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
   const columns = useMemo<ColumnDef<InfoLPJ>[]>(
     () => [
       {
-        key: "idPengajuan",
-        header: "ID Pengajuan",
+        key: "noPengajuan",
+        header: "Nomor Pengajuan",
         width: "200px",
         cell: (item) => (
           <div className="flex items-center gap-2.5">
@@ -89,7 +113,7 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
             </button>
             <div className="min-w-0">
               <span className="font-bold text-slate-900 dark:text-slate-100 tracking-tight block truncate">
-                {item.idPengajuan}
+                {item.noPengajuan}
               </span>
             </div>
           </div>
@@ -173,7 +197,7 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
               <button
                 type="button"
                 disabled={!isUploadActive}
-                // onClick={() => isUploadActive && setSelectedItemUpload(item)}
+                onClick={() => isUploadActive && router.push(`/lpj/create?id=${item.id}`)}
                 className={cn(
                   "inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0",
                   isUploadActive
@@ -182,7 +206,7 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
                 )}
                 title={
                   isUploadActive
-                    ? "Upload Berkas LPJ"
+                    ? "Isi / Upload Berkas LPJ"
                     : item.status === "disetujui"
                     ? "LPJ sudah disetujui"
                     : "LPJ sedang diverifikasi"
@@ -204,16 +228,34 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
       if (statusFilter !== "all" && item.status !== statusFilter) {
         return false;
       }
+      if (jenisFilter !== "all" && item.jenis.toLowerCase() !== jenisFilter.toLowerCase()) {
+        return false;
+      }
+      if (dateRangeFilter.startDate || dateRangeFilter.endDate) {
+        const itemDate = parseItemDate(item.tanggalCair);
+        if (itemDate) {
+          if (dateRangeFilter.startDate) {
+            const start = new Date(dateRangeFilter.startDate);
+            start.setHours(0, 0, 0, 0);
+            if (itemDate < start) return false;
+          }
+          if (dateRangeFilter.endDate) {
+            const end = new Date(dateRangeFilter.endDate);
+            end.setHours(23, 59, 59, 999);
+            if (itemDate > end) return false;
+          }
+        }
+      }
       return true;
     });
-  }, [data, statusFilter]);
+  }, [data, statusFilter, jenisFilter, dateRangeFilter]);
 
   return (
     <>
       <MasterDataTableShell<InfoLPJ>
         data={filteredData}
         columns={columns}
-        keyExtractor={(item) => item.idPengajuan}
+        keyExtractor={(item) => item.id || item.noPengajuan}
         isLoading={isLoading}
         totalRecords={filteredData.length}
         currentPage={1}
@@ -222,9 +264,29 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
         onViewDetails={(item) => handleViewDetail(item)}
         toolbarProps={{
           searchPlaceholder: "Cari nomor pengajuan, jenis, atau tanggal...",
-          statusFilter,
-          onStatusFilterChange: setStatusFilter,
-          statusOptions: LPJ_STATUS_OPTIONS,
+          dateRangeFilter,
+          onDateRangeFilterChange: setDateRangeFilter,
+          filterOptionGroups: [
+            {
+              id: "status",
+              title: "Status LPJ",
+              value: statusFilter,
+              onChange: setStatusFilter,
+              options: LPJ_STATUS_OPTIONS,
+            },
+            {
+              id: "jenis",
+              title: "Jenis Pengajuan",
+              value: jenisFilter,
+              onChange: setJenisFilter,
+              options: JENIS_LPJ_OPTIONS,
+            },
+          ],
+          onResetFilters: () => {
+            setStatusFilter("all");
+            setJenisFilter("all");
+            setDateRangeFilter({ startDate: "", endDate: "" });
+          },
           onExport: () => alert("Exporting data rekap LPJ..."),
           onRefresh: loadData,
         }}
