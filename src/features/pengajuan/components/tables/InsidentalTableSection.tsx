@@ -30,8 +30,8 @@ export function InsidentalTableSection({ initialData }: InsidentalTableSectionPr
 
       const minNom = Number(nominalRangeFilter.minNominal);
       const maxNom = Number(nominalRangeFilter.maxNominal);
-      const matchMinNominal = nominalRangeFilter.minNominal === "" || nominalRangeFilter.minNominal === undefined || item.nominal >= minNom;
-      const matchMaxNominal = nominalRangeFilter.maxNominal === "" || nominalRangeFilter.maxNominal === undefined || item.nominal <= maxNom;
+      const matchMinNominal = nominalRangeFilter.minNominal === "" || nominalRangeFilter.minNominal === undefined || item.nominalPengajuan >= minNom;
+      const matchMaxNominal = nominalRangeFilter.maxNominal === "" || nominalRangeFilter.maxNominal === undefined || item.nominalPengajuan <= maxNom;
 
       return matchType && matchStatus && matchStart && matchEnd && matchMinNominal && matchMaxNominal;
     });
@@ -91,7 +91,7 @@ export function InsidentalTableSection({ initialData }: InsidentalTableSectionPr
       sortable: true,
       cell: (item) => (
         <div className="font-bold text-slate-900 dark:text-slate-100 text-sm whitespace-nowrap">
-          {formatIDR(item.nominal)}
+          {formatIDR(item.nominalPengajuan)}
         </div>
       ),
     },
@@ -124,9 +124,16 @@ export function InsidentalTableSection({ initialData }: InsidentalTableSectionPr
         onViewDetails={(item) => setSelectedItemDetail(item)}
         toolbarProps={{
           searchPlaceholder: "Cari di Pengajuan Insidental...",
-          statusFilter,
-          onStatusFilterChange: setStatusFilter,
-          statusOptions: STATUS_OPTIONS,
+          filterOptionGroups: [
+            {
+              id: "status",
+              title: "Status Insidental",
+              value: statusFilter,
+              onChange: setStatusFilter,
+              options: STATUS_OPTIONS,
+              allLabel: "Semua Status",
+            },
+          ],
           dateRangeFilter,
           onDateRangeFilterChange: setDateRangeFilter,
           nominalRangeFilter,

@@ -18,11 +18,25 @@ interface FormJaldisShellProps {
 
 export function FormJaldisShell({ form }: FormJaldisShellProps) {
   const [ttdPreviewUrl, setTtdPreviewUrl] = useState<string | null>(null);
+  const [kwitansiPreviewUrl, setKwitansiPreviewUrl] = useState<string | null>(null);
 
   const handleTtdSelect = (files: FileList | null) => {
     if (files && files[0]) {
       setTtdPreviewUrl(URL.createObjectURL(files[0]));
     }
+  };
+
+  const handleKwitansiSelect = (files: FileList | null) => {
+    if (files && files[0]) {
+      setKwitansiPreviewUrl(URL.createObjectURL(files[0]));
+      form.removeLampiran(0);
+      form.addLampiran(files);
+    }
+  };
+
+  const handleClearKwitansi = () => {
+    setKwitansiPreviewUrl(null);
+    form.removeLampiran(0);
   };
 
   const handlePrintKwitansi = () => {
@@ -176,12 +190,12 @@ export function FormJaldisShell({ form }: FormJaldisShellProps) {
         }
       >
         <FileUploadZone
-          label="Upload / Tarik Lampiran di Sini"
-          sublabel="Format PDF/DOC/DOCX/Gambar (Maks 10MB per file)"
-          multiple
-          onFileSelect={form.addLampiran}
-          files={form.lampiranFiles}
-          onRemoveFile={form.removeLampiran}
+          label="Tarik & Lepas Kwitansi di Sini"
+          sublabel="Format PNG/JPG (Maks 10MB)"
+          accept="image/*"
+          onFileSelect={handleKwitansiSelect}
+          previewUrl={kwitansiPreviewUrl}
+          onClearPreview={handleClearKwitansi}
         />
       </FormCardSection>
 

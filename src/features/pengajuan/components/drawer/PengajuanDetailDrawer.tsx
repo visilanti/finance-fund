@@ -61,8 +61,8 @@ export function PengajuanDetailDrawer({
           kelompok: displayItem.kelompok || "Belanja Modal (CAPEX)",
           kegiatanRka: displayItem.kegiatan,
           bulan: "Maret 2026",
-          budget: Math.round(displayItem.nominal * 1.15),
-          nominal: displayItem.nominal,
+          budget: Math.round(displayItem.nominalPengajuan * 1.15),
+          nominal: displayItem.nominalPengajuan,
         },
       ];
 
@@ -75,8 +75,8 @@ export function PengajuanDetailDrawer({
           {
             keterangan: displayItem.kegiatan,
             volume: 1,
-            biaya: displayItem.nominal,
-            jumlah: displayItem.nominal,
+            biaya: displayItem.nominalPengajuan,
+            jumlah: displayItem.nominalPengajuan,
           },
         ];
 
@@ -84,9 +84,9 @@ export function PengajuanDetailDrawer({
     displayItem.jenis === "Jaldis" && displayItem.itemsJaldis
       ? displayItem.itemsJaldis
       : [
-        { uraian: "Tiket Pesawat & Transportasi Lokal", jumlah: Math.round(displayItem.nominal * 0.45) },
-        { uraian: "Akomodasi & Penginapan Hotel", jumlah: Math.round(displayItem.nominal * 0.35) },
-        { uraian: "Uang Saku & Uang Makan Harian", jumlah: Math.round(displayItem.nominal * 0.20) },
+        { uraian: "Tiket Pesawat & Transportasi Lokal", jumlah: Math.round(displayItem.nominalPengajuan * 0.45) },
+        { uraian: "Akomodasi & Penginapan Hotel", jumlah: Math.round(displayItem.nominalPengajuan * 0.35) },
+        { uraian: "Uang Saku & Uang Makan Harian", jumlah: Math.round(displayItem.nominalPengajuan * 0.20) },
       ];
 
   const rekening =
@@ -192,14 +192,14 @@ export function PengajuanDetailDrawer({
           </div>
         </Card>
 
-        {/* Nominal Pengajuan Box */}
+        {/* nominalPengajuan Pengajuan Box */}
         <Card variant="secondary" className="p-4">
-          <span className="text-slate-400 dark:text-slate-400 font-medium">Nominal Pengajuan</span>
+          <span className="text-slate-400 dark:text-slate-400 font-medium">nominalPengajuan Pengajuan</span>
           <div className="text-lg font-extrabold text-slate-900 dark:text-slate-100 mt-0.5">
-            {formatIDR(displayItem.nominal)}
+            {formatIDR(displayItem.nominalPengajuan)}
           </div>
           <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block italic font-medium">
-            "{numberToTerbilang(displayItem.nominal)}"
+            "{numberToTerbilang(displayItem.nominalPengajuan)}"
           </span>
         </Card>
 
@@ -242,7 +242,7 @@ export function PengajuanDetailDrawer({
             kode={displayItem.kode}
             kegiatan={displayItem.kegiatan}
             divisi={displayItem.divisi}
-            nominal={displayItem.nominal}
+            nominal={displayItem.nominalPengajuan}
           />
         )}
 

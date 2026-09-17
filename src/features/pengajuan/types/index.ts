@@ -57,7 +57,7 @@ export interface PengajuanDanaBase {
   kegiatan: string;
   divisi: string;
   kelompok?: string;
-  nominal: number;
+  nominalPengajuan: number;
   currentStatus: StatusType;
   currentStep: StepType;
   riwayatStep?: RiwayatStep[];

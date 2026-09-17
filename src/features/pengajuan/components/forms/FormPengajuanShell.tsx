@@ -51,12 +51,12 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
 
   const handleInvoiceSelect = (files: FileList | null) => {
     if (files && files.length > 0) {
-      setInvoiceFiles((prev) => [...prev, ...Array.from(files)]);
+      setInvoiceFiles(Array.from(files));
     }
   };
 
-  const handleRemoveInvoice = (index: number) => {
-    setInvoiceFiles((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveInvoice = () => {
+    setInvoiceFiles([]);
   };
 
   return (
@@ -76,13 +76,10 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
         <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl space-y-1.5 text-rose-900 dark:text-rose-200">
           <div className="flex items-center gap-2 font-bold text-sm text-rose-700 dark:text-rose-300">
             <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-            <span>Revisi: Pengajuan Ditolak Sebelumnya</span>
+            <span>Catatan Verifikator</span>
           </div>
           <div className="text-xs text-rose-800 dark:text-rose-300 bg-white/70 dark:bg-rose-900/30 p-2.5 rounded-lg border border-rose-200/60 dark:border-rose-800/40">
-            <span className="font-semibold text-rose-900 dark:text-rose-200 block text-[10px] uppercase tracking-wider mb-0.5">
-              Catatan Penolakan:
-            </span>
-            "{form.alasan}"
+            {form.alasan}
           </div>
         </div>
       )}
@@ -220,15 +217,12 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
 
       {isReimbursement && (
         <FormCardSection
-          // stepNumber={5}
           title="Upload Invoice"
-          description="Unggah satu atau beberapa file invoice Anda"
         >
           <FileUploadZone
-            label="Upload / Tarik Invoice di Sini"
-            sublabel="Format PDF/DOC/DOCX (Maks 10MB per file)"
-            accept="image/*,.pdf,.doc,.docx"
-            multiple
+            label="Tarik & Lepas Invoice di Sini"
+            sublabel="Format PDF (Maksimal 10MB)"
+            accept=".pdf,application/pdf"
             onFileSelect={handleInvoiceSelect}
             files={invoiceFiles}
             onRemoveFile={handleRemoveInvoice}
