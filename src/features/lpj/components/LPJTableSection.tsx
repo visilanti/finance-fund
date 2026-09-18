@@ -29,7 +29,7 @@ const JENIS_LPJ_OPTIONS = [
   { label: "Jaldis", value: "jaldis" },
 ];
 
-function parseItemDate(dateStr: string): Date | null {
+function parseItemDate(dateStr?: string): Date | null {
   if (!dateStr) return null;
   const normalized = dateStr
     .replace(/\bMei\b/gi, "May")
@@ -47,7 +47,8 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [jenisFilter, setJenisFilter] = useState<string>("all");
-  const [dateRangeFilter, setDateRangeFilter] = useState<DateRangeFilter>({ startDate: "", endDate: "" });
+  const [tanggalCairFilter, setTanggalCairFilter] = useState<DateRangeFilter>({ startDate: "", endDate: "" });
+  const [tanggalPengajuanFilter, setTanggalPengajuanFilter] = useState<DateRangeFilter>({ startDate: "", endDate: "" });
   const [selectedItemDetail, setSelectedItemDetail] = useState<LPJBase | null>(null);
 
   // Muat data jika initialData kosong
@@ -114,6 +115,9 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
             <div className="min-w-0">
               <span className="font-bold text-slate-900 dark:text-slate-100 tracking-tight block truncate">
                 {item.noPengajuan}
+              </span>
+              <span className="text-[11px] font-normal text-slate-400 dark:text-slate-400 mt-0.5">
+                {item.tanggalCair}
               </span>
             </div>
           </div>
@@ -208,8 +212,8 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
                   isUploadActive
                     ? "Isi / Upload Berkas LPJ"
                     : item.status === "disetujui"
-                    ? "LPJ sudah disetujui"
-                    : "LPJ sedang diverifikasi"
+                      ? "LPJ sudah disetujui"
+                      : "LPJ sedang diverifikasi"
                 }
               >
                 <Upload className="w-3.5 h-3.5" />
@@ -231,16 +235,31 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
       if (jenisFilter !== "all" && item.jenis.toLowerCase() !== jenisFilter.toLowerCase()) {
         return false;
       }
-      if (dateRangeFilter.startDate || dateRangeFilter.endDate) {
+      if (tanggalCairFilter.startDate || tanggalCairFilter.endDate) {
         const itemDate = parseItemDate(item.tanggalCair);
         if (itemDate) {
-          if (dateRangeFilter.startDate) {
-            const start = new Date(dateRangeFilter.startDate);
+          if (tanggalCairFilter.startDate) {
+            const start = new Date(tanggalCairFilter.startDate);
             start.setHours(0, 0, 0, 0);
             if (itemDate < start) return false;
           }
-          if (dateRangeFilter.endDate) {
-            const end = new Date(dateRangeFilter.endDate);
+          if (tanggalCairFilter.endDate) {
+            const end = new Date(tanggalCairFilter.endDate);
+            end.setHours(23, 59, 59, 999);
+            if (itemDate > end) return false;
+          }
+        }
+      }
+      if (tanggalPengajuanFilter.startDate || tanggalPengajuanFilter.endDate) {
+        const itemDate = parseItemDate(item.tanggalPengajuan);
+        if (itemDate) {
+          if (tanggalPengajuanFilter.startDate) {
+            const start = new Date(tanggalPengajuanFilter.startDate);
+            start.setHours(0, 0, 0, 0);
+            if (itemDate < start) return false;
+          }
+          if (tanggalPengajuanFilter.endDate) {
+            const end = new Date(tanggalPengajuanFilter.endDate);
             end.setHours(23, 59, 59, 999);
             if (itemDate > end) return false;
           }
@@ -248,7 +267,7 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
       }
       return true;
     });
-  }, [data, statusFilter, jenisFilter, dateRangeFilter]);
+  }, [data, statusFilter, jenisFilter, tanggalCairFilter, tanggalPengajuanFilter]);
 
   return (
     <>
@@ -264,8 +283,22 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
         onViewDetails={(item) => handleViewDetail(item)}
         toolbarProps={{
           searchPlaceholder: "Cari nomor pengajuan, jenis, atau tanggal...",
-          dateRangeFilter,
-          onDateRangeFilterChange: setDateRangeFilter,
+          dateRangeFilterGroups: [
+            {
+              id: "tanggalCair",
+              title: "Tanggal Pencairan",
+              placeholder: "Pilih rentang tgl cair...",
+              value: tanggalCairFilter,
+              onChange: setTanggalCairFilter,
+            },
+            {
+              id: "tanggalPengajuan",
+              title: "Tanggal Pengajuan",
+              placeholder: "Pilih rentang tgl pengajuan...",
+              value: tanggalPengajuanFilter,
+              onChange: setTanggalPengajuanFilter,
+            },
+          ],
           filterOptionGroups: [
             {
               id: "status",
@@ -285,7 +318,8 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
           onResetFilters: () => {
             setStatusFilter("all");
             setJenisFilter("all");
-            setDateRangeFilter({ startDate: "", endDate: "" });
+            setTanggalCairFilter({ startDate: "", endDate: "" });
+            setTanggalPengajuanFilter({ startDate: "", endDate: "" });
           },
           onExport: () => alert("Exporting data rekap LPJ..."),
           onRefresh: loadData,

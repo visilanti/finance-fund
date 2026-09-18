@@ -182,7 +182,7 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
               Saldo Akhir
             </span>
             <div className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-slate-100 mt-1 whitespace-nowrap">
-              {item.rincian?.saldoAkhir !== undefined ? formatIDR(item.rincian.saldoAkhir) : "-"}
+              {item.saldoAkhir !== undefined ? formatIDR(item.saldoAkhir) : "-"}
             </div>
           </Card>
           <Card variant="secondary" className="p-3 text-center">
@@ -190,7 +190,7 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
               SiLPA
             </span>
             <div className="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 whitespace-nowrap">
-              {item.rincian?.silpa !== undefined ? formatIDR(item.rincian.silpa) : "-"}
+              {item.silpa !== undefined ? formatIDR(item.silpa) : "-"}
             </div>
           </Card>
         </div>

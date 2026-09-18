@@ -29,6 +29,14 @@ export interface DateRangeFilter {
   endDate?: string;
 }
 
+export interface DateRangeFilterGroup {
+  id: string;
+  title: string;
+  placeholder?: string;
+  value?: DateRangeFilter;
+  onChange?: (dateRange: DateRangeFilter) => void;
+}
+
 export interface NominalRangeFilter {
   minNominal?: number | string;
   maxNominal?: number | string;
@@ -39,6 +47,7 @@ export interface TableToolbarProps {
   onSearchChange: (query: string) => void;
   searchPlaceholder?: string;
   filterOptionGroups?: FilterOptionGroup[];
+  dateRangeFilterGroups?: DateRangeFilterGroup[];
   filterDrawerContent?: React.ReactNode | ((props: { close: () => void }) => React.ReactNode);
   activeFilterCount?: number;
   onResetFilters?: () => void;
@@ -52,8 +61,6 @@ export interface TableToolbarProps {
   totalRecords?: number;
   selectedCount?: number;
   bulkActions?: React.ReactNode;
-  dateRangeFilter?: DateRangeFilter;
-  onDateRangeFilterChange?: (dateRange: DateRangeFilter) => void;
   nominalRangeFilter?: NominalRangeFilter;
   onNominalRangeFilterChange?: (nominalRange: NominalRangeFilter) => void;
 }
@@ -63,6 +70,7 @@ export function TableToolbar({
   onSearchChange,
   searchPlaceholder = "Cari data...",
   filterOptionGroups,
+  dateRangeFilterGroups,
   filterDrawerContent,
   activeFilterCount,
   onResetFilters,
@@ -76,23 +84,26 @@ export function TableToolbar({
   totalRecords,
   selectedCount = 0,
   bulkActions,
-  dateRangeFilter,
-  onDateRangeFilterChange,
   nominalRangeFilter,
   onNominalRangeFilterChange,
 }: TableToolbarProps) {
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const hasFilterOptionGroups = Boolean(filterOptionGroups && filterOptionGroups.length > 0);
+  const hasDateRangeGroups = Boolean(dateRangeFilterGroups && dateRangeFilterGroups.length > 0);
 
   const hasFilterSection = Boolean(
     hasFilterOptionGroups ||
-    onDateRangeFilterChange ||
+    hasDateRangeGroups ||
     onNominalRangeFilterChange ||
     filterDrawerContent
   );
 
-  const isDateFilterActive = Boolean(dateRangeFilter?.startDate || dateRangeFilter?.endDate);
+  const activeDateGroupsCount = (dateRangeFilterGroups || []).filter(
+    (g) => Boolean(g.value?.startDate || g.value?.endDate)
+  ).length;
+  const isDateFilterActive = activeDateGroupsCount > 0;
+
   const isNominalFilterActive = Boolean(
     (nominalRangeFilter?.minNominal !== undefined && nominalRangeFilter?.minNominal !== "") ||
     (nominalRangeFilter?.maxNominal !== undefined && nominalRangeFilter?.maxNominal !== "")
@@ -114,7 +125,7 @@ export function TableToolbar({
   const calculatedActiveCount =
     activeFilterCount ??
     (activeGroupsCount +
-      (isDateFilterActive ? 1 : 0) +
+      activeDateGroupsCount +
       (isNominalFilterActive ? 1 : 0));
 
   const handleReset = () => {
@@ -123,7 +134,11 @@ export function TableToolbar({
         g.onChange?.(g.allValue ?? "all");
       });
     }
-    onDateRangeFilterChange?.({ startDate: "", endDate: "" });
+    if (dateRangeFilterGroups && dateRangeFilterGroups.length > 0) {
+      dateRangeFilterGroups.forEach((g) => {
+        g.onChange?.({ startDate: "", endDate: "" });
+      });
+    }
     onNominalRangeFilterChange?.({ minNominal: "", maxNominal: "" });
     onResetFilters?.();
   };
@@ -260,41 +275,46 @@ export function TableToolbar({
               : filterDrawerContent
           ) : (
             <div className="space-y-5">
-              {onDateRangeFilterChange && (
-                <div className="space-y-2">
-                  <Label variant="bold">Rentang Tanggal</Label>
-                  <DatePicker
-                    id="filterDateRange"
-                    mode="range"
-                    placeholder="Pilih Rentang Tanggal..."
-                    value={
-                      dateRangeFilter?.startDate && dateRangeFilter?.endDate
-                        ? `${dateRangeFilter.startDate} to ${dateRangeFilter.endDate}`
-                        : dateRangeFilter?.startDate || ""
-                    }
-                    onChange={(selectedDates: Date[], dateStr: string) => {
-                      if (selectedDates && selectedDates.length === 2) {
-                        const parts = (dateStr as string).split(" to ");
-                        onDateRangeFilterChange({
-                          startDate: parts[0] || "",
-                          endDate: parts[1] || parts[0] || "",
-                        });
-                      } else if (selectedDates && selectedDates.length === 1) {
-                        const parts = (dateStr as string).split(" to ");
-                        onDateRangeFilterChange({
-                          startDate: parts[0] || "",
-                          endDate: "",
-                        });
-                      } else if (!dateStr) {
-                        onDateRangeFilterChange({
-                          startDate: "",
-                          endDate: "",
-                        });
-                      }
-                    }}
-                  />
-                </div>
-              )}
+              {/* Date Range Filter Groups */}
+              {dateRangeFilterGroups?.map((group) => {
+                const val = group.value;
+                const displayVal =
+                  val?.startDate && val?.endDate
+                    ? `${val.startDate} to ${val.endDate}`
+                    : val?.startDate || "";
+
+                return (
+                  <div key={group.id} className="space-y-2">
+                    <Label variant="bold">{group.title}</Label>
+                    <DatePicker
+                      id={`filterDateRange_${group.id}`}
+                      mode="range"
+                      placeholder={group.placeholder || `Pilih Rentang ${group.title}...`}
+                      value={displayVal}
+                      onChange={(selectedDates: Date[], dateStr: string) => {
+                        if (selectedDates && selectedDates.length === 2) {
+                          const parts = (dateStr as string).split(" to ");
+                          group.onChange?.({
+                            startDate: parts[0] || "",
+                            endDate: parts[1] || parts[0] || "",
+                          });
+                        } else if (selectedDates && selectedDates.length === 1) {
+                          const parts = (dateStr as string).split(" to ");
+                          group.onChange?.({
+                            startDate: parts[0] || "",
+                            endDate: "",
+                          });
+                        } else if (!dateStr) {
+                          group.onChange?.({
+                            startDate: "",
+                            endDate: "",
+                          });
+                        }
+                      }}
+                    />
+                  </div>
+                );
+              })}
 
               {onNominalRangeFilterChange && (
                 <div className="space-y-2">

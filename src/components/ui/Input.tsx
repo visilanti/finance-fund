@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, forwardRef } from "react";
-import { Eye, EyeOff, AlertCircle, Calendar } from "lucide-react";
+import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { cn, formatIDR } from "@/lib/utils";
 import { Label } from "./Label";
 
@@ -433,10 +433,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
-          ) : isDateType && !rightIcon ? (
-            <div className="absolute right-3 text-slate-400 dark:text-slate-500 pointer-events-none flex items-center justify-center">
-              <Calendar className="w-4 h-4" />
-            </div>
           ) : (
             rightIcon && (
               <div className="absolute right-3 text-slate-400 dark:text-slate-500 pointer-events-none flex items-center justify-center">

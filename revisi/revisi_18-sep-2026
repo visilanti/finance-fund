@@ -1,0 +1,203 @@
+# Dokumen Analisis & Spesifikasi: Revisi Alur Proses Bisnis
+**Sistem Informasi Pengajuan Dana & LPJ (Finance Fund)**
+
+---
+
+## 1. Ringkasan Eksekutif
+
+Revisi proses bisnis ini membawa penyempurnaan signifikan pada tata kelola keuangan, akuntabilitas audit, kedisiplinan pelaporan anggaran, serta kemudahan antarmuka pengguna (*user experience*). Terdapat **11 poin perubahan pokok** yang saling terintegrasi dalam siklus pengajuan dana hingga pertanggungjawaban (LPJ).
+
+---
+
+## 2. Rincian & Analisis 11 Poin Perubahan
+
+### 1. Bukti Invoice di Setiap Item Tabel LPJ (Tanpa Berkas LPJ Global)
+> [!NOTE]
+> **Prinsip Baru**: Akuntabilitas pengeluaran kini melekat langsung pada baris item belanja (*itemized accountability*).
+
+- **Kondisi Lama**: Pengguna mengunggah satu bundel file PDF gelondongan di luar tabel (`LpjUrl`). Tim finance/audit kesulitan mencocokkan nota belanja dengan baris rincian tertentu.
+- **Aturan Baru**:
+  - Berkas global LPJ ditiadakan.
+  - Setiap baris pengeluaran pada tabel rincian LPJ (`DetailItemLPJ`) memiliki kolom upload/lampirkan bukti struk/nota/invoice tersendiri (`buktiUrl`, `buktiNama`).
+  - Laporan audit dapat langsung menginspeksi atau men-download bukti nota spesifik per transaksi.
+
+---
+
+### 2. Sanksi Pembekuan Pengajuan Baru (Tunggakan LPJ > 2 Bulan)
+> [!WARNING]
+> **Kebijakan Disiplin Anggaran**: Divisi yang lalai menyelesaikan LPJ lama akan diblokir dari mengajukan anggaran baru.
+
+- **Aturan Bisnis**:
+  - Jika suatu divisi memiliki pengajuan yang telah dicairkan lebih dari **2 bulan kalender** yang lalu dan status LPJ-nya belum disetujui (`status !== 'disetujui'`), maka fitur pembuatan pengajuan baru (`/pengajuan/create`) dikunci (*freeze*).
+- **Mekanisme Sistem**:
+  - Sebelum form pengajuan dibuka atau disubmit, sistem melakukan validasi:  
+    `selisihBulan(tanggalSekarang, lpj.tanggalCair) >= 2 && lpj.status !== "disetujui"`
+  - Muncul banner peringatan pinalti berwarna merah/kuning di dashboard dan halaman pengajuan.
+  - Tombol "Tambah Pengajuan" dinonaktifkan dengan navigasi langsung ke halaman penyelesaian LPJ terkait.
+
+---
+
+### 3. Dukungan Paste File Clipboard (`Ctrl + V`)
+> [!TIP]
+> **Peningkatan Efisiensi UX**: Memudahkan staf melampirkan screenshot bukti transfer, invoice digital WhatsApp, atau hasil *Snipping Tool*.
+
+- **Mekanisme**:
+  - Seluruh komponen upload berkas (Dropzone, upload bukti nota di tabel, lampiran dokumen umum) dipasangi *event listener* `onPaste`.
+  - Jika clipboard pengguna berisi data gambar (`image/*`) atau PDF (`application/pdf`), sistem langsung menangkap dan mengonversinya menjadi objek `File` untuk diunggah tanpa perlu disimpan manual ke harddisk terlebih dahulu.
+
+---
+
+### 4. Tanda Tangan Digital Otomatis Berdasarkan Profil Akun
+- **Kondisi Lama**: Pengguna harus menggambar tanda tangan berulang kali di kanvas atau mengunggah gambar tanda tangan manual di setiap formulir.
+- **Aturan Baru**:
+  - Setiap pengguna (Divisi, Manager, Bendahara, Finance) memiliki spesimen tanda tangan / paraf digital resmi (atau QR otentikasi) yang tersimpan di profil akun mereka.
+  - Saat pengajuan diajukan atau disetujui, sistem otomatis mencantumkan tanda tangan digital dan nama terang akun login saat itu, menjamin konsistensi dan integritas pengesahan.
+
+---
+
+### 5. Fitur Laporan: Voucher Kas/Bank dengan Riwayat Audit (*Audit Trail*)
+- **Kebutuhan Bisnis**: Kebutuhan dokumen cetak resmi (*hardcopy* / PDF arsip) berbentuk **Voucher Pengeluaran Kas/Bank (Disbursement Voucher)**.
+- **Struktur Dokumen Voucher**:
+  1. **Header Voucher**: No. Voucher, Tanggal, Jenis Pengajuan, Kode Mata Anggaran (COA).
+  2. **Tabel Rincian**: Deskripsi belanja, nominal kotor, potongan/pajak (jika ada), nominal bersih yang dibayarkan.
+  3. **Detail Rekening Tujuan**: Bank, No. Rekening, Pemilik Rekening.
+  4. **Matriks Audit Trail**:
+     - *Diajukan oleh*: Nama Pemohon & Timestamp.
+     - *Disetujui Manager*: Nama Manager, Catatan, & Timestamp.
+     - *Diaudit Bendahara*: Nama Bendahara, Catatan audit nominal, & Timestamp.
+     - *Dicairkan Finance*: Nama Finance, No. Bukti transfer bank, & Timestamp.
+  5. Tombol aksi: **Cetak Dokumen (Print Friendly)** dan **Ekspor PDF A4**.
+
+---
+
+### 6. Kontrol Anggaran RKA: Peringatan Over-Budget & Koordinasi Finance
+> [!CAUTION]
+> **Pencegahan Defisit**: Pengajuan RKA dilarang melebihi sisa plafon pagu anggaran divisi.
+
+- **Validasi Sistem**:
+  - Sistem menghitung `sisaBudget = plafonRKA - totalRealisasi`.
+  - Jika pengguna menginput `nominalPengajuan > sisaBudget`:
+    - Muncul dialog peringatan interaktif:  
+      *"Nominal pengajuan (Rp X) melebihi sisa anggaran RKA yang tersedia (Rp Y). Silakan hubungi Divisi Finance untuk mengajukan revisi/pergeseran anggaran RKA atau kebijakan anggaran khusus."*
+    - Tombol simpan/kirim dikunci (*disabled*) sampai nominal disesuaikan atau diajukan pergeseran pos anggaran.
+
+---
+
+### 7. Lampiran Pendukung PDF / Gambar Opsional di Semua Form Pengajuan
+- **Aturan Bisnis**:
+  - Seluruh varian form pengajuan (RKA, Perjalanan Dinas, Reimbursement, Insidental) menyediakan bagian pengunggahan dokumen pendukung (TOR, proposal kegiatan, surat tugas, disposisi, dsb.).
+  - Sifat lampiran ini adalah **Opsional** (*tidak wajib*).
+  - Mendukung file PDF dan gambar (JPG/PNG), lengkap dengan kemampuan *paste clipboard*.
+
+---
+
+### 8. Penyatuan Form Awal Reimbursement dengan LPJ
+> [!IMPORTANT]
+> **Logika Keuangan**: Uang talangan reimbursement sudah dibelanjakan di masa lalu sebelum pengajuan dibuat, sehingga pengajuan reimbursement hakikatnya adalah dokumen pertanggungjawaban (LPJ) itu sendiri.
+
+- **Konsep Alur Baru**:
+  - Pada pengajuan reimbursement, pemohon langsung menginputkan bukti nota belanja riil di formulir awal.
+  - Setelah pengajuan melewati proses review dan dicairkan oleh Bendahara/Finance, status transaksi langsung **SELESAI (LPJ Otomatis Terpenuhi)**.
+  - Pemohon **tidak perlu lagi** masuk ke menu LPJ untuk membuat dokumen LPJ terpisah.
+
+---
+
+### 9. Granularitas Sub-Detail Item & Bukti Nota Reimbursement
+- **Struktur Form**:
+  - Menggunakan struktur bertingkat (*Parent-Child Item*):
+    - **Header Kegiatan**: Nama agenda umum (misal: "Operasional Rapat Kerja & Jamuan").
+    - **Daftar Rincian Belanja (Sub-Item)**:
+      - Uraian belanja terperinci (misal: Konsumsi, Bensin, Parkir, Perlengkapan).
+      - Tanggal transaksi.
+      - Volume & Satuan Biaya.
+      - Jumlah nominal.
+      - **Upload Bukti Nota Wajib** per baris rincian kegiatan.
+
+---
+
+### 10. Alur Approval Khusus Reimbursement: (Manager & Finance) ↔️✔️ ➡️ Bendahara
+
+| Tahap | Reguler (RKA / Jaldis / Insidental) | Reimbursement |
+| :---: | :--- | :--- |
+| **1** | Divisi Mengajukan | Divisi Mengajukan + Bukti Nota per Sub-Item Langsung |
+| **2** | Manager Menyetujui | **Manager & Finance review secara PARALEL (bersamaan)** |
+| **2a** | — | Manager: Setujui kelayakan kebutuhan operasional divisi |
+| **2b** | — | Finance: Verifikasi keaslian bukti nota, kesesuaian pajak & akuntansi |
+| **3** | Bendahara Audit Nominal | **Jika KEDUANYA (Manager + Finance) telah menyetujui** ➔ lanjut ke Bendahara |
+| **4** | Finance Mencairkan Dana | **Bendahara**: Approval final & pencairan dana ke rekening pemohon |
+| **5** | Divisi Buat LPJ Terpisah | *(LPJ otomatis terpenuhi, tidak perlu langkah tambahan)* |
+
+> [!IMPORTANT]
+> Pengajuan Reimbursement **tidak dapat diteruskan ke Bendahara** jika salah satu dari Manager atau Finance belum memberikan persetujuan. Sistem memvalidasi bahwa **kedua review harus terpenuhi** sebelum status bergerak ke step `bendahara`.
+
+- **Rasional perubahan urutan**:
+  - Bukti transaksi nota fisik/digital sudah ada di tangan pemohon sejak awal pengajuan.
+  - **Manager & Finance dapat mereview secara bersamaan** untuk mempercepat proses, tanpa menunggu satu sama lain.
+  - **Bendahara** bertindak sebagai *Otorisator & Disburser Akhir* — hanya bertindak setelah validasi operasional (Manager) dan validasi akuntansi (Finance) keduanya terpenuhi.
+
+---
+
+### 11. Pembatasan Jam Pengajuan (Cut-Off Time 15:00 - 00:00)
+- **Aturan Waktu Operasional**:
+  - **Jendela Pengajuan Buka**: Pukul **00:00 s/d 15:00 WIB** setiap hari.
+  - **Jendela Tutup (Cut-Off Operasional Kas)**: Pukul **15:01 s/d 23:59 WIB**.
+- **Perilaku UI & Sistem**:
+  - Jika pengguna mengakses form pembuatan pengajuan setelah jam 15:00:
+    - Form ditampilkan dalam mode terkunci (*read-only*) dengan banner peringatan:  
+      *"Pengajuan dana hari ini telah ditutup pukul 15:00 WIB untuk proses rekonsiliasi dan cut-off perbankan. Anda dapat mengajukan kembali mulai pukul 00:00 WIB."*
+    - Tombol submit dinonaktifkan.
+  - Pengajuan yang sudah masuk sebelum jam 15:00 tetap dapat diproses dan disetujui oleh pejabat berwenang.
+
+---
+
+## 3. Diagram Alur Proses Bisnis
+
+````carousel
+```mermaid
+flowchart TD
+    START([Mulai: Pengajuan Baru]) --> TIME
+    TIME{"Jam sekarang sebelum 15:00?"}
+    TIME -->|Tidak| CUTOFF(["🔒 Terkunci: Sistem Buka Kembali Jam 00:00"])
+    TIME -->|Ya| PENALTY{"Ada LPJ tertunggak lebih dari 2 bulan?"}
+    PENALTY -->|Ya| PUNISH(["🚫 Dibekukan: Selesaikan LPJ Dulu"])
+    PENALTY -->|Tidak| FORM{Pilih Jenis Pengajuan}
+    FORM -->|"RKA / Jaldis / Insidental"| BUDGET{"Nominal melebihi pagu budget RKA?"}
+    BUDGET -->|Ya| OVER(["⚠️ Hubungi Finance untuk Revisi RKA"])
+    BUDGET -->|Tidak| REG_SUB[Submit Pengajuan Reguler]
+    FORM -->|Reimbursement| REIMB_SUB["Submit Klaim + Rincian Nota per Baris"]
+```
+<!-- slide -->
+```mermaid
+flowchart TD
+    subgraph REG["📋 Alur Reguler: RKA / Jaldis / Insidental"]
+        R1["Divisi Submit Pengajuan"] --> R2["✅ Manager: Setujui Kebutuhan"]
+        R2 --> R3["📋 Bendahara: Audit Nominal"]
+        R3 --> R4["💳 Finance: Cairkan Dana"]
+        R4 --> R5["Kegiatan Dilaksanakan"]
+        R5 --> R6["📎 Divisi: Isi LPJ + Upload Bukti Nota per Baris"]
+        R6 --> R7(["✅ Selesai"])
+    end
+```
+<!-- slide -->
+```mermaid
+flowchart TD
+    subgraph REIMB["Alur Reimbursement: Parallel-Gate Approval"]
+        M1["Divisi Submit Klaim + Rincian Nota per Sub-Item"] --> M2["Step 1: Manager Review"]
+        M1 --> M3["Step 1: Finance Review"]
+        M2 --> GATE{"Keduanya Setuju?"}
+        M3 --> GATE
+        GATE -->|Salah satu belum| WAIT["Menunggu Persetujuan yang Belum"]
+        WAIT --> M2
+        WAIT --> M3
+        GATE -->|Ya, keduanya setuju| M5["Step 2: Bendahara Approval Final dan Cairkan Dana"]
+        M5 --> M6(["Selesai: LPJ Otomatis Terpenuhi"])
+    end
+```
+````
+
+---
+
+## 4. Lokasi File Dokumentasi
+
+Dokumen lengkap ini juga tersimpan di repositori pada berkas:  
+[`docs/REVISI_ALUR_PROSES_BISNIS.md`](file:///d:/finance-fund-main/docs/REVISI_ALUR_PROSES_BISNIS.md)

@@ -169,7 +169,7 @@ export function FormLPJItemsTable({
                         id={`tgl-${idx}`}
                         value={item.tanggal}
                         onChange={(e) => onUpdateItem(idx, "tanggal", e.target.value)}
-                        placeholder="Pilih tanggal..."
+                        placeholder="YYYY-MM-DD"
                         className="text-xs"
                       />
                     </td>

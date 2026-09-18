@@ -6,6 +6,7 @@ export interface InfoLPJ {
   id: string;
   noPengajuan: string;
   tanggalCair: string;
+  tanggalPengajuan?: string;
   jenis: JenisLPJ;
   saldoAwal: number;
   saldoAkhir?: number;
@@ -27,11 +28,11 @@ export interface LPJBase {
   tanggalCair: string;
   jenis: JenisLPJ;
   saldoAwal: number;
+  saldoAkhir?: number;
+  silpa?: number;
   status: StatusLPJ;
   rincian: {
     item: DetailItemLPJ[];
-    saldoAkhir?: number;
-    silpa?: number;
   };
   LpjUrl: string;
 }

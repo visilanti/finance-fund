@@ -53,15 +53,16 @@ export interface RiwayatStep {
 export interface PengajuanDanaBase {
   id: string;
   kode: string;
-  tanggal: string;
+  tanggalPengajuan: string;
+  harapanRealisasi?: string;
   kegiatan: string;
   divisi: string;
   kelompok?: string;
   nominalPengajuan: number;
+  nominalDiterima?: number;
   currentStatus: StatusType;
   currentStep: StepType;
   riwayatStep?: RiwayatStep[];
-  harapanRealisasi?: string;
   pengesahan?: Pengesahan;
   buktiLpjUrl?: string;
   buktiLpjNama?: string;

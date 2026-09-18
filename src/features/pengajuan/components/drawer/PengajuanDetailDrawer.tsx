@@ -176,12 +176,14 @@ export function PengajuanDetailDrawer({
           </div>
           <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2.5">
             <span className="text-slate-500 dark:text-slate-400 font-medium">Tanggal Pengajuan</span>
-            <span className="font-semibold text-slate-800 dark:text-slate-200">{displayItem.tanggal}</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200">
+              {displayItem.tanggalPengajuan}
+            </span>
           </div>
           <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2.5">
             <span className="text-slate-500 dark:text-slate-400 font-medium">Harapan Realisasi</span>
             <span className="font-semibold text-slate-800 dark:text-slate-200">
-              {displayItem.harapanRealisasi || displayItem.tanggal}
+              {displayItem.harapanRealisasi}
             </span>
           </div>
           <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2.5">
@@ -192,15 +194,39 @@ export function PengajuanDetailDrawer({
           </div>
         </Card>
 
-        {/* nominalPengajuan Pengajuan Box */}
+        {/* Nominal Pengajuan Box */}
         <Card variant="secondary" className="p-4">
-          <span className="text-slate-400 dark:text-slate-400 font-medium">nominalPengajuan Pengajuan</span>
+          <span className="text-slate-400 dark:text-slate-400 font-medium">Nominal Pengajuan</span>
           <div className="text-lg font-extrabold text-slate-900 dark:text-slate-100 mt-0.5">
             {formatIDR(displayItem.nominalPengajuan)}
           </div>
           <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block italic font-medium">
             "{numberToTerbilang(displayItem.nominalPengajuan)}"
           </span>
+        </Card>
+
+        {/* Nominal Diterima Box */}
+        <Card variant="secondary" className="p-4">
+          <span className="text-slate-400 dark:text-slate-400 font-medium">Nominal Diterima</span>
+          {displayItem.nominalDiterima ? (
+            <>
+              <div className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                {formatIDR(displayItem.nominalDiterima)}
+              </div>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block italic font-medium">
+                "{numberToTerbilang(displayItem.nominalDiterima)}"
+              </span>
+            </>
+          ) : (
+            <>
+              <div className="text-lg font-extrabold text-slate-400 dark:text-slate-500 mt-0.5">
+                -
+              </div>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 block italic font-medium">
+                Belum melalui persetujuan Bendahara
+              </span>
+            </>
+          )}
         </Card>
 
         {/* Dynamic Item Content based on Jenis Pengajuan */}

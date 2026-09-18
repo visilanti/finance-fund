@@ -25,8 +25,9 @@ export function InsidentalTableSection({ initialData }: InsidentalTableSectionPr
     return initialData.filter((item) => {
       const matchType = item.jenis === "Insidental";
       const matchStatus = statusFilter === "all" || item.currentStatus === statusFilter;
-      const matchStart = !dateRangeFilter.startDate || new Date(item.tanggal) >= new Date(dateRangeFilter.startDate);
-      const matchEnd = !dateRangeFilter.endDate || new Date(item.tanggal) <= new Date(dateRangeFilter.endDate);
+      const itemDateStr = item.tanggalPengajuan;
+      const matchStart = !dateRangeFilter.startDate || (itemDateStr ? new Date(itemDateStr) >= new Date(dateRangeFilter.startDate) : true);
+      const matchEnd = !dateRangeFilter.endDate || (itemDateStr ? new Date(itemDateStr) <= new Date(dateRangeFilter.endDate) : true);
 
       const minNom = Number(nominalRangeFilter.minNominal);
       const maxNom = Number(nominalRangeFilter.maxNominal);
@@ -57,7 +58,7 @@ export function InsidentalTableSection({ initialData }: InsidentalTableSectionPr
               {item.kode}
             </span>
             <div className="text-[11px] font-normal text-slate-400 dark:text-slate-400 mt-0.5">
-              {item.tanggal}
+              {item.tanggalPengajuan}
             </div>
           </div>
         </div>
@@ -84,14 +85,32 @@ export function InsidentalTableSection({ initialData }: InsidentalTableSectionPr
       ),
     },
     {
-      key: "nominal",
-      header: "Total Nominal",
+      key: "nominalPengajuan",
+      header: "Nominal Pengajuan",
       width: "160px",
       align: "right",
       sortable: true,
       cell: (item) => (
         <div className="font-bold text-slate-900 dark:text-slate-100 text-sm whitespace-nowrap">
           {formatIDR(item.nominalPengajuan)}
+        </div>
+      ),
+    },
+    {
+      key: "nominalDiterima",
+      header: "Nominal Diterima",
+      width: "160px",
+      align: "right",
+      sortable: true,
+      cell: (item) => (
+        <div className="text-sm whitespace-nowrap">
+          {item.nominalDiterima ? (
+            <span className="font-bold text-emerald-600 dark:text-emerald-400">
+              {formatIDR(item.nominalDiterima)}
+            </span>
+          ) : (
+            <span className="font-semibold text-slate-400 dark:text-slate-500">-</span>
+          )}
         </div>
       ),
     },
@@ -134,8 +153,15 @@ export function InsidentalTableSection({ initialData }: InsidentalTableSectionPr
               allLabel: "Semua Status",
             },
           ],
-          dateRangeFilter,
-          onDateRangeFilterChange: setDateRangeFilter,
+          dateRangeFilterGroups: [
+            {
+              id: "tanggalPengajuan",
+              title: "Rentang Tanggal",
+              placeholder: "Pilih Rentang Tanggal...",
+              value: dateRangeFilter,
+              onChange: setDateRangeFilter,
+            },
+          ],
           nominalRangeFilter,
           onNominalRangeFilterChange: setNominalRangeFilter,
           onExport: () => alert("Exporting data Insidental..."),

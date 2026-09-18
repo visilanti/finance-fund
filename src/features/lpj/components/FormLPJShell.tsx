@@ -79,10 +79,10 @@ export function FormLPJShell({ lpj, onSave, isSubmitting = false }: FormLPJShell
     const updatedLpj: LPJBase = {
       ...lpj,
       status: "submit",
+      saldoAkhir,
+      silpa,
       rincian: {
         item: [pencairanRow, ...items],
-        saldoAkhir,
-        silpa,
       },
       LpjUrl: lpj.LpjUrl,
     };

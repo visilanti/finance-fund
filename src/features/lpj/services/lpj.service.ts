@@ -5,6 +5,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     id: "e2b80456-821f-4b9e-9d29-a35c24e68e01",
     noPengajuan: "001/PJ-RKA/IT/2026",
     tanggalCair: "2026-03-09",
+    tanggalPengajuan: "2026-03-01",
     jenis: "RKA",
     saldoAwal: 45000000,
     saldoAkhir: 1500000,
@@ -14,6 +15,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     id: "7f3c1a24-9d18-4b72-88ec-d59160e94202",
     noPengajuan: "002/PJ-RKA/CLOUD/2026",
     tanggalCair: "2026-03-08",
+    tanggalPengajuan: "2026-03-02",
     jenis: "RKA",
     saldoAwal: 78500000,
     saldoAkhir: 0,
@@ -23,6 +25,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     id: "3b92f75a-674e-4df0-9b48-e8cb90172303",
     noPengajuan: "003/PJ-INS/OPS/2026",
     tanggalCair: "2026-03-06",
+    tanggalPengajuan: "2026-02-28",
     jenis: "Insidental",
     saldoAwal: 15000000,
     saldoAkhir: undefined,
@@ -32,6 +35,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     id: "6c1e5a82-f38b-4a57-bf91-b75d26390404",
     noPengajuan: "004/REIMB/MKT/2026",
     tanggalCair: "2026-03-07",
+    tanggalPengajuan: "2026-03-01",
     jenis: "Reimbursement",
     saldoAwal: 5100000,
     saldoAkhir: 0,
@@ -41,6 +45,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     id: "9a4d8c71-2e53-4b6a-8f19-35c7e1905505",
     noPengajuan: "005/REIMB/GA/2026",
     tanggalCair: "2026-03-11",
+    tanggalPengajuan: "2026-03-03",
     jenis: "Reimbursement",
     saldoAwal: 3750000,
     saldoAkhir: undefined,
@@ -50,6 +55,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     id: "1d8e2c47-3b95-4fa6-82e7-91c530e46606",
     noPengajuan: "006/KW-JALDIS/IT/2026",
     tanggalCair: "2026-03-05",
+    tanggalPengajuan: "2026-02-25",
     jenis: "Jaldis",
     saldoAwal: 8600000,
     saldoAkhir: 450000,
@@ -59,6 +65,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     id: "5e7b9a32-8f14-4dc5-9321-e490b6287707",
     noPengajuan: "007/KW-JALDIS/BD/2026",
     tanggalCair: "2026-03-12",
+    tanggalPengajuan: "2026-03-05",
     jenis: "Jaldis",
     saldoAwal: 12400000,
     saldoAkhir: 800000,
@@ -68,6 +75,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     id: "8c2f4e19-5d73-4ea8-b619-a34c89208808",
     noPengajuan: "008/PJ-INS/HR/2026",
     tanggalCair: "2026-03-04",
+    tanggalPengajuan: "2026-02-27",
     jenis: "Insidental",
     saldoAwal: 9800000,
     saldoAkhir: 200000,
@@ -82,6 +90,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     tanggalCair: "2026-03-09",
     jenis: "RKA",
     saldoAwal: 45000000,
+    saldoAkhir: 1500000,
+    silpa: 1500000,
     status: "disetujui",
     rincian: {
       item: [
@@ -107,8 +117,6 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           kredit: 0,
         },
       ],
-      saldoAkhir: 1500000,
-      silpa: 1500000,
     },
     LpjUrl: "/documents/LPJ_001_PJ-RKA_IT_2026.pdf",
   },
@@ -118,6 +126,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     tanggalCair: "2026-03-08",
     jenis: "RKA",
     saldoAwal: 78500000,
+    saldoAkhir: 0,
+    silpa: 0,
     status: "submit",
     rincian: {
       item: [
@@ -136,8 +146,6 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           kredit: 26200000,
         },
       ],
-      saldoAkhir: 0,
-      silpa: 0,
     },
     LpjUrl: "/documents/LPJ_002_PJ-RKA_CLOUD_2026.pdf",
   },
@@ -147,11 +155,11 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     tanggalCair: "2026-03-06",
     jenis: "Insidental",
     saldoAwal: 15000000,
+    saldoAkhir: undefined,
+    silpa: undefined,
     status: "belum_lpj",
     rincian: {
       item: [],
-      saldoAkhir: undefined,
-      silpa: undefined,
     },
     LpjUrl: "",
   },
@@ -161,6 +169,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     tanggalCair: "2026-03-07",
     jenis: "Reimbursement",
     saldoAwal: 5100000,
+    saldoAkhir: 0,
+    silpa: 0,
     status: "disetujui",
     rincian: {
       item: [
@@ -179,8 +189,6 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           kredit: 1900000,
         },
       ],
-      saldoAkhir: 0,
-      silpa: 0,
     },
     LpjUrl: "/documents/LPJ_004_REIMB_MKT_2026.pdf",
   },
@@ -190,11 +198,11 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     tanggalCair: "2026-03-11",
     jenis: "Reimbursement",
     saldoAwal: 3750000,
+    saldoAkhir: undefined,
+    silpa: undefined,
     status: "belum_lpj",
     rincian: {
       item: [],
-      saldoAkhir: undefined,
-      silpa: undefined,
     },
     LpjUrl: "",
   },
@@ -204,6 +212,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     tanggalCair: "2026-03-05",
     jenis: "Jaldis",
     saldoAwal: 8600000,
+    saldoAkhir: 450000,
+    silpa: 450000,
     status: "ditolak",
     rincian: {
       item: [
@@ -229,8 +239,6 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           kredit: 1900000,
         },
       ],
-      saldoAkhir: 450000,
-      silpa: 450000,
     },
     LpjUrl: "/documents/LPJ_006_KW-JALDIS_IT_2026.pdf",
   },
@@ -240,6 +248,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     tanggalCair: "2026-03-12",
     jenis: "Jaldis",
     saldoAwal: 12400000,
+    saldoAkhir: 800000,
+    silpa: 800000,
     status: "submit",
     rincian: {
       item: [
@@ -265,8 +275,6 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           kredit: 1500000,
         },
       ],
-      saldoAkhir: 800000,
-      silpa: 800000,
     },
     LpjUrl: "/documents/LPJ_007_KW-JALDIS_BD_2026.pdf",
   },
@@ -276,6 +284,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     tanggalCair: "2026-03-04",
     jenis: "Insidental",
     saldoAwal: 9800000,
+    saldoAkhir: 200000,
+    silpa: 200000,
     status: "ditolak",
     rincian: {
       item: [
@@ -294,8 +304,6 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           kredit: 2100000,
         },
       ],
-      saldoAkhir: 200000,
-      silpa: 200000,
     },
     LpjUrl: "/documents/LPJ_008_PJ-INS_HR_2026.pdf",
   },
@@ -344,11 +352,11 @@ export class LPJService {
             tanggalCair: info.tanggalCair,
             jenis: info.jenis,
             saldoAwal: info.saldoAwal,
+            saldoAkhir: info.saldoAkhir,
+            silpa: info.saldoAkhir,
             status: info.status,
             rincian: {
               item: [],
-              saldoAkhir: info.saldoAkhir,
-              silpa: info.saldoAkhir,
             },
             LpjUrl: "",
           };
@@ -373,7 +381,7 @@ export class LPJService {
             return {
               ...item,
               status: lpjData.status,
-              saldoAkhir: lpjData.rincian?.saldoAkhir ?? item.saldoAkhir,
+              saldoAkhir: lpjData.saldoAkhir ?? item.saldoAkhir,
             };
           }
           return item;
@@ -430,6 +438,8 @@ export class LPJService {
             tanggalCair: found.tanggalCair,
             jenis: found.jenis,
             saldoAwal: found.saldoAwal,
+            saldoAkhir: 0,
+            silpa: 0,
             status: "submit",
             rincian: {
               item: [
@@ -441,8 +451,6 @@ export class LPJService {
                   kredit: found.saldoAwal,
                 },
               ],
-              saldoAkhir: 0,
-              silpa: 0,
             },
             LpjUrl: fileData.url || `/documents/${fileData.name}`,
           };

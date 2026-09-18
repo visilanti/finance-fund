@@ -1,12 +1,19 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Inbox, Eye, Edit3, Trash2, ArrowUpDown } from "lucide-react";
-import { TableToolbar, TableToolbarProps, FilterOptionGroup, DateRangeFilter } from "./TableToolbar";
+import { ChevronLeft, ChevronRight, Inbox, Eye, Edit3, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { TableToolbar, TableToolbarProps, FilterOptionGroup, DateRangeFilter, DateRangeFilterGroup } from "./TableToolbar";
 import { StatusBadge, StatusBadgeProps } from "./StatusBadge";
 import { cn } from "@/lib/utils";
 
-export { StatusBadge, type StatusBadgeProps, type FilterOptionGroup, type DateRangeFilter };
+export type SortDirection = "asc" | "desc";
+
+export interface SortConfig {
+  key: string;
+  direction: SortDirection;
+}
+
+export { StatusBadge, type StatusBadgeProps, type FilterOptionGroup, type DateRangeFilter, type DateRangeFilterGroup };
 
 export interface ColumnDef<T> {
   key: string;
@@ -14,6 +21,8 @@ export interface ColumnDef<T> {
   width?: string;
   align?: "left" | "center" | "right";
   sortable?: boolean;
+  sortKey?: string;
+  sortFn?: (a: T, b: T, direction: "asc" | "desc") => number;
   cell: (item: T, index: number) => React.ReactNode;
 }
 
@@ -26,6 +35,12 @@ export interface MasterDataTableShellProps<T> {
   emptyDescription?: string;
   emptyAction?: React.ReactNode;
   
+  // Sorting
+  defaultSortKey?: string;
+  defaultSortDirection?: SortDirection;
+  sortConfig?: SortConfig | null;
+  onSortChange?: (sortConfig: SortConfig | null) => void;
+
   // Toolbar configuration
   toolbarProps?: Omit<TableToolbarProps, "searchQuery" | "onSearchChange">;
   
@@ -57,6 +72,10 @@ export function MasterDataTableShell<T>({
   emptyTitle = "Belum Ada Data",
   emptyDescription = "Tidak ada data yang memenuhi kriteria pencarian atau filter Anda.",
   emptyAction,
+  defaultSortKey,
+  defaultSortDirection = "asc",
+  sortConfig,
+  onSortChange,
   toolbarProps,
   currentPage: propsCurrentPage,
   totalPages: propsTotalPages,
@@ -74,6 +93,33 @@ export function MasterDataTableShell<T>({
 }: MasterDataTableShellProps<T>) {
   const [internalSearch, setInternalSearch] = useState("");
   const [internalPage, setInternalPage] = useState(1);
+  const [internalSortConfig, setInternalSortConfig] = useState<SortConfig | null>(
+    defaultSortKey
+      ? { key: defaultSortKey, direction: defaultSortDirection || "asc" }
+      : null
+  );
+
+  const activeSort = sortConfig !== undefined ? sortConfig : internalSortConfig;
+
+  const handleSort = (colKey: string, col: ColumnDef<T>) => {
+    if (!col.sortable) return;
+
+    let nextSort: SortConfig | null = null;
+    if (!activeSort || activeSort.key !== colKey) {
+      nextSort = { key: colKey, direction: "asc" };
+    } else if (activeSort.direction === "asc") {
+      nextSort = { key: colKey, direction: "desc" };
+    } else {
+      nextSort = null;
+    }
+
+    if (onSortChange) {
+      onSortChange(nextSort);
+    }
+    if (sortConfig === undefined) {
+      setInternalSortConfig(nextSort);
+    }
+  };
 
   // Search filtering
   const filteredData = useMemo(() => {
@@ -86,13 +132,62 @@ export function MasterDataTableShell<T>({
     );
   }, [data, internalSearch]);
 
-  // Reset page when search or data length changes
+  // Client-side sorting
+  const sortedData = useMemo(() => {
+    if (!activeSort) return filteredData;
+
+    const col = columns.find((c) => c.key === activeSort.key);
+    const keyToAccess = (col?.sortKey || activeSort.key) as keyof T;
+
+    return [...filteredData].sort((a, b) => {
+      if (col?.sortFn) {
+        return col.sortFn(a, b, activeSort.direction);
+      }
+
+      const aVal = a[keyToAccess];
+      const bVal = b[keyToAccess];
+
+      if (aVal === bVal) return 0;
+      if (aVal === undefined || aVal === null || aVal === "") return 1;
+      if (bVal === undefined || bVal === null || bVal === "") return -1;
+
+      // Numbers comparison
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        return activeSort.direction === "asc" ? aVal - bVal : bVal - aVal;
+      }
+
+      // Numeric strings comparison
+      const aNum = Number(aVal);
+      const bNum = Number(bVal);
+      if (!isNaN(aNum) && !isNaN(bNum) && typeof aVal !== "boolean" && typeof bVal !== "boolean") {
+        return activeSort.direction === "asc" ? aNum - bNum : bNum - aNum;
+      }
+
+      // Date comparison
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        const aTime = Date.parse(aVal);
+        const bTime = Date.parse(bVal);
+        if (!isNaN(aTime) && !isNaN(bTime) && aVal.length > 5 && bVal.length > 5) {
+          return activeSort.direction === "asc" ? aTime - bTime : bTime - aTime;
+        }
+      }
+
+      // Default string comparison
+      const aStr = String(aVal).toLowerCase();
+      const bStr = String(bVal).toLowerCase();
+      return activeSort.direction === "asc"
+        ? aStr.localeCompare(bStr)
+        : bStr.localeCompare(aStr);
+    });
+  }, [filteredData, activeSort, columns]);
+
+  // Reset page when search, sort, or data length changes
   useEffect(() => {
     setInternalPage(1);
-  }, [internalSearch, data.length]);
+  }, [internalSearch, data.length, activeSort]);
 
   // Pagination calculation
-  const totalItemCount = propsTotalRecords ?? filteredData.length;
+  const totalItemCount = propsTotalRecords ?? sortedData.length;
   const computedTotalPages = propsTotalPages && onPageChange
     ? propsTotalPages
     : Math.ceil(totalItemCount / pageSize) || 1;
@@ -103,8 +198,8 @@ export function MasterDataTableShell<T>({
   const isPreSliced = data.length <= pageSize && totalItemCount > data.length && Boolean(onPageChange);
 
   const displayData = isPreSliced
-    ? filteredData
-    : filteredData.slice((activePage - 1) * pageSize, activePage * pageSize);
+    ? sortedData
+    : sortedData.slice((activePage - 1) * pageSize, activePage * pageSize);
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > computedTotalPages) return;
@@ -150,30 +245,48 @@ export function MasterDataTableShell<T>({
                   />
                 </th>
               )}
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  style={{ width: col.width }}
-                  className={cn(
-                    "px-4 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400",
-                    col.align === "center" && "text-center",
-                    col.align === "right" && "text-right"
-                  )}
-                >
-                  <div
+              {columns.map((col) => {
+                const isSorted = activeSort?.key === col.key;
+                const sortDir = isSorted ? activeSort.direction : null;
+
+                return (
+                  <th
+                    key={col.key}
+                    style={{ width: col.width }}
                     className={cn(
-                      "inline-flex items-center gap-1.5",
-                      col.align === "center" && "justify-center",
-                      col.align === "right" && "justify-end"
+                      "px-4 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 select-none",
+                      col.align === "center" && "text-center",
+                      col.align === "right" && "text-right",
+                      col.sortable && "cursor-pointer hover:text-slate-800 dark:hover:text-slate-200 transition-colors group"
                     )}
+                    onClick={() => col.sortable && handleSort(col.key, col)}
+                    title={col.sortable ? `Urutkan berdasarkan ${typeof col.header === "string" ? col.header : col.key}` : undefined}
                   >
-                    <span>{col.header}</span>
-                    {col.sortable && (
-                      <ArrowUpDown className="w-3 h-3 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer" />
-                    )}
-                  </div>
-                </th>
-              ))}
+                    <div
+                      className={cn(
+                        "inline-flex items-center gap-1.5",
+                        col.align === "center" && "justify-center",
+                        col.align === "right" && "justify-end"
+                      )}
+                    >
+                      <span className={cn(isSorted && "text-primary dark:text-primary font-bold")}>
+                        {col.header}
+                      </span>
+                      {col.sortable && (
+                        <span className="inline-flex items-center">
+                          {sortDir === "asc" ? (
+                            <ArrowUp className="w-3.5 h-3.5 text-primary dark:text-primary shrink-0" />
+                          ) : sortDir === "desc" ? (
+                            <ArrowDown className="w-3.5 h-3.5 text-primary dark:text-primary shrink-0" />
+                          ) : (
+                            <ArrowUpDown className="w-3 h-3 text-slate-400/60 dark:text-slate-500/60 group-hover:text-slate-600 dark:group-hover:text-slate-300 shrink-0 transition-colors" />
+                          )}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                );
+              })}
               {isActionColumnNeeded && (
                 <th className="px-4 py-3.5 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 w-24">
                   Aksi
