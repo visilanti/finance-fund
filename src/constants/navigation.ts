@@ -58,72 +58,78 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    title: "LIST PENCAIRAN",
+    items: [
+      {
+        id: "list-pencairan",
+        label: "List Pencairan",
+        icon: ListFilter,
+        path: "/pencairan",
+        roles: ["finance"],
+        children: [
+          {
+            id: "list-rka",
+            label: "RKA",
+            path: "/pencairan?type=rka",
+            roles: ["finance"],
+          },
+          {
+            id: "list-insidental",
+            label: "Insidental",
+            path: "/pencairan?type=insidental",
+            roles: ["finance"],
+          },
+          {
+            id: "list-reimbursement",
+            label: "Reimbursement",
+            path: "/pencairan?type=reimbursement",
+            roles: ["finance"],
+          },
+          {
+            id: "list-dinas",
+            label: "Perjalanan Dinas",
+            path: "/pencairan?type=jaldis",
+            roles: ["finance"],
+          },
+        ],
+      },
+    ],
+  },
+  {
     title: "PENGAJUAN DANA",
     items: [
       {
         id: "list-pengajuan",
         label: "List Pengajuan",
         icon: ListFilter,
-        roles: ["divisi", "finance"],
+        roles: ["divisi"],
         children: [
           {
             id: "list-rka",
             label: "RKA",
             path: "/pengajuan?type=rka",
-            roles: ["divisi", "finance"],
+            roles: ["divisi"],
           },
           {
             id: "list-insidental",
             label: "Insidental",
             path: "/pengajuan?type=insidental",
-            roles: ["divisi", "finance"],
+            roles: ["divisi"],
           },
           {
             id: "list-reimbursement",
             label: "Reimbursement",
             path: "/pengajuan?type=reimbursement",
-            roles: ["divisi", "finance"],
+            roles: ["divisi"],
           },
           {
             id: "list-dinas",
             label: "Perjalanan Dinas",
             path: "/pengajuan?type=jaldis",
-            roles: ["divisi", "finance"],
+            roles: ["divisi"],
           },
         ],
       },
-      // {
-      //   id: "form-pengajuan",
-      //   label: "Form Pengajuan",
-      //   icon: FileText,
-      //   roles: ["divisi", "finance"],
-      //   children: [
-      //     {
-      //       id: "pengajuan-rka",
-      //       label: "RKA",
-      //       path: "/pengajuan/create?type=rka",
-      //       roles: ["divisi", "finance"],
-      //     },
-      //     {
-      //       id: "pengajuan-insidental",
-      //       label: "Insidental",
-      //       path: "/pengajuan/create?type=insidental",
-      //       roles: ["divisi", "finance"],
-      //     },
-      //     {
-      //       id: "pengajuan-reimbursement",
-      //       label: "Reimbursement",
-      //       path: "/pengajuan/create?type=reimbursement",
-      //       roles: ["divisi", "finance"],
-      //     },
-      //     {
-      //       id: "pengajuan-dinas",
-      //       label: "Perjalanan Dinas",
-      //       path: "/pengajuan/create?type=jaldis",
-      //       roles: ["divisi", "finance"],
-      //     },
-      //   ],
-      // },
     ],
   },
   {
@@ -133,7 +139,7 @@ export const NAV_GROUPS: NavGroup[] = [
         id: "approval-group",
         label: "List Approval",
         icon: CheckSquare,
-        roles: ["manager", "bendahara", "finance"],
+        roles: ["manager", "bendahara"],
         children: [
           {
             id: "approval-rka",
@@ -141,7 +147,7 @@ export const NAV_GROUPS: NavGroup[] = [
             path: "/approval/rka",
             badge: 3,
             badgeColor: "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300",
-            roles: ["manager", "bendahara", "finance"],
+            roles: ["manager", "bendahara"],
           },
           {
             id: "approval-insidental",
@@ -149,7 +155,7 @@ export const NAV_GROUPS: NavGroup[] = [
             path: "/approval/insidental",
             badge: 2,
             badgeColor: "bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300",
-            roles: ["manager", "bendahara", "finance"],
+            roles: ["manager", "bendahara"],
           },
           {
             id: "approval-reimbursement",
@@ -157,7 +163,7 @@ export const NAV_GROUPS: NavGroup[] = [
             path: "/pencairan",
             badge: 5,
             badgeColor: "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300",
-            roles: ["manager", "bendahara", "finance"],
+            roles: ["manager", "bendahara"],
           },
         ],
       },
@@ -166,14 +172,14 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "LPJ",
         icon: CreditCard,
         path: "/lpj",
-        roles: ["divisi", "manager", "bendahara", "finance"],
+        roles: ["divisi", "finance"],
       },
       {
         id: "laporan",
         label: "Laporan",
         icon: BarChart3,
         path: "/laporan",
-        roles: ["divisi", "manager", "bendahara", "finance"],
+        roles: ["divisi", "finance"],
       },
     ],
   },

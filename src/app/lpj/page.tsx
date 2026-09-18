@@ -8,7 +8,7 @@ export default async function Page() {
 
   return (
     <MainLayoutShell
-      pageTitle="Laporan Pertanggungjawaban (LPJ)"
+      pageTitle="Daftar LPJ"
       initialRole="divisi"
       activePath="/lpj"
     >
