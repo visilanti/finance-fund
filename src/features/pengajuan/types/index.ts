@@ -15,10 +15,6 @@ export interface DetailItemReimbursement {
 
 export type DetailItemInsidental = DetailItemReimbursement;
 
-export interface DetailItemJaldis {
-  uraian: string;
-  jumlah: number;
-}
 
 export interface RekeningTujuan {
   namaBank: string;
@@ -31,13 +27,6 @@ export interface Pengesahan {
   namaTerang: string;
 }
 
-export interface InformasiKwitansi {
-  nomor: string;
-  tanggal: string;
-  diberikanKepada: string;
-  terbilang: string;
-  tujuan: string;
-}
 
 export type StepType = "manager" | "bendahara" | "finance" | "lpj" | "selesai";
 export type StatusType = "disetujui" | "ditolak" | "menunggu" | "diproses" | "selesai";
@@ -88,15 +77,7 @@ export interface PengajuanDanaItemReimbursement extends PengajuanDanaBase {
   buktiPembayaranUrl?: string;
 }
 
-export interface PengajuanDanaItemJaldis extends PengajuanDanaBase {
-  jenis: "Jaldis";
-  itemsJaldis?: DetailItemJaldis[];
-  informasiKwitansi?: InformasiKwitansi;
-  buktiKwitansiUrl?: string;
-}
-
 export type PengajuanDanaItem =
   | PengajuanDanaItemRKA
   | PengajuanDanaItemInsidental
   | PengajuanDanaItemReimbursement
-  | PengajuanDanaItemJaldis;

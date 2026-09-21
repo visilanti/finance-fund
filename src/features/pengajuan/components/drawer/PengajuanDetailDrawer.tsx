@@ -6,7 +6,6 @@ import {
   PengajuanDanaItem,
   DetailItemRKA,
   DetailItemReimbursement,
-  DetailItemJaldis,
 } from "@/features/pengajuan/types";
 import { formatIDR, numberToTerbilang } from "@/lib/utils";
 import { Printer, Edit3 } from "lucide-react";
@@ -17,8 +16,6 @@ import { RejectionBanner } from "./RejectionBanner";
 import { ProgressLineChecklist } from "./ProgressLineChecklist";
 import { DrawerRkaContent } from "./DrawerRkaContent";
 import { DrawerReimbursementContent } from "./DrawerReimbursementContent";
-import { DrawerJaldisContent } from "./DrawerJaldisContent";
-import { LpjBuktiCard } from "./LpjBuktiCard";
 
 export interface PengajuanDetailDrawerProps {
   item: PengajuanDanaItem | null;
@@ -45,7 +42,6 @@ export function PengajuanDetailDrawer({
         RKA: "rka",
         Insidental: "insidental",
         Reimbursement: "reimbursement",
-        Perjalanan: "jaldis",
       };
       const typeKey = typeMap[displayItem.jenis] || "rka";
       window.location.href = `/pengajuan/create?type=${typeKey}&editId=${displayItem.id}`;
@@ -80,17 +76,8 @@ export function PengajuanDetailDrawer({
           },
         ];
 
-  const jaldisItems: DetailItemJaldis[] =
-    displayItem.jenis === "Jaldis" && displayItem.itemsJaldis
-      ? displayItem.itemsJaldis
-      : [
-        { uraian: "Tiket Pesawat & Transportasi Lokal", jumlah: Math.round(displayItem.nominalPengajuan * 0.45) },
-        { uraian: "Akomodasi & Penginapan Hotel", jumlah: Math.round(displayItem.nominalPengajuan * 0.35) },
-        { uraian: "Uang Saku & Uang Makan Harian", jumlah: Math.round(displayItem.nominalPengajuan * 0.20) },
-      ];
-
   const rekening =
-    displayItem.jenis !== "Jaldis" && displayItem.rekeningTujuan
+    displayItem.rekeningTujuan
       ? displayItem.rekeningTujuan
       : {
         namaBank: "Bank Mandiri",
@@ -105,9 +92,7 @@ export function PengajuanDetailDrawer({
   const buktiUrl =
     (displayItem.jenis === "Reimbursement"
       ? displayItem.buktiPembayaranUrl
-      : displayItem.jenis === "Jaldis"
-        ? displayItem.buktiKwitansiUrl
-        : "#") || "#";
+      : "#") || "#";
 
   const isSelesai =
     displayItem.currentStatus?.toLowerCase() === "selesai" ||
@@ -247,28 +232,6 @@ export function PengajuanDetailDrawer({
             pengesahan={pengesahan}
             itemId={displayItem.id}
             buktiUrl={buktiUrl}
-          />
-        )}
-
-        {displayItem.jenis === "Jaldis" && (
-          <DrawerJaldisContent
-            items={jaldisItems}
-            pengesahan={pengesahan}
-            itemId={displayItem.id}
-            buktiUrl={buktiUrl}
-          />
-        )}
-
-        {/* Section Card Bukti LPJ (Hanya Tampil Jika Status/CurrentStep Selesai) */}
-        {isSelesai && (
-          <LpjBuktiCard
-            buktiLpjUrl={displayItem.buktiLpjUrl}
-            buktiLpjNama={displayItem.buktiLpjNama}
-            tanggalUploadLpj={displayItem.tanggalUploadLpj}
-            kode={displayItem.kode}
-            kegiatan={displayItem.kegiatan}
-            divisi={displayItem.divisi}
-            nominal={displayItem.nominalPengajuan}
           />
         )}
 

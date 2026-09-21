@@ -52,18 +52,6 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     ]
   },
   {
-    id: "4",
-    kode: "004/KW-JALDIS/IT/2026",
-    tanggalPengajuan: "05 Mar 2026",
-    kegiatan: "Perjalanan Dinas Audit Datacenter Surabaya",
-    divisi: "IT & Infrastructure",
-    nominalPengajuan: 8600000,
-    currentStatus: "menunggu",
-    currentStep: "manager",
-    jenis: "Jaldis",
-    riwayatStep: []
-  },
-  {
     id: "5",
     kode: "005/PJ-INS/GA/2026",
     tanggalPengajuan: "04 Mar 2026",
@@ -112,22 +100,6 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
       { step: "bendahara", status: "disetujui", tanggalUpdate: "2026-03-02T11:45:00Z", diupdateOleh: "Dra. Hj. Siti Rahmah" },
       { step: "finance", status: "disetujui", tanggalUpdate: "2026-03-02T14:20:00Z", diupdateOleh: "Dewi Lestari, S.E." },
       { step: "selesai", status: "selesai", tanggalUpdate: "2026-03-02T16:30:00Z", diupdateOleh: "Drs. Hendra Wijaya, M.M." }
-    ]
-  },
-  {
-    id: "8",
-    kode: "008/KW-JALDIS/MKT/2026",
-    tanggalPengajuan: "01 Mar 2026",
-    kegiatan: "Perjalanan Dinas Kickoff Project Bandung Client",
-    divisi: "Marketing & Business",
-    nominalPengajuan: 4200000,
-    nominalDiterima: 4200000,
-    currentStatus: "diproses",
-    currentStep: "finance",
-    jenis: "Jaldis",
-    riwayatStep: [
-      { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-01T09:00:00Z", diupdateOleh: "Budi Santoso, S.T." },
-      { step: "bendahara", status: "disetujui", tanggalUpdate: "2026-03-01T11:00:00Z", diupdateOleh: "Dra. Hj. Siti Rahmah" }
     ]
   },
   {

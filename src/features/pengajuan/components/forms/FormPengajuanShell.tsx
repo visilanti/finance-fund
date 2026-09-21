@@ -20,7 +20,6 @@ interface FormPengajuanShellProps {
 }
 
 export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellProps) {
-  const [ttdPreviewUrl, setTtdPreviewUrl] = useState<string | null>(null);
   const [invoiceFiles, setInvoiceFiles] = useState<File[]>([]);
 
   const isRka = type === "rka";
@@ -36,18 +35,10 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
     rka: "Form RKA",
     insidental: "Form Insidental",
     reimbursement: "Form Reimbursement",
-    jaldis: "Form Perjalanan Dinas",
   };
 
   const displayTypeLabel = typeLabelMap[type || "rka"] || "RKA";
 
-  const handleTtdSelect = (files: FileList | null) => {
-    if (files && files[0]) {
-      const file = files[0];
-      const url = URL.createObjectURL(file);
-      setTtdPreviewUrl(url);
-    }
-  };
 
   const handleInvoiceSelect = (files: FileList | null) => {
     if (files && files.length > 0) {
@@ -192,27 +183,6 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
             />
           </div>
         </div>
-      </FormCardSection>
-
-      <FormCardSection
-        // stepNumber={4}
-        title="Tanda Tangan & Pengesahan"
-      >
-        <FileUploadZone
-          label="Upload / Tarik TTD di Sini"
-          sublabel="Format PNG/JPG Transparan (Maks 2MB)"
-          accept="image/*"
-          onFileSelect={handleTtdSelect}
-          previewUrl={ttdPreviewUrl}
-          onClearPreview={() => setTtdPreviewUrl(null)}
-        />
-
-        <Input
-          label="Nama Terang Pemohon"
-          placeholder="Masukkan nama pemohon..."
-          value={form.namaPemohon}
-          onChange={(e) => form.setNamaPemohon(e.target.value)}
-        />
       </FormCardSection>
 
       {isReimbursement && (

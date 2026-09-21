@@ -3,7 +3,6 @@ import { MainLayoutShell } from "@/components/layout/MainLayoutShell";
 import { RKATableSection } from "@/features/pengajuan/components/tables/RKATableSection";
 import { InsidentalTableSection } from "@/features/pengajuan/components/tables/InsidentalTableSection";
 import { ReimbursementTableSection } from "@/features/pengajuan/components/tables/ReimbursementTableSection";
-import { JaldisTableSection } from "@/features/pengajuan/components/tables/JaldisTableSection";
 import { PengajuanServiceFactory } from "@/features/pengajuan/services/pengajuanService.factory";
 
 interface PageProps {
@@ -21,7 +20,6 @@ export default async function Page({ searchParams }: PageProps) {
     rka: "RKA",
     insidental: "Insidental",
     reimbursement: "Reimbursement",
-    jaldis: "Perjalanan Dinas",
   };
 
   const displayTypeLabel = typeLabelMap[currentType] || "RKA";
@@ -32,8 +30,6 @@ export default async function Page({ searchParams }: PageProps) {
         return <InsidentalTableSection initialData={daftarPengajuan} />;
       case "reimbursement":
         return <ReimbursementTableSection initialData={daftarPengajuan} />;
-      case "jaldis":
-        return <JaldisTableSection initialData={daftarPengajuan} />;
       case "rka":
       default:
         return <RKATableSection initialData={daftarPengajuan} />;
