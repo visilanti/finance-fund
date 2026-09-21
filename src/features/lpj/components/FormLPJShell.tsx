@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { LPJBase, DetailItemLPJ } from "../types";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { FormCardSection } from "@/components/shared/FormCardSection";
-import { FileUploadZone } from "@/components/shared/FileUploadZone";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { formatIDR } from "@/lib/utils";
@@ -30,7 +29,6 @@ export function FormLPJShell({ lpj, onSave, isSubmitting = false }: FormLPJShell
       (it) => !it.keterangan?.toLowerCase().startsWith("pencairan dana")
     );
   });
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isPernyataanOpen, setIsPernyataanOpen] = useState(false);
 
   // Real-time calculations: Pengeluaran kredit mengurangi saldo awal
@@ -47,6 +45,8 @@ export function FormLPJShell({ lpj, onSave, isSubmitting = false }: FormLPJShell
         keterangan: "",
         debit: 0,
         kredit: 0,
+        buktiUrl: undefined,
+        buktiNama: undefined,
       },
     ]);
   };
@@ -84,21 +84,10 @@ export function FormLPJShell({ lpj, onSave, isSubmitting = false }: FormLPJShell
       rincian: {
         item: [pencairanRow, ...items],
       },
-      LpjUrl: lpj.LpjUrl,
     };
 
     await onSave(updatedLpj);
     setIsPernyataanOpen(false);
-  };
-
-  const handleFileSelect = (files: FileList | null) => {
-    if (files && files.length > 0) {
-      setUploadedFiles(Array.from(files));
-    }
-  };
-
-  const handleRemoveFile = () => {
-    setUploadedFiles([]);
   };
 
   const isDitolak = lpj.status === "ditolak";
@@ -179,20 +168,6 @@ export function FormLPJShell({ lpj, onSave, isSubmitting = false }: FormLPJShell
         onRemoveItem={handleRemoveItem}
         onUpdateItem={handleUpdateItem}
       />
-
-      {/* KARTU 3: Upload Dokumen Berkas LPJ */}
-      <FormCardSection
-        title="Dokumen Berkas LPJ"
-      >
-        <FileUploadZone
-          label="Tarik & Lepas Berkas LPJ di Sini"
-          sublabel="Format PDF (Maksimal 10MB)"
-          accept=".pdf,application/pdf"
-          onFileSelect={handleFileSelect}
-          files={uploadedFiles}
-          onRemoveFile={handleRemoveFile}
-        />
-      </FormCardSection>
 
       {/* Sticky Bottom Summary & Submit Bar */}
       <FormStickyFooter

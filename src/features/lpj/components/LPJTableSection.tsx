@@ -26,7 +26,6 @@ const JENIS_LPJ_OPTIONS = [
   { label: "RKA", value: "rka" },
   { label: "Insidental", value: "insidental" },
   { label: "Reimbursement", value: "reimbursement" },
-  { label: "Jaldis", value: "jaldis" },
 ];
 
 function parseItemDate(dateStr?: string): Date | null {

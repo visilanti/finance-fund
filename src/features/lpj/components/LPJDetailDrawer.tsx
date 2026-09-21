@@ -3,7 +3,7 @@
 import { Drawer } from "@/components/shared/Drawer";
 import { LPJBase, DetailItemLPJ } from "@/features/lpj/types";
 import { formatIDR } from "@/lib/utils";
-import { Printer, Download, ExternalLink, FileText, Upload, Receipt, AlertCircle } from "lucide-react";
+import { Printer, Download, ExternalLink, FileText, Receipt, AlertCircle, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Card } from "@/components/ui/Card";
@@ -20,17 +20,17 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
   const rawItems = item.rincian?.item || [];
   const items: DetailItemLPJ[] = rawItems.length > 0
     ? (rawItems.some((it) => it.keterangan?.toLowerCase().startsWith("pencairan dana"))
-        ? rawItems
-        : [
-            {
-              tanggal: item.tanggalCair,
-              noKwitansi: "-",
-              keterangan: `Pencairan Dana — ${item.jenis}`,
-              debit: item.saldoAwal,
-              kredit: 0,
-            },
-            ...rawItems,
-          ])
+      ? rawItems
+      : [
+        {
+          tanggal: item.tanggalCair,
+          noKwitansi: "-",
+          keterangan: `Pencairan Dana — ${item.jenis}`,
+          debit: item.saldoAwal,
+          kredit: 0,
+        },
+        ...rawItems,
+      ])
     : [];
 
   const totalDebit = item.saldoAwal;
@@ -64,16 +64,6 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
   const badgeProps = getStatusBadgeProps(item.status);
   const isUploadAllowed = item.status === "belum_lpj" || item.status === "ditolak";
 
-  const handleDownloadDoc = () => {
-    if (!item.LpjUrl) return;
-    const link = document.createElement("a");
-    link.href = item.LpjUrl;
-    link.download = `LPJ-${item.noPengajuan.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
     <Drawer
       isOpen={!!item}
@@ -90,39 +80,42 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
         </span>
       }
       footerActions={
-        <div className="flex items-center justify-between gap-2 w-full">
+        isUploadAllowed ? (
+          <div className="flex items-center justify-end gap-2 w-full">
+            <Button
+              variant="outline"
+              size="md"
+              leftIcon={<Printer className="w-3.5 h-3.5" />}
+              onClick={() => window.print()}
+            >
+              Print
+            </Button>
+            <Button
+              variant="primary"
+              size="md"
+              leftIcon={<FileText className="w-3.5 h-3.5" />}
+              onClick={() => {
+                onClose();
+                if (onOpenUpload) {
+                  onOpenUpload(item);
+                } else {
+                  window.location.href = `/lpj/create?id=${item.id}`;
+                }
+              }}
+            >
+              Isi LPJ
+            </Button>
+          </div>
+        ) : (
           <Button
             variant="outline"
-            size="md"
-            leftIcon={<Printer className="w-3.5 h-3.5" />}
+            className="w-full"
+            leftIcon={<Printer className="w-3 h-3" />}
             onClick={() => window.print()}
           >
             Print
           </Button>
-
-          <div className="flex items-center gap-2">
-            {isUploadAllowed && (
-              <Button
-                variant="primary"
-                size="md"
-                leftIcon={<Upload className="w-3.5 h-3.5" />}
-                onClick={() => {
-                  onClose();
-                  if (onOpenUpload) {
-                    onOpenUpload(item);
-                  } else {
-                    window.location.href = `/lpj/create?id=${item.id}`;
-                  }
-                }}
-              >
-                Upload LPJ
-              </Button>
-            )}
-            <Button variant="outline" size="md" onClick={onClose}>
-              Tutup
-            </Button>
-          </div>
-        </div>
+        )
       }
     >
       <div className="space-y-4 text-xs">
@@ -223,31 +216,66 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
                     <th className="p-2.5 font-semibold text-right">Debit</th>
                     <th className="p-2.5 font-semibold text-right">Kredit</th>
                     <th className="p-2.5 font-semibold text-right">Saldo</th>
+                    <th className="p-2.5 font-semibold">
+                      <span className="flex items-center gap-1">
+                        <Paperclip className="w-3 h-3" />
+                        Bukti
+                      </span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-                  {items.map((it, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                      <td className="p-2.5 whitespace-nowrap">
-                        <div className="font-semibold text-slate-800 dark:text-slate-200">{it.tanggal}</div>
-                        <div className="text-[10px] text-slate-400 font-mono mt-0.5">{it.noKwitansi || "-"}</div>
-                      </td>
-                      <td className="p-2.5">
-                        <div className="font-medium text-slate-700 dark:text-slate-300 max-w-xs">
-                          {it.keterangan}
-                        </div>
-                      </td>
-                      <td className="p-2.5 text-right font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                        {it.debit > 0 ? formatIDR(it.debit) : "-"}
-                      </td>
-                      <td className="p-2.5 text-right font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                        {it.kredit > 0 ? formatIDR(it.kredit) : "-"}
-                      </td>
-                      <td className="p-2.5 text-right font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
-                        {formatIDR(runningSaldos[idx])}
-                      </td>
-                    </tr>
-                  ))}
+                  {items.map((it, idx) => {
+                    // Baris pencairan awal tidak perlu bukti
+                    const isPencairan = it.keterangan?.toLowerCase().startsWith("pencairan dana");
+                    return (
+                      <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                        <td className="p-2.5 whitespace-nowrap">
+                          <div className="font-semibold text-slate-800 dark:text-slate-200">{it.tanggal}</div>
+                          <div className="text-[10px] text-slate-400 font-mono mt-0.5">{it.noKwitansi || "-"}</div>
+                        </td>
+                        <td className="p-2.5">
+                          <div className="font-medium text-slate-700 dark:text-slate-300 max-w-xs">
+                            {it.keterangan}
+                          </div>
+                        </td>
+                        <td className="p-2.5 text-right font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                          {it.debit > 0 ? formatIDR(it.debit) : "-"}
+                        </td>
+                        <td className="p-2.5 text-right font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                          {it.kredit > 0 ? formatIDR(it.kredit) : "-"}
+                        </td>
+                        <td className="p-2.5 text-right font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                          {formatIDR(runningSaldos[idx])}
+                        </td>
+                        {/* Kolom Bukti Nota */}
+                        <td className="p-2.5">
+                          {isPencairan ? (
+                            <span className="text-slate-300 dark:text-slate-700 text-[10px] italic">—</span>
+                          ) : it.buktiUrl ? (
+                            <a
+                              href={it.buktiUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={it.buktiNama}
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-semibold transition-colors max-w-[90px] truncate"
+                            >
+                              <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                              <span className="truncate">{it.buktiNama ?? "Lihat"}</span>
+                            </a>
+                          ) : (
+                            <span
+                              title="Bukti nota belum diunggah"
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 text-[10px] font-semibold border border-amber-200 dark:border-amber-800/50"
+                            >
+                              <AlertCircle className="w-2.5 h-2.5 shrink-0" />
+                              Belum
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
                 <tfoot>
                   <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-800 font-semibold text-slate-800 dark:text-slate-200">
@@ -261,69 +289,10 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
                     <td className="p-2.5 text-right font-extrabold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
                       {formatIDR(runningSaldos[runningSaldos.length - 1] ?? item.saldoAwal)}
                     </td>
+                    <td />
                   </tr>
                 </tfoot>
               </table>
-            </div>
-          )}
-        </Card>
-
-        {/* Card Dokumen / Bukti LPJ */}
-        <Card variant="secondary" className="p-3.5 space-y-2">
-          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-            Dokumen Berkas LPJ
-          </span>
-
-          {item.LpjUrl ? (
-            <div className="flex items-center justify-between p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 shrink-0">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-semibold text-slate-800 dark:text-slate-200 text-xs truncate">
-                    {`Dokumen_LPJ_${item.noPengajuan.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`}
-                  </p>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-                    Berkas Laporan Pertanggungjawaban Resmi
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  leftIcon={<Download className="w-3.5 h-3.5" />}
-                  onClick={handleDownloadDoc}
-                  className="text-[11px] py-1 px-2.5"
-                >
-                  Unduh
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg border border-dashed border-slate-200 dark:border-slate-800">
-              <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
-                <FileText className="w-4 h-4 shrink-0" />
-                <span className="text-xs">Belum ada berkas LPJ yang diunggah</span>
-              </div>
-              {isUploadAllowed && onOpenUpload && (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="primary"
-                  leftIcon={<Upload className="w-3.5 h-3.5" />}
-                  onClick={() => {
-                    onClose();
-                    onOpenUpload(item);
-                  }}
-                  className="text-[11px] py-1 px-2.5"
-                >
-                  Upload Sekarang
-                </Button>
-              )}
             </div>
           )}
         </Card>

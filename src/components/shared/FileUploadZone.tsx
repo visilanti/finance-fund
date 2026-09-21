@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useRef } from "react";
 import { Paperclip, Trash2, FileText, Image as ImageIcon, File, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -45,7 +47,7 @@ function getFileIcon(filename: string, fileType?: string, className?: string) {
 
 export function FileUploadZone({
   label = "Tarik & Lepas File di Sini",
-  sublabel = "Mendukung format PDF, XLSX, atau ZIP (Maksimal 10MB)",
+  sublabel = "Format PDF, JPG, PNG — atau Ctrl+V untuk tempel dari clipboard",
   accept,
   multiple = false,
   onFileSelect,
@@ -55,6 +57,27 @@ export function FileUploadZone({
   onRemoveFile,
   className,
 }: FileUploadZoneProps) {
+  const dropzoneRef = useRef<HTMLDivElement>(null);
+
+  /** Ambil file pertama (atau semua jika multiple) dari clipboard saat Ctrl+V */
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items || !onFileSelect) return;
+
+    const fileItems = Array.from(items).filter((it) => it.kind === "file");
+    if (fileItems.length === 0) return;
+
+    e.preventDefault();
+
+    // Bangun DataTransfer agar kompatibel dengan signature onFileSelect(FileList)
+    const dt = new DataTransfer();
+    for (const it of multiple ? fileItems : [fileItems[0]]) {
+      const file = it.getAsFile();
+      if (file) dt.items.add(file);
+    }
+    onFileSelect(dt.files);
+  };
+
   // Mode 1: Pratinjau gambar eksplisit via previewUrl
   if (previewUrl) {
     return (
@@ -138,10 +161,15 @@ export function FileUploadZone({
   return (
     <div className={cn("space-y-3", className)}>
       <div
-        className="relative border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-6 text-center hover:bg-slate-50/50 dark:hover:bg-slate-800/50 hover:border-slate-300 dark:hover:border-slate-600 transition-colors cursor-pointer group"
+        ref={dropzoneRef}
+        tabIndex={0}
+        onPaste={handlePaste}
+        onMouseEnter={() => dropzoneRef.current?.focus()}
+        className="relative border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-6 text-center hover:bg-slate-50/50 dark:hover:bg-slate-800/50 hover:border-slate-300 dark:hover:border-slate-600 focus:outline-none focus:border-primary focus:bg-primary/5 transition-colors cursor-pointer group"
       >
         <input
           type="file"
+          title="Klik untuk pilih file, atau Ctrl+V untuk tempel dari clipboard"
           accept={accept}
           multiple={multiple}
           onChange={(e) => onFileSelect?.(e.target.files)}

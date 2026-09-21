@@ -1,4 +1,4 @@
-import { InfoLPJ, LPJBase, DetailItemLPJ } from "../types";
+import { InfoLPJ, LPJBase } from "../types";
 
 let MOCK_INFO_LPJ: InfoLPJ[] = [
   {
@@ -53,20 +53,20 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
   },
   {
     id: "1d8e2c47-3b95-4fa6-82e7-91c530e46606",
-    noPengajuan: "006/KW-JALDIS/IT/2026",
+    noPengajuan: "006/PJ-INS/IT/2026",
     tanggalCair: "2026-03-05",
     tanggalPengajuan: "2026-02-25",
-    jenis: "Jaldis",
+    jenis: "Insidental",
     saldoAwal: 8600000,
     saldoAkhir: 450000,
     status: "ditolak",
   },
   {
     id: "5e7b9a32-8f14-4dc5-9321-e490b6287707",
-    noPengajuan: "007/KW-JALDIS/BD/2026",
+    noPengajuan: "007/PJ-RKA/BD/2026",
     tanggalCair: "2026-03-12",
     tanggalPengajuan: "2026-03-05",
-    jenis: "Jaldis",
+    jenis: "RKA",
     saldoAwal: 12400000,
     saldoAkhir: 800000,
     status: "submit",
@@ -101,6 +101,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Pembelian Unit Workstation Core i9 14900K",
           debit: 0,
           kredit: 35000000,
+          buktiUrl: "/documents/nota/KW-IT-001.pdf",
+          buktiNama: "KW-IT-001.pdf",
         },
         {
           tanggal: "2026-03-11",
@@ -108,6 +110,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Upgrade RAM 64GB DDR5 & NVMe Gen4 2TB",
           debit: 0,
           kredit: 8500000,
+          buktiUrl: "/documents/nota/KW-IT-002.pdf",
+          buktiNama: "KW-IT-002.pdf",
         },
         {
           tanggal: "2026-03-12",
@@ -118,7 +122,6 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
         },
       ],
     },
-    LpjUrl: "/documents/LPJ_001_PJ-RKA_IT_2026.pdf",
   },
   "7f3c1a24-9d18-4b72-88ec-d59160e94202": {
     id: "7f3c1a24-9d18-4b72-88ec-d59160e94202",
@@ -137,6 +140,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Pembayaran Tagihan Cloud AWS Production Cluster Q1",
           debit: 0,
           kredit: 52300000,
+          buktiUrl: "/documents/nota/INV-AWS-2026-03.pdf",
+          buktiNama: "INV-AWS-2026-03.pdf",
         },
         {
           tanggal: "2026-03-10",
@@ -144,10 +149,11 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Langganan Google Cloud Platform Data Warehouse",
           debit: 0,
           kredit: 26200000,
+          buktiUrl: "/documents/nota/INV-GCP-2026-03.pdf",
+          buktiNama: "INV-GCP-2026-03.pdf",
         },
       ],
     },
-    LpjUrl: "/documents/LPJ_002_PJ-RKA_CLOUD_2026.pdf",
   },
   "3b92f75a-674e-4df0-9b48-e8cb90172303": {
     id: "3b92f75a-674e-4df0-9b48-e8cb90172303",
@@ -161,7 +167,6 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     rincian: {
       item: [],
     },
-    LpjUrl: "",
   },
   "6c1e5a82-f38b-4a57-bf91-b75d26390404": {
     id: "6c1e5a82-f38b-4a57-bf91-b75d26390404",
@@ -180,6 +185,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Jamuan Makan Siang Kemitraan Bank Nusantara",
           debit: 0,
           kredit: 3200000,
+          buktiUrl: "/documents/nota/RESTO-MKT-081.jpg",
+          buktiNama: "RESTO-MKT-081.jpg",
         },
         {
           tanggal: "2026-03-07",
@@ -187,10 +194,11 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Transportasi Tim Presentasi & Meeting",
           debit: 0,
           kredit: 1900000,
+          buktiUrl: "/documents/nota/TAXI-EXP-992.jpg",
+          buktiNama: "TAXI-EXP-992.jpg",
         },
       ],
     },
-    LpjUrl: "/documents/LPJ_004_REIMB_MKT_2026.pdf",
   },
   "9a4d8c71-2e53-4b6a-8f19-35c7e1905505": {
     id: "9a4d8c71-2e53-4b6a-8f19-35c7e1905505",
@@ -204,13 +212,12 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     rincian: {
       item: [],
     },
-    LpjUrl: "",
   },
   "1d8e2c47-3b95-4fa6-82e7-91c530e46606": {
     id: "1d8e2c47-3b95-4fa6-82e7-91c530e46606",
-    noPengajuan: "006/KW-JALDIS/IT/2026",
+    noPengajuan: "006/PJ-INS/IT/2026",
     tanggalCair: "2026-03-05",
-    jenis: "Jaldis",
+    jenis: "Insidental",
     saldoAwal: 8600000,
     saldoAkhir: 450000,
     silpa: 450000,
@@ -223,6 +230,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Tiket Kereta Eksekutif PP Jakarta - Surabaya",
           debit: 0,
           kredit: 3400000,
+          buktiUrl: "/documents/nota/TIKET-GA-2291.pdf",
+          buktiNama: "TIKET-GA-2291.pdf",
         },
         {
           tanggal: "2026-03-07",
@@ -230,6 +239,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Akomodasi Hotel 2 Malam Surabaya Pusat",
           debit: 0,
           kredit: 2850000,
+          buktiUrl: "/documents/nota/HTL-SBY-883.jpg",
+          buktiNama: "HTL-SBY-883.jpg",
         },
         {
           tanggal: "2026-03-08",
@@ -237,16 +248,16 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Uang Saku Harian & Transport Lokal (Kwitansi tidak lengkap)",
           debit: 0,
           kredit: 1900000,
+          // buktiUrl sengaja kosong — alasan penolakan LPJ
         },
       ],
     },
-    LpjUrl: "/documents/LPJ_006_KW-JALDIS_IT_2026.pdf",
   },
   "5e7b9a32-8f14-4dc5-9321-e490b6287707": {
     id: "5e7b9a32-8f14-4dc5-9321-e490b6287707",
-    noPengajuan: "007/KW-JALDIS/BD/2026",
+    noPengajuan: "007/PJ-RKA/BD/2026",
     tanggalCair: "2026-03-12",
-    jenis: "Jaldis",
+    jenis: "RKA",
     saldoAwal: 12400000,
     saldoAkhir: 800000,
     silpa: 800000,
@@ -259,6 +270,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Tiket Pesawat Garuda Indonesia PP Bali",
           debit: 0,
           kredit: 6200000,
+          buktiUrl: "/documents/nota/AV-GA-9912.pdf",
+          buktiNama: "AV-GA-9912.pdf",
         },
         {
           tanggal: "2026-03-14",
@@ -266,6 +279,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Hotel Seminar & Workshop Edukasi",
           debit: 0,
           kredit: 3900000,
+          buktiUrl: "/documents/nota/HTL-DPS-102.pdf",
+          buktiNama: "HTL-DPS-102.pdf",
         },
         {
           tanggal: "2026-03-15",
@@ -273,10 +288,11 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Konsumsi Harian dan Sewa Kendaraan",
           debit: 0,
           kredit: 1500000,
+          buktiUrl: "/documents/nota/MEAL-DPS-091.jpg",
+          buktiNama: "MEAL-DPS-091.jpg",
         },
       ],
     },
-    LpjUrl: "/documents/LPJ_007_KW-JALDIS_BD_2026.pdf",
   },
   "8c2f4e19-5d73-4ea8-b619-a34c89208808": {
     id: "8c2f4e19-5d73-4ea8-b619-a34c89208808",
@@ -295,6 +311,8 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Pemberian Bantuan Kesehatan Darurat Karyawan",
           debit: 0,
           kredit: 7500000,
+          buktiUrl: "/documents/nota/KW-HR-MED-01.pdf",
+          buktiNama: "KW-HR-MED-01.pdf",
         },
         {
           tanggal: "2026-03-06",
@@ -302,10 +320,10 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
           keterangan: "Obat-obatan & Perlengkapan Medis Khusus (Struk buram)",
           debit: 0,
           kredit: 2100000,
+          // buktiUrl sengaja kosong — alasan penolakan LPJ
         },
       ],
     },
-    LpjUrl: "/documents/LPJ_008_PJ-INS_HR_2026.pdf",
   },
 };
 
@@ -341,7 +359,7 @@ export class LPJService {
           return;
         }
 
-        // Fallback jika ada di MOCK_INFO_LPJ
+        // Fallback jika ada di MOCK_INFO_LPJ tapi belum ada entry detail
         const info = MOCK_INFO_LPJ.find(
           (i) => i.id === idOrNoPengajuan || i.noPengajuan === idOrNoPengajuan
         );
@@ -358,7 +376,6 @@ export class LPJService {
             rincian: {
               item: [],
             },
-            LpjUrl: "",
           };
           resolve(fallback);
           return;
@@ -370,7 +387,7 @@ export class LPJService {
   }
 
   /**
-   * Simpan atau update data LPJ secara penuh (termasuk rincian kwitansi).
+   * Simpan atau update data LPJ secara penuh (termasuk rincian kwitansi & bukti nota per item).
    */
   async saveLPJ(lpjData: LPJBase): Promise<{ success: boolean; data: LPJBase }> {
     return new Promise((resolve) => {
@@ -393,82 +410,6 @@ export class LPJService {
         resolve({
           success: true,
           data: { ...lpjData },
-        });
-      }, 250);
-    });
-  }
-
-  /**
-   * Mengunggah dokumen LPJ untuk suatu pengajuan.
-   * Mengubah status menjadi "submit", memperbarui tanggal, dan menyimpan url dokumen.
-   */
-  async uploadLPJ(
-    idOrNoPengajuan: string,
-    fileData: { name: string; size?: number | string; url?: string },
-    keterangan?: string
-  ): Promise<{ success: boolean; data: LPJBase }> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        let targetId = idOrNoPengajuan;
-        const found = MOCK_INFO_LPJ.find(
-          (i) => i.id === idOrNoPengajuan || i.noPengajuan === idOrNoPengajuan
-        );
-        if (found) {
-          targetId = found.id;
-        }
-
-        // Perbarui di info list
-        MOCK_INFO_LPJ = MOCK_INFO_LPJ.map((item) => {
-          if (item.id === targetId || item.noPengajuan === idOrNoPengajuan) {
-            return {
-              ...item,
-              status: "submit",
-              saldoAkhir: item.saldoAkhir ?? 0,
-            };
-          }
-          return item;
-        });
-
-        // Perbarui di detail map
-        let existingDetail = MOCK_LPJ_DETAIL_MAP[targetId] || MOCK_LPJ_DETAIL_MAP[idOrNoPengajuan];
-        if (!existingDetail && found) {
-          existingDetail = {
-            id: found.id,
-            noPengajuan: found.noPengajuan,
-            tanggalCair: found.tanggalCair,
-            jenis: found.jenis,
-            saldoAwal: found.saldoAwal,
-            saldoAkhir: 0,
-            silpa: 0,
-            status: "submit",
-            rincian: {
-              item: [
-                {
-                  tanggal: new Date().toISOString().split("T")[0],
-                  noKwitansi: `KW-${found.noPengajuan.replace(/[^a-zA-Z0-9]/g, "")}`,
-                  keterangan: keterangan || `Pertanggungjawaban LPJ Berkas ${fileData.name}`,
-                  debit: 0,
-                  kredit: found.saldoAwal,
-                },
-              ],
-            },
-            LpjUrl: fileData.url || `/documents/${fileData.name}`,
-          };
-        } else if (existingDetail) {
-          existingDetail = {
-            ...existingDetail,
-            status: "submit",
-            LpjUrl: fileData.url || `/documents/${fileData.name}`,
-          };
-        }
-
-        if (existingDetail) {
-          MOCK_LPJ_DETAIL_MAP[targetId] = existingDetail;
-        }
-
-        resolve({
-          success: true,
-          data: existingDetail,
         });
       }, 250);
     });

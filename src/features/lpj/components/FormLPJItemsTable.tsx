@@ -1,12 +1,10 @@
 "use client";
-
-import React from "react";
-import { Plus, Trash2, Receipt } from "lucide-react";
+import { Plus, Trash2, Receipt, Paperclip } from "lucide-react";
 import { DetailItemLPJ } from "../types";
 import { FormCardSection } from "@/components/shared/FormCardSection";
 import { Input } from "@/components/ui/Input";
-import { DatePicker } from "@/components/ui/DatePicker";
 import { formatIDR } from "@/lib/utils";
+import { InlineFileUpload } from "@/components/shared/InlineFileUpload";
 
 interface FormLPJItemsTableProps {
   items: DetailItemLPJ[];
@@ -17,6 +15,7 @@ interface FormLPJItemsTableProps {
   onRemoveItem: (index: number) => void;
   onUpdateItem: (index: number, field: keyof DetailItemLPJ, value: any) => void;
 }
+
 
 export function FormLPJItemsTable({
   items,
@@ -39,6 +38,18 @@ export function FormLPJItemsTable({
   const saldoAkhir = runningSaldos.length > 0 ? runningSaldos[runningSaldos.length - 1] : saldoAwal;
   const isDeficit = saldoAkhir < 0;
 
+  const handleBuktiUpload = (idx: number, file: File) => {
+    // Mock: gunakan object URL lokal. Ganti dengan upload ke server di implementasi nyata.
+    const objectUrl = URL.createObjectURL(file);
+    onUpdateItem(idx, "buktiUrl", objectUrl);
+    onUpdateItem(idx, "buktiNama", file.name);
+  };
+
+  const handleBuktiRemove = (idx: number) => {
+    onUpdateItem(idx, "buktiUrl", undefined);
+    onUpdateItem(idx, "buktiNama", undefined);
+  };
+
   return (
     <FormCardSection
       title="Rincian Penggunaan Dana"
@@ -54,7 +65,7 @@ export function FormLPJItemsTable({
       }
     >
       <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-        <table className="w-full text-left border-collapse min-w-[860px]">
+        <table className="w-full text-left border-collapse min-w-[1020px]">
           <thead>
             <tr className="bg-slate-50/60 dark:bg-slate-800/60 border-y border-slate-200/80 dark:border-slate-800 text-[11px] uppercase font-semibold text-slate-500 dark:text-slate-400">
               <th className="px-3 py-2.5 w-12 text-center">No</th>
@@ -64,6 +75,12 @@ export function FormLPJItemsTable({
               <th className="px-3 py-2.5 w-36 min-w-[130px] text-right">Debit</th>
               <th className="px-3 py-2.5 w-36 min-w-[130px] text-right">Kredit</th>
               <th className="px-3 py-2.5 w-36 min-w-[130px] text-right">Saldo</th>
+              <th className="px-3 py-2.5 w-36 min-w-[140px]">
+                <span className="flex items-center gap-1">
+                  <Paperclip className="w-3 h-3" />
+                  Bukti Nota
+                </span>
+              </th>
               <th className="px-3 py-2.5 w-12 text-center">Hapus</th>
             </tr>
           </thead>
@@ -125,6 +142,11 @@ export function FormLPJItemsTable({
                 />
               </td>
 
+              {/* Bukti nota kosong untuk baris pencairan */}
+              <td className="px-3 py-2.5">
+                <span className="text-slate-300 dark:text-slate-700 text-[10px] italic">—</span>
+              </td>
+
               <td className="px-3 py-2.5 text-center">
                 <button
                   type="button"
@@ -140,7 +162,7 @@ export function FormLPJItemsTable({
             {/* Baris 2+: Rincian Kwitansi Pengeluaran */}
             {items.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-3 py-8 text-center text-slate-400 dark:text-slate-500 bg-slate-50/20 dark:bg-slate-800/10">
+                <td colSpan={9} className="px-3 py-8 text-center text-slate-400 dark:text-slate-500 bg-slate-50/20 dark:bg-slate-800/10">
                   <div className="flex flex-col items-center justify-center gap-1.5">
                     <Receipt className="w-5 h-5 text-slate-300 dark:text-slate-600" />
                     <span className="font-medium text-xs">Belum ada rincian kwitansi pengeluaran yang ditambahkan.</span>
@@ -229,6 +251,17 @@ export function FormLPJItemsTable({
                       />
                     </td>
 
+                    {/* Kolom Upload & Preview Bukti Nota per baris */}
+                    <td className="px-3 py-2.5">
+                      <InlineFileUpload
+                        fileUrl={item.buktiUrl}
+                        fileName={item.buktiNama}
+                        accept="image/*,.jpg,.jpeg,.png"
+                        onUpload={(file) => handleBuktiUpload(idx, file)}
+                        onRemove={() => handleBuktiRemove(idx)}
+                      />
+                    </td>
+
                     <td className="px-3 py-2.5 text-center">
                       <button
                         type="button"
@@ -285,3 +318,4 @@ export function FormLPJItemsTable({
     </FormCardSection>
   );
 }
+

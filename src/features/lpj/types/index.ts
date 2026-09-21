@@ -1,5 +1,5 @@
 export type StatusLPJ = "belum_lpj" | "submit" | "ditolak" | "disetujui" | string;
-export type JenisLPJ = "RKA" | "Insidental" | "Reimbursement" | "Jaldis" | string;
+export type JenisLPJ = "RKA" | "Insidental" | "Reimbursement" | string;
 
 //get info utama lpj untuk semua jenis
 export interface InfoLPJ {
@@ -19,6 +19,8 @@ export interface DetailItemLPJ {
   keterangan: string;
   debit: number;
   kredit: number;
+  buktiUrl?: string;
+  buktiNama?: string;
 }
 
 //buat get dan insert by id 
@@ -34,5 +36,4 @@ export interface LPJBase {
   rincian: {
     item: DetailItemLPJ[];
   };
-  LpjUrl: string;
 }
