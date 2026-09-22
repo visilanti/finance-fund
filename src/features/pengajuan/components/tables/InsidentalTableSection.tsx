@@ -103,9 +103,9 @@ export function InsidentalTableSection({ initialData }: InsidentalTableSectionPr
       align: "right",
       sortable: true,
       cell: (item) => (
-        <div className="text-sm whitespace-nowrap">
+        <div className="font-bold text-slate-900 dark:text-slate-100 text-sm whitespace-nowrap">
           {item.nominalDiterima ? (
-            <span className="font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="text-slate-900 dark:text-slate-100">
               {formatIDR(item.nominalDiterima)}
             </span>
           ) : (

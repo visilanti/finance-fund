@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api/apiClient";
-import { IPengajuanService, COAOption, PengajuanPayload, PengajuanMetricsSummary } from "./pengajuanService.types";
-import { PengajuanDanaItem } from "../types";
+import { IPengajuanService, PengajuanPayload, PengajuanMetricsSummary } from "./pengajuanService.types";
+import { PengajuanDanaItem, KelompokRKA } from "../types";
 
 const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
   {
@@ -43,12 +43,12 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     divisi: "Marketing & Business",
     nominalPengajuan: 5100000,
     nominalDiterima: 5100000,
-    currentStatus: "diproses",
-    currentStep: "finance",
+    currentStatus: "menunggu",
+    currentStep: "manager",
     jenis: "Reimbursement",
+    buktiPembayaranUrl: null,
     riwayatStep: [
-      { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-07T09:00:00Z", diupdateOleh: "Budi Santoso, S.T." },
-      { step: "bendahara", status: "disetujui", tanggalUpdate: "2026-03-07T13:00:00Z", diupdateOleh: "Dra. Hj. Siti Rahmah" }
+      { step: "finance", status: "disetujui", tanggalUpdate: "2026-03-07T09:00:00Z", diupdateOleh: "Budi Santoso, S.T." },
     ]
   },
   {
@@ -95,10 +95,61 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     currentStatus: "disetujui",
     currentStep: "selesai",
     jenis: "Reimbursement",
+    itemsReimbursement: [
+      {
+        keterangan: "Pembelian Hand Sanitizer & Disinfektan",
+        volume: 1,
+        biaya: 1750000,
+        jumlah: 1750000,
+        detailItemLPJ: [
+          {
+            tanggal: "2026-03-01",
+            noKwitansi: "KW-001/MTR/2026",
+            keterangan: "Hand Sanitizer 5L (5 Jerigen)",
+            debit: 0,
+            kredit: 1250000,
+            buktiUrl: "https://placehold.co/600x400.png",
+            buktiNama: "nota-sanitizer.png",
+          },
+          {
+            tanggal: "2026-03-01",
+            noKwitansi: "KW-002/MTR/2026",
+            keterangan: "Cairan Disinfektan Spray 500ml",
+            debit: 0,
+            kredit: 500000,
+            buktiUrl: "https://placehold.co/600x400.png",
+            buktiNama: "nota-disinfektan.png",
+          },
+        ],
+      },
+      {
+        keterangan: "Perlengkapan Alat Kebersihan Lantai",
+        volume: 1,
+        biaya: 1500000,
+        jumlah: 1500000,
+        detailItemLPJ: [
+          {
+            tanggal: "2026-03-02",
+            noKwitansi: "KW-003/MTR/2026",
+            keterangan: "Mop Set & Floor Cleaner Concentrate",
+            debit: 0,
+            kredit: 1500000,
+            buktiUrl: "https://placehold.co/600x400.png",
+            buktiNama: "nota-alat-kebersihan.png",
+          },
+        ],
+      },
+    ],
+    rekeningTujuan: {
+      namaBank: "Bank Mandiri",
+      nomorRekening: "1370019283741",
+      namaPemilikRekening: "Budi Santoso (GA Officer)",
+    },
+    buktiPembayaranUrl: "https://placehold.co/600x400.png",
     riwayatStep: [
       { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-02T09:30:00Z", diupdateOleh: "Andi Pratama, S.T." },
-      { step: "bendahara", status: "disetujui", tanggalUpdate: "2026-03-02T11:45:00Z", diupdateOleh: "Dra. Hj. Siti Rahmah" },
-      { step: "finance", status: "disetujui", tanggalUpdate: "2026-03-02T14:20:00Z", diupdateOleh: "Dewi Lestari, S.E." },
+      { step: "finance", status: "disetujui", tanggalUpdate: "2026-03-02T11:45:00Z", diupdateOleh: "Dewi Lestari, S.E." },
+      { step: "bendahara", status: "disetujui", tanggalUpdate: "2026-03-02T14:20:00Z", diupdateOleh: "Dra. Hj. Siti Rahmah" },
       { step: "selesai", status: "selesai", tanggalUpdate: "2026-03-02T16:30:00Z", diupdateOleh: "Drs. Hendra Wijaya, M.M." }
     ]
   },
@@ -133,8 +184,43 @@ const MOCK_PENGAJUAN_LIST: PengajuanDanaItem[] = [
     currentStatus: "ditolak",
     currentStep: "bendahara",
     jenis: "Reimbursement",
+    buktiPembayaranUrl: null,
+    itemsReimbursement: [
+      {
+        keterangan: "Pembelian Sparepart Aki & Filter Genset",
+        volume: 1,
+        biaya: 12500000,
+        jumlah: 12500000,
+        detailItemLPJ: [
+          {
+            tanggal: "2026-03-01",
+            noKwitansi: "KW-GS-99",
+            keterangan: "Aki Genset 120Ah x 2 Unit",
+            debit: 0,
+            kredit: 8500000,
+            buktiUrl: "https://placehold.co/600x400.png",
+            buktiNama: "kwitansi-aki-genset.png",
+          },
+          {
+            tanggal: "2026-03-01",
+            noKwitansi: "KW-GS-100",
+            keterangan: "Filter Oli & Jasa Servis",
+            debit: 0,
+            kredit: 4000000,
+            buktiUrl: "https://placehold.co/600x400.png",
+            buktiNama: "kwitansi-filter-oli.png",
+          },
+        ],
+      },
+    ],
+    rekeningTujuan: {
+      namaBank: "Bank BCA",
+      nomorRekening: "8820192831",
+      namaPemilikRekening: "Andi Pratama, S.T.",
+    },
     riwayatStep: [
       { step: "manager", status: "disetujui", tanggalUpdate: "2026-03-01T09:00:00Z", diupdateOleh: "Andi Pratama, S.T." },
+      { step: "finance", status: "disetujui", tanggalUpdate: "2026-03-01T11:30:00Z", diupdateOleh: "Dewi Lestari, S.E." },
       {
         step: "bendahara",
         status: "ditolak",
@@ -153,80 +239,156 @@ const MOCK_METRICS_SUMMARY: PengajuanMetricsSummary = {
   sisaPlafonRka: 32000000,
 };
 
-const MOCK_COA_LIST: COAOption[] = [
+export const MOCK_KELOMPOK_RKA: KelompokRKA[] = [
   {
-    code: "5.1.02.01",
-    name: "Belanja Peralatan & Perangkat IT",
-    category: "Belanja Modal (CAPEX)",
-    plafonTahunan: 500000000,
-    sisaBulanIni: 65000000,
-    monthlyBreakdown: [
-      { month: "Jan", budget: 40000000, terpakai: 38000000, sisa: 2000000 },
-      { month: "Feb", budget: 40000000, terpakai: 40000000, sisa: 0 },
-      { month: "Mar", budget: 70000000, terpakai: 5000000, sisa: 65000000 },
-      { month: "Apr", budget: 45000000, terpakai: 0, sisa: 45000000 },
-      { month: "Mei", budget: 40000000, terpakai: 0, sisa: 40000000 },
-      { month: "Jun", budget: 40000000, terpakai: 0, sisa: 40000000 },
-      { month: "Jul", budget: 45000000, terpakai: 0, sisa: 45000000 },
-      { month: "Agu", budget: 40000000, terpakai: 0, sisa: 40000000 },
-      { month: "Sep", budget: 45000000, terpakai: 0, sisa: 45000000 },
-      { month: "Okt", budget: 45000000, terpakai: 0, sisa: 45000000 },
-      { month: "Nov", budget: 45000000, terpakai: 0, sisa: 45000000 },
-      { month: "Des", budget: 50000000, terpakai: 0, sisa: 50000000 },
+    id: "kel-1",
+    namaKelompok: "Operasional",
+    DetailItemRKA: [
+      {
+        kegiatanRka: "Operasional Listrik & Kebersihan",
+        detail: [
+          { bulan: "Januari", budget: 15000000 },
+          { bulan: "Februari", budget: 15000000 },
+          { bulan: "Maret", budget: 18000000 },
+        ],
+      },
+      {
+        kegiatanRka: "Maintenance Jaringan & Internet",
+        detail: [
+          { bulan: "Februari", budget: 25000000 },
+          { bulan: "Maret", budget: 27500000 },
+        ],
+      },
+      {
+        kegiatanRka: "Langganan Cloud Infrastructure AWS & GCP",
+        detail: [
+          { bulan: "Maret", budget: 40000000 },
+        ],
+      },
     ],
   },
   {
-    code: "5.2.01.04",
-    name: "Sewa Cloud Infrastructure & SaaS",
-    category: "Belanja Operasional (OPEX)",
-    plafonTahunan: 950000000,
-    sisaBulanIni: 120000000,
-    monthlyBreakdown: [
-      { month: "Jan", budget: 80000000, terpakai: 78000000, sisa: 2000000 },
-      { month: "Feb", budget: 80000000, terpakai: 80000000, sisa: 0 },
-      { month: "Mar", budget: 120000000, terpakai: 0, sisa: 120000000 },
-      { month: "Apr", budget: 80000000, terpakai: 0, sisa: 80000000 },
-      { month: "Mei", budget: 80000000, terpakai: 0, sisa: 80000000 },
-      { month: "Jun", budget: 80000000, terpakai: 0, sisa: 80000000 },
-      { month: "Jul", budget: 80000000, terpakai: 0, sisa: 80000000 },
-      { month: "Agu", budget: 80000000, terpakai: 0, sisa: 80000000 },
-      { month: "Sep", budget: 90000000, terpakai: 0, sisa: 90000000 },
-      { month: "Okt", budget: 80000000, terpakai: 0, sisa: 80000000 },
-      { month: "Nov", budget: 80000000, terpakai: 0, sisa: 80000000 },
-      { month: "Des", budget: 100000000, terpakai: 0, sisa: 100000000 },
+    id: "kel-2",
+    namaKelompok: "Pengadaan & Sarpras",
+    DetailItemRKA: [
+      {
+        kegiatanRka: "Pengadaan Hardware IT & Server",
+        detail: [
+          { bulan: "Januari", budget: 45000000 },
+        ],
+      },
+      {
+        kegiatanRka: "Pengadaan Workstation High-Spec Core i9",
+        detail: [
+          { bulan: "Februari", budget: 50000000 },
+        ],
+      },
+      {
+        kegiatanRka: "Pengadaan Server Storage NAS Backup 64TB",
+        detail: [
+          { bulan: "Maret", budget: 35000000 },
+        ],
+      },
     ],
   },
   {
-    code: "5.3.04.02",
-    name: "Pelatihan & Sertifikasi Karyawan",
-    category: "Pengembangan SDM",
-    plafonTahunan: 200000000,
-    sisaBulanIni: 25000000,
-    monthlyBreakdown: [
-      { month: "Jan", budget: 15000000, terpakai: 15000000, sisa: 0 },
-      { month: "Feb", budget: 15000000, terpakai: 15000000, sisa: 0 },
-      { month: "Mar", budget: 25000000, terpakai: 0, sisa: 25000000 },
-      { month: "Apr", budget: 15000000, terpakai: 0, sisa: 15000000 },
-      { month: "Mei", budget: 15000000, terpakai: 0, sisa: 15000000 },
-      { month: "Jun", budget: 20000000, terpakai: 0, sisa: 20000000 },
-      { month: "Jul", budget: 15000000, terpakai: 0, sisa: 15000000 },
-      { month: "Agu", budget: 15000000, terpakai: 0, sisa: 15000000 },
-      { month: "Sep", budget: 20000000, terpakai: 0, sisa: 20000000 },
-      { month: "Okt", budget: 15000000, terpakai: 0, sisa: 15000000 },
-      { month: "Nov", budget: 15000000, terpakai: 0, sisa: 15000000 },
-      { month: "Des", budget: 15000000, terpakai: 0, sisa: 15000000 },
+    id: "kel-3",
+    namaKelompok: "Pemeliharaan",
+    DetailItemRKA: [
+      {
+        kegiatanRka: "Perawatan & Servis Berkala Perangkat IT",
+        detail: [
+          { bulan: "Januari", budget: 12000000 },
+          { bulan: "Februari", budget: 14000000 },
+        ],
+      },
+      {
+        kegiatanRka: "Pemeliharaan AC Central & Ruang Server",
+        detail: [
+          { bulan: "Februari", budget: 18000000 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "kel-4",
+    namaKelompok: "Pengembangan SDM",
+    DetailItemRKA: [
+      {
+        kegiatanRka: "Pelatihan & Workshop Guru",
+        detail: [
+          { bulan: "Januari", budget: 15000000 },
+        ],
+      },
+      {
+        kegiatanRka: "Pelatihan & Sertifikasi AWS Certified Solutions Architect",
+        detail: [
+          { bulan: "Februari", budget: 18500000 },
+        ],
+      },
+      {
+        kegiatanRka: "Pelatihan & Workshop DevOps Engineer",
+        detail: [
+          { bulan: "Maret", budget: 20000000 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "kel-5",
+    namaKelompok: "Kegiatan Siswa/Akademik",
+    DetailItemRKA: [
+      {
+        kegiatanRka: "Bahan Ajar & Modul Pembelajaran",
+        detail: [
+          { bulan: "Januari", budget: 10000000 },
+          { bulan: "Februari", budget: 12000000 },
+        ],
+      },
+      {
+        kegiatanRka: "Workshop UI/UX & Design System Modern",
+        detail: [
+          { bulan: "Februari", budget: 15000000 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "kel-6",
+    namaKelompok: "Belanja Modal (CAPEX)",
+    DetailItemRKA: [
+      {
+        kegiatanRka: "Pengadaan Workstation High-Spec Core i9 untuk Dev Team",
+        detail: [
+          { bulan: "Januari", budget: 50000000 },
+        ],
+      },
+      {
+        kegiatanRka: "Pengadaan Server Storage NAS Backup 64TB",
+        detail: [
+          { bulan: "Februari", budget: 35000000 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "kel-7",
+    namaKelompok: "Belanja Operasional (OPEX)",
+    DetailItemRKA: [
+      {
+        kegiatanRka: "Langganan Cloud Infrastructure AWS & GCP Q1 2026",
+        detail: [
+          { bulan: "Januari", budget: 28000000 },
+          { bulan: "Februari", budget: 28000000 },
+          { bulan: "Maret", budget: 29000000 },
+        ],
+      },
     ],
   },
 ];
 
-export class DivisiPengajuanService implements IPengajuanService {
-  async getCOAOptions(): Promise<COAOption[]> {
-    const res = await apiClient<COAOption[]>("/coa-options", {
-      mockData: MOCK_COA_LIST,
-    });
-    return res.data;
-  }
 
+export class DivisiPengajuanService implements IPengajuanService {
   async createPengajuan(payload: PengajuanPayload): Promise<{ id: string; kode: string }> {
     const randomNum = Math.floor(100 + Math.random() * 900);
     const mockCreated = {
@@ -252,27 +414,39 @@ export class DivisiPengajuanService implements IPengajuanService {
         kode: foundItem.kode,
         nomorPengajuan: foundItem.kode,
         divisi: foundItem.divisi,
-        coaCode: "5.1.02.01",
         judul: foundItem.kegiatan,
         tanggalPengajuan: foundItem.tanggalPengajuan,
         tanggalKebutuhan: foundItem.harapanRealisasi || "2026-03-25",
         tanggalHarapan: foundItem.harapanRealisasi || "2026-03-25",
         urgensi: "normal",
-        items: [
-          {
-            id: "item-1",
-            kegiatanRka: foundItem.kegiatan,
-            kelompok: foundItem.kelompok || "Operasional",
-            bulan: "Maret",
-            budgetRka: Math.round(foundItem.nominalPengajuan * 1.2),
-            nominalPengajuan: foundItem.nominalPengajuan,
-            subtotal: foundItem.nominalPengajuan,
-            namaItem: foundItem.kegiatan,
-            volume: 1,
-            satuan: "Unit",
-            hargaSatuan: foundItem.nominalPengajuan,
-          },
-        ],
+        items:
+          foundItem.jenis === "Reimbursement" && "itemsReimbursement" in foundItem && foundItem.itemsReimbursement
+            ? foundItem.itemsReimbursement.map((it, idx) => ({
+                id: `item-${idx + 1}`,
+                namaItem: it.keterangan,
+                keterangan: it.keterangan,
+                volume: it.volume,
+                biaya: it.biaya,
+                hargaSatuan: it.biaya,
+                subtotal: it.jumlah || it.volume * it.biaya,
+                nominalPengajuan: it.jumlah || it.volume * it.biaya,
+                detailItemLPJ: it.detailItemLPJ,
+              }))
+            : [
+                {
+                  id: "item-1",
+                  kegiatanRka: foundItem.kegiatan,
+                  kelompok: foundItem.kelompok || "Operasional",
+                  bulan: "Maret",
+                  budgetRka: Math.round(foundItem.nominalPengajuan * 1.2),
+                  nominalPengajuan: foundItem.nominalPengajuan,
+                  subtotal: foundItem.nominalPengajuan,
+                  namaItem: foundItem.kegiatan,
+                  volume: 1,
+                  satuan: "Unit",
+                  hargaSatuan: foundItem.nominalPengajuan,
+                },
+              ],
         totalNominal: foundItem.nominalPengajuan,
         namaBank: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.namaBank : undefined) || "Bank Mandiri",
         noRekening: ("rekeningTujuan" in foundItem ? foundItem.rekeningTujuan?.nomorRekening : undefined) || "1370019283741",
@@ -287,7 +461,6 @@ export class DivisiPengajuanService implements IPengajuanService {
         kode: "REQ-2026-001",
         nomorPengajuan: "001/PJ/2026",
         divisi: "IT & Infrastructure",
-        coaCode: "5.1.02.01",
         judul: "Pengadaan Workstation High-Spec Core i9 untuk Dev Team",
         tanggalKebutuhan: "2026-03-25",
         urgensi: "normal",
@@ -320,6 +493,13 @@ export class DivisiPengajuanService implements IPengajuanService {
   async getDaftarPengajuan(): Promise<PengajuanDanaItem[]> {
     const res = await apiClient<PengajuanDanaItem[]>("/pengajuan/list", {
       mockData: MOCK_PENGAJUAN_LIST,
+    });
+    return res.data;
+  }
+
+  async getDataRKA(): Promise<KelompokRKA[]> {
+    const res = await apiClient<KelompokRKA[]>("/rka/kelompok", {
+      mockData: MOCK_KELOMPOK_RKA,
     });
     return res.data;
   }

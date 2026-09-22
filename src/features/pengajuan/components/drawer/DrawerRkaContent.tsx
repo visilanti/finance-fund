@@ -45,7 +45,9 @@ export function DrawerRkaContent({
                     <div className="font-semibold text-slate-800 dark:text-slate-200">{it.kegiatanRka}</div>
                     <div className="text-[10px] text-slate-400">{it.kelompok}</div>
                   </td>
-                  <td className="p-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap">{it.bulan}</td>
+                  <td className="p-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                    {Array.isArray(it.bulan) ? it.bulan.join(", ") : it.bulan}
+                  </td>
                   <td className="p-2.5 text-right font-medium text-slate-500 whitespace-nowrap">
                     {formatIDR(it.budget)}
                   </td>

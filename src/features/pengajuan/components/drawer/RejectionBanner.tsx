@@ -1,20 +1,23 @@
 import React from "react";
 import { AlertOctagon } from "lucide-react";
-import { STEP_ROLE_LABEL_MAP } from "./ProgressLineChecklist";
+import { STEP_ROLE_LABEL_MAP, REIMB_STEP_ROLE_LABEL_MAP } from "./ProgressLineChecklist";
 
 interface RejectionBannerProps {
   currentStep: string;
   alasan?: string;
+  jenis?: string;
 }
 
-export function RejectionBanner({ currentStep, alasan }: RejectionBannerProps) {
+export function RejectionBanner({ currentStep, alasan, jenis }: RejectionBannerProps) {
+  const roleLabelMap = jenis === "Reimbursement" ? REIMB_STEP_ROLE_LABEL_MAP : STEP_ROLE_LABEL_MAP;
+
   return (
     <div className="p-3.5 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 rounded-xl space-y-2 text-rose-900 dark:text-rose-200">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-xs text-rose-700 dark:text-rose-300">
           <AlertOctagon className="w-4 h-4 text-rose-600 shrink-0" />
           <span>
-            Ditolak oleh {STEP_ROLE_LABEL_MAP[currentStep] || currentStep}
+            Ditolak oleh {roleLabelMap[currentStep] || currentStep}
           </span>
         </div>
       </div>

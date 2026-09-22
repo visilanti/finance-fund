@@ -7,12 +7,13 @@ import { FileUploadZone } from "@/components/shared/FileUploadZone";
 import { Input } from "@/components/ui/Input";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
-import { FormItemsTable } from "./FormItemsTable";
+import { FormItemsRKATable } from "./FormItemsRKATable";
 import { FormInsidentalItemsTable } from "./FormInsidentalItemsTable";
 import { FormStickyFooter } from "./FormStickyFooter";
 import { RKAMatrixDrawer } from "./RKAMatrixDrawer";
 
 import { AlertCircle } from "lucide-react";
+import { FormReimbursementItemsTable } from "./FormReimbursementItemsTable";
 
 interface FormPengajuanShellProps {
   form: UsePengajuanFormReturn;
@@ -20,7 +21,7 @@ interface FormPengajuanShellProps {
 }
 
 export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellProps) {
-  const [invoiceFiles, setInvoiceFiles] = useState<File[]>([]);
+  const [lampiranFiles, setLampiranFiles] = useState<File[]>([]);
 
   const isRka = type === "rka";
   const isReimbursement = type === "reimbursement";
@@ -40,14 +41,14 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
   const displayTypeLabel = typeLabelMap[type || "rka"] || "RKA";
 
 
-  const handleInvoiceSelect = (files: FileList | null) => {
+  const handleLampiranSelect = (files: FileList | null) => {
     if (files && files.length > 0) {
-      setInvoiceFiles(Array.from(files));
+      setLampiranFiles(Array.from(files));
     }
   };
 
-  const handleRemoveInvoice = () => {
-    setInvoiceFiles([]);
+  const handleRemoveLampiran = () => {
+    setLampiranFiles([]);
   };
 
   return (
@@ -133,7 +134,16 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
       </FormCardSection>
 
       {isRka ? (
-        <FormItemsTable
+        <FormItemsRKATable
+          items={form.items}
+          onAddItem={form.addItem}
+          onRemoveItem={form.removeItem}
+          onUpdateItem={form.updateItem}
+          totalNominal={form.totalNominal}
+          kelompokRkaList={form.kelompokRkaList}
+        />
+      ) : isReimbursement ? (
+        <FormReimbursementItemsTable
           items={form.items}
           onAddItem={form.addItem}
           onRemoveItem={form.removeItem}
@@ -150,55 +160,19 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
         />
       )}
 
-      {/* KARTU 3: Rekening Tujuan & Vendor */}
+      {/* Upload Dokumen Pendukung */}
       <FormCardSection
-        // stepNumber={3}
-        title="Info Rekening Tujuan"
+        title="Upload Lampiran Dokumen Pendukung"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Input
-              label="Bank Tujuan"
-              value={form.namaBank}
-              onChange={(e) => form.setNamaBank(e.target.value)}
-              placeholder="Bank Mandiri / BCA / BNI"
-            />
-          </div>
-
-          <div>
-            <Input
-              label="Nomor Rekening"
-              value={form.noRekening}
-              onChange={(e) => form.setNoRekening(e.target.value)}
-              placeholder="Contoh: 1370019283741"
-            />
-          </div>
-
-          <div>
-            <Input
-              label="Atas Nama (a.n)"
-              value={form.namaPemilikRekening}
-              onChange={(e) => form.setNamaPemilikRekening(e.target.value)}
-              placeholder="Nama pemilik rekening"
-            />
-          </div>
-        </div>
+        <FileUploadZone
+          label="Tarik & Lepas Lampiran di Sini"
+          sublabel="Format PDF (Maksimal 10MB) - Opsional dokumen pendukung tambahan"
+          accept=".pdf,application/pdf"
+          onFileSelect={handleLampiranSelect}
+          files={lampiranFiles}
+          onRemoveFile={handleRemoveLampiran}
+        />
       </FormCardSection>
-
-      {isReimbursement && (
-        <FormCardSection
-          title="Upload Invoice"
-        >
-          <FileUploadZone
-            label="Tarik & Lepas Invoice di Sini"
-            sublabel="Format PDF (Maksimal 10MB)"
-            accept=".pdf,application/pdf"
-            onFileSelect={handleInvoiceSelect}
-            files={invoiceFiles}
-            onRemoveFile={handleRemoveInvoice}
-          />
-        </FormCardSection>
-      )}
 
       <FormStickyFooter
         totalNominal={form.totalNominal}
@@ -213,7 +187,7 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
         <RKAMatrixDrawer
           isOpen={form.isRkaDrawerOpen}
           onClose={() => form.setIsRkaDrawerOpen(false)}
-          selectedCoa={form.selectedCoa}
+          kelompokRkaList={form.kelompokRkaList}
         />
       )}
     </div>

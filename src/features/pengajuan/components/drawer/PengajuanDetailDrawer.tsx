@@ -90,9 +90,9 @@ export function PengajuanDetailDrawer({
   };
 
   const buktiUrl =
-    (displayItem.jenis === "Reimbursement"
+    displayItem.jenis === "Reimbursement"
       ? displayItem.buktiPembayaranUrl
-      : "#") || "#";
+      : undefined;
 
   const isSelesai =
     displayItem.currentStatus?.toLowerCase() === "selesai" ||
@@ -146,7 +146,11 @@ export function PengajuanDetailDrawer({
       <div className="space-y-4 text-xs">
         {/* Rejection Alert Banner if status is ditolak */}
         {displayItem.currentStatus === "ditolak" && (
-          <RejectionBanner currentStep={displayItem.currentStep} alasan={rejectionCatatan} />
+          <RejectionBanner
+            currentStep={displayItem.currentStep}
+            alasan={rejectionCatatan}
+            jenis={displayItem.jenis}
+          />
         )}
 
         {/* Informasi Utama Pengajuan */}

@@ -8,7 +8,7 @@ import { DateRangeFilter, NominalRangeFilter } from "@/components/shared/TableTo
 import { formatIDR } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { STATUS_OPTIONS } from "@/lib/constants";
-import { Eye } from "lucide-react";
+import { ExternalLink, Eye } from "lucide-react";
 
 interface ReimbursementTableSectionProps {
   initialData: PengajuanDanaItem[];
@@ -103,9 +103,9 @@ export function ReimbursementTableSection({ initialData }: ReimbursementTableSec
       align: "right",
       sortable: true,
       cell: (item) => (
-        <div className="text-sm whitespace-nowrap">
+        <div className="font-bold text-slate-900 dark:text-slate-100 text-sm whitespace-nowrap">
           {item.nominalDiterima ? (
-            <span className="font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="text-slate-900 dark:text-slate-100">
               {formatIDR(item.nominalDiterima)}
             </span>
           ) : (
@@ -113,6 +113,33 @@ export function ReimbursementTableSection({ initialData }: ReimbursementTableSec
           )}
         </div>
       ),
+    },
+    {
+      key: "buktiUrl",
+      header: "Bukti Transfer",
+      width: "160px",
+      cell: (item) => {
+        const buktiTransfer =
+          item.buktiUrl ??
+          (item.jenis === "Reimbursement" ? item.buktiPembayaranUrl : null);
+
+        return (
+          <div className="text-sm whitespace-nowrap">
+            {buktiTransfer ? (
+              <button
+                type="button"
+                onClick={() => setSelectedItemDetail(item)}
+                className="px-2.5 py-1 text-[11px] font-semibold text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-all flex items-center gap-1 cursor-pointer"
+              >
+                <ExternalLink className="w-3 h-3" />
+                Lihat Bukti
+              </button>
+            ) : (
+              <span className="font-semibold text-slate-400 dark:text-slate-500">-</span>
+            )}
+          </div>
+        );
+      },
     },
     {
       key: "status",

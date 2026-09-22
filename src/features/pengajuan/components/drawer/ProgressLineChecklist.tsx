@@ -1,5 +1,5 @@
 import React from "react";
-import { Clock, Check, X } from "lucide-react";
+import { Clock, Check, X, GitFork } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 import { PengajuanDanaItem, StepType } from "@/features/pengajuan/types";
@@ -12,16 +12,40 @@ export const STEP_ROLE_LABEL_MAP: Record<string, string> = {
   selesai: "Selesai",
 };
 
-export function getStepIndex(currentStep: string = "", status: string = ""): number {
-  if (status === "disetujui" || currentStep === "selesai") {
-    return 4; // Selesai
+export const REIMB_STEP_ROLE_LABEL_MAP: Record<string, string> = {
+  manager: "Manager Divisi",
+  finance: "Finance Reviewer",
+  bendahara: "Bendahara Yayasan",
+  selesai: "Selesai",
+};
+
+export function getStepIndex(
+  currentStep: string = "",
+  status: string = "",
+  isReimbursement: boolean = false
+): number {
+  const statusLower = status?.toLowerCase() || "";
+  const stepLower = currentStep?.toLowerCase() || "";
+
+  if (statusLower === "disetujui" || statusLower === "selesai" || stepLower === "selesai") {
+    return isReimbursement ? 3 : 4; // Selesai
   }
 
-  const stepLower = currentStep.toLowerCase();
+  if (isReimbursement) {
+    if (stepLower === "bendahara") {
+      return 2; // Bendahara (Approval Final & Pencairan)
+    }
+    if (stepLower === "finance") {
+      return 1; // Finance Reviewer
+    }
+    return 0; // Default: Manager Divisi
+  }
+
+  // Alur Reguler (RKA & Insidental)
   if (stepLower === "lpj") {
     return 3; // Pembuatan LPJ
   }
-  if (stepLower === "finance" || status === "diproses") {
+  if (stepLower === "finance" || statusLower === "diproses") {
     return 2; // Pencairan Finance
   }
   if (stepLower === "bendahara") {
@@ -53,16 +77,50 @@ interface ProgressLineChecklistProps {
 }
 
 export function ProgressLineChecklist({ item }: ProgressLineChecklistProps) {
+  const isReimbursement = item.jenis === "Reimbursement";
   const isRejected = item.currentStatus === "ditolak";
-  const currentStepIndex = getStepIndex(item.currentStep, item.currentStatus);
+  const currentStepIndex = getStepIndex(item.currentStep, item.currentStatus, isReimbursement);
 
-  const stepsList: { key: StepType; label: string; sublabel: string }[] = [
+  const regularSteps: { key: StepType; label: string; sublabel: string }[] = [
     { key: "manager", label: "Manager", sublabel: "Persetujuan Manager Divisi" },
     { key: "bendahara", label: "Bendahara", sublabel: "Verifikasi & Approval Yayasan" },
     { key: "finance", label: "Pencairan Finance", sublabel: "Transfer & Pencairan Dana" },
     { key: "lpj", label: "Pembuatan LPJ", sublabel: "Laporan Pertanggungjawaban" },
     { key: "selesai", label: "Selesai", sublabel: "Verifikasi LPJ oleh Finance" },
   ];
+
+  const reimbursementSteps: { key: StepType; label: string; sublabel: string }[] = [
+    { key: "manager", label: "Manager", sublabel: "Persetujuan Kelayakan Operasional" },
+    { key: "finance", label: "Finance Reviewer", sublabel: "Verifikasi Bukti Kwitansi & Nota LPJ" },
+    { key: "bendahara", label: "Bendahara", sublabel: "Approval Final & Pencairan Dana" },
+    { key: "selesai", label: "Selesai", sublabel: "Pencairan Selesai & LPJ Terpenuhi" },
+  ];
+
+  const stepsList = isReimbursement ? reimbursementSteps : regularSteps;
+
+  // Evaluasi Status Paralel Khusus Reimbursement
+  const managerRecord = item.riwayatStep?.find((r) => r.step === "manager");
+  const financeRecord = item.riwayatStep?.find((r) => r.step === "finance");
+  const bendaharaRecord = item.riwayatStep?.find((r) => r.step === "bendahara");
+  const selesaiRecord = item.riwayatStep?.find((r) => r.step === "selesai");
+
+  const isManagerApproved = managerRecord?.status === "disetujui" || managerRecord?.status === "selesai";
+  const isManagerRejected = managerRecord?.status === "ditolak" || (isRejected && item.currentStep === "manager");
+
+  const isFinanceApproved = financeRecord?.status === "disetujui" || financeRecord?.status === "selesai";
+  const isFinanceRejected = financeRecord?.status === "ditolak" || (isRejected && item.currentStep === "finance");
+
+  const isBothParallelApproved = isManagerApproved && isFinanceApproved;
+
+  const isBendaharaApproved = bendaharaRecord?.status === "disetujui" || bendaharaRecord?.status === "selesai";
+  const isBendaharaRejected = bendaharaRecord?.status === "ditolak" || (isRejected && item.currentStep === "bendahara");
+
+  const isSelesai =
+    item.currentStatus === "disetujui" ||
+    item.currentStatus === "selesai" ||
+    item.currentStep === "selesai" ||
+    selesaiRecord?.status === "selesai" ||
+    isBendaharaApproved;
 
   return (
     <Card
@@ -75,12 +133,66 @@ export function ProgressLineChecklist({ item }: ProgressLineChecklistProps) {
       <div className="space-y-0 pt-1">
         {stepsList.map((step, idx) => {
           const stepRecord = item.riwayatStep?.find((r) => r.step === step.key);
-          const isCompleted = stepRecord
-            ? stepRecord.status === "disetujui" || stepRecord.status === "selesai"
-            : idx < currentStepIndex && !isRejected;
-          const isCurrent = !stepRecord && idx === currentStepIndex && !isRejected;
-          const isStepRejected = stepRecord?.status === "ditolak" || (isRejected && idx === currentStepIndex);
           const isLast = idx === stepsList.length - 1;
+
+          let isCompleted = false;
+          let isCurrent = false;
+          let isStepRejected = false;
+          let customStatusBadge: string | null = null;
+
+          if (isReimbursement) {
+            if (step.key === "manager") {
+              isCompleted = isManagerApproved;
+              isStepRejected = isManagerRejected;
+              isCurrent = !isManagerApproved && !isManagerRejected && !isFinanceRejected && !isBendaharaRejected && !isSelesai;
+              if (isCurrent) {
+                customStatusBadge = "Menunggu Review";
+              }
+            } else if (step.key === "finance") {
+              isCompleted = isFinanceApproved;
+              isStepRejected = isFinanceRejected;
+              isCurrent = !isFinanceApproved && !isFinanceRejected && !isManagerRejected && !isBendaharaRejected && !isSelesai;
+              if (isCurrent) {
+                customStatusBadge = "Menunggu Review";
+              }
+            } else if (step.key === "bendahara") {
+              isCompleted = isBendaharaApproved;
+              isStepRejected = isBendaharaRejected;
+              isCurrent = isBothParallelApproved && !isBendaharaApproved && !isBendaharaRejected && !isSelesai;
+              if (isCurrent) {
+                customStatusBadge = "Menunggu Approval & Pencairan";
+              } else if (!isBothParallelApproved && !isManagerRejected && !isFinanceRejected) {
+                if (isManagerApproved && !isFinanceApproved) {
+                  customStatusBadge = "Menunggu Review Finance";
+                } else if (!isManagerApproved && isFinanceApproved) {
+                  customStatusBadge = "Menunggu Review Manager";
+                } else {
+                  customStatusBadge = "Menunggu Review Manager & Finance";
+                }
+              }
+            } else if (step.key === "selesai") {
+              isCompleted = isSelesai;
+              isCurrent = false;
+              isStepRejected = false;
+            }
+          } else {
+            // Alur Reguler (RKA & Insidental)
+            isStepRejected =
+              stepRecord?.status === "ditolak" || (isRejected && idx === currentStepIndex);
+            isCompleted =
+              !isStepRejected &&
+              (stepRecord
+                ? stepRecord.status === "disetujui" || stepRecord.status === "selesai"
+                : idx < currentStepIndex && !isRejected);
+            isCurrent =
+              !isCompleted &&
+              !isStepRejected &&
+              (stepRecord
+                ? stepRecord.status === "menunggu" || stepRecord.status === "diproses" || idx === currentStepIndex
+                : idx === currentStepIndex && !isRejected);
+          }
+
+          const isParallelStep = isReimbursement && (step.key === "manager" || step.key === "finance");
 
           return (
             <div key={idx} className="flex items-stretch gap-3">
@@ -100,6 +212,8 @@ export function ProgressLineChecklist({ item }: ProgressLineChecklistProps) {
                     <Check className="w-3 h-3 stroke-[3]" />
                   ) : isStepRejected ? (
                     <X className="w-3 h-3 stroke-[3]" />
+                  ) : isParallelStep ? (
+                    <GitFork className="w-3 h-3" />
                   ) : (
                     <span>{idx + 1}</span>
                   )}
@@ -118,21 +232,28 @@ export function ProgressLineChecklist({ item }: ProgressLineChecklistProps) {
 
               {/* Step Label & Detail */}
               <div className="flex-1 min-w-0 pt-0.5 pb-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold text-xs leading-5 text-slate-800 dark:text-slate-100">
-                    {step.label}
-                  </span>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-xs leading-5 text-slate-800 dark:text-slate-100">
+                      {step.label}
+                    </span>
+                  </div>
+
                   {isStepRejected ? (
                     <span className="text-[9px] font-bold text-rose-600 dark:text-rose-400 flex items-center gap-0.5">
                       <X className="w-2.5 h-2.5" /> Ditolak
                     </span>
                   ) : isCompleted ? (
                     <span className="text-[9px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
-                      <Check className="w-2.5 h-2.5" /> Selesai
+                      <Check className="w-2.5 h-2.5" /> Disetujui
                     </span>
                   ) : isCurrent ? (
                     <span className="text-[9px] font-bold text-orange-500 animate-pulse">
-                      Menunggu Approval
+                      {customStatusBadge || "Menunggu Approval"}
+                    </span>
+                  ) : customStatusBadge ? (
+                    <span className="text-[9px] text-slate-400 dark:text-slate-500 italic">
+                      {customStatusBadge}
                     </span>
                   ) : null}
                 </div>

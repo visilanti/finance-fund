@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { PengajuanPayload, PengajuanItemDetail, COAOption } from "../services/pengajuanService.types";
+import { PengajuanPayload, PengajuanItemDetail } from "../services/pengajuanService.types";
 import { PengajuanServiceFactory } from "../services/pengajuanService.factory";
 import { RoleType } from "@/components/layout/Sidebar";
+import { KelompokRKA } from "../types";
+import { MOCK_KELOMPOK_RKA } from "../services/divisiPengajuan.service";
 
 export interface UsePengajuanFormReturn {
   // Form State
@@ -13,8 +15,6 @@ export interface UsePengajuanFormReturn {
   setJudul: (v: string) => void;
   divisi: string;
   setDivisi: (v: string) => void;
-  selectedCoaCode: string;
-  setSelectedCoaCode: (v: string) => void;
   tanggalPengajuan: string;
   setTanggalPengajuan: (v: string) => void;
   tanggalKebutuhan: string;
@@ -48,9 +48,8 @@ export interface UsePengajuanFormReturn {
 
   // Calculated Values
   totalNominal: number;
-  coaOptions: COAOption[];
-  selectedCoa: COAOption | null;
   isOverBudget: boolean;
+  kelompokRkaList: KelompokRKA[];
 
   // Drawer UI State
   isRkaDrawerOpen: boolean;
@@ -71,9 +70,8 @@ export function usePengajuanForm(
 ): UsePengajuanFormReturn {
   const service = useMemo(() => PengajuanServiceFactory.getService(role), [role]);
 
-  // COA Options state
-  const [coaOptions, setCoaOptions] = useState<COAOption[]>([]);
-  const [selectedCoaCode, setSelectedCoaCode] = useState<string>("");
+  // Data RKA state
+  const [kelompokRkaList, setKelompokRkaList] = useState<KelompokRKA[]>([]);
 
   // Form Fields (Empty by default for Create mode)
   const [nomorPengajuan, setNomorPengajuan] = useState<string>("");
@@ -118,14 +116,15 @@ export function usePengajuanForm(
   const [alasan, setAlasan] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
-  // Fetch COA Options & Edit Data on mount
+  // Fetch Edit Data on mount
   useEffect(() => {
-    service.getCOAOptions().then((options) => {
-      setCoaOptions(options);
-      if (options.length > 0) {
-        setSelectedCoaCode(options[0].code);
-      }
-    });
+    if (service.getDataRKA) {
+      service.getDataRKA().then((rkaData) => {
+        if (rkaData && rkaData.length > 0) {
+          setKelompokRkaList(rkaData);
+        }
+      });
+    }
 
     if (typeof window !== "undefined") {
       const searchParams = new URLSearchParams(window.location.search);
@@ -137,7 +136,6 @@ export function usePengajuanForm(
             if (data.nomorPengajuan || data.kode) setNomorPengajuan(data.nomorPengajuan || data.kode || "");
             if (data.judul) setJudul(data.judul);
             if (data.divisi) setDivisi(data.divisi);
-            if (data.coaCode) setSelectedCoaCode(data.coaCode);
             if (data.tanggalPengajuan) setTanggalPengajuan(data.tanggalPengajuan);
             if (data.tanggalHarapan) setTanggalHarapan(data.tanggalHarapan);
             if (data.items && data.items.length > 0) setItems(data.items);
@@ -152,31 +150,29 @@ export function usePengajuanForm(
     }
   }, [service]);
 
-  // Active selected COA object
-  const selectedCoa = useMemo(() => {
-    return coaOptions.find((c) => c.code === selectedCoaCode) || null;
-  }, [coaOptions, selectedCoaCode]);
-
   // Dynamic Total Calculation
   const totalNominal = useMemo(() => {
     return items.reduce((acc, curr) => acc + (curr.nominalPengajuan ?? curr.subtotal ?? 0), 0);
   }, [items]);
 
-  // Check if current proposed total exceeds remaining monthly budget for COA
+  // Check if current proposed items exceed budget RKA
   const isOverBudget = useMemo(() => {
-    if (!selectedCoa) return false;
-    return totalNominal > selectedCoa.sisaBulanIni;
-  }, [selectedCoa, totalNominal]);
+    const hasItemOverBudget = items.some(
+      (item) => (item.budgetRka || 0) > 0 && (item.nominalPengajuan || 0) > (item.budgetRka || 0)
+    );
+    const totalBudget = items.reduce((acc, curr) => acc + (curr.budgetRka || 0), 0);
+    return hasItemOverBudget || (totalBudget > 0 && totalNominal > totalBudget);
+  }, [items, totalNominal]);
 
   // Item List Handlers
   const addItem = () => {
     setItems((prev) => [
       ...prev,
       {
-        kelompok: "Operasional",
-        kegiatanRka: "Pengadaan Hardware IT & Server",
-        bulan: "Januari",
-        budgetRka: 25000000,
+        kelompok: "",
+        kegiatanRka: "",
+        bulan: "",
+        budgetRka: 0,
         nominalPengajuan: 0,
         subtotal: 0,
         namaItem: "",
@@ -196,6 +192,58 @@ export function usePengajuanForm(
     setItems((prev) => {
       const updated = [...prev];
       const target = { ...updated[index], [field]: value };
+      const activeRkaList = kelompokRkaList.length > 0 ? kelompokRkaList : MOCK_KELOMPOK_RKA;
+
+      if (field === "kelompok") {
+        target.kelompok = value;
+        if (target.kegiatanRka && activeRkaList.length > 0) {
+          const kel = activeRkaList.find((k) => k.namaKelompok === value);
+          const stillValid = kel?.DetailItemRKA.some((d) => d.kegiatanRka === target.kegiatanRka);
+          if (!stillValid) {
+            target.kegiatanRka = "";
+            target.bulan = "";
+            target.budgetRka = 0;
+          }
+        }
+      }
+
+      if (field === "kegiatanRka") {
+        target.kegiatanRka = value;
+        if (value && activeRkaList.length > 0) {
+          const currentKel = activeRkaList.find((k) => k.namaKelompok === target.kelompok);
+          const parentKel = target.kelompok
+            ? currentKel
+            : activeRkaList.find((k) => k.DetailItemRKA.some((d) => d.kegiatanRka === value));
+          const matched = parentKel?.DetailItemRKA.find((d) => d.kegiatanRka === value);
+
+          if (matched && parentKel) {
+            if (!target.kelompok) target.kelompok = parentKel.namaKelompok;
+            const availableMonths = matched.detail.map((d) => d.bulan);
+            if (!target.bulan || !availableMonths.includes(target.bulan)) {
+              target.bulan = availableMonths[0] || "";
+            }
+            const matchedMonth = matched.detail.find((d) => d.bulan === target.bulan);
+            target.budgetRka = matchedMonth?.budget || 0;
+          } else {
+            target.bulan = "";
+            target.budgetRka = 0;
+          }
+        }
+      }
+
+      if (field === "bulan") {
+        target.bulan = value;
+        if (target.kegiatanRka && activeRkaList.length > 0) {
+          const kel = activeRkaList.find((k) => k.namaKelompok === target.kelompok);
+          const matchedKeg =
+            kel?.DetailItemRKA.find((d) => d.kegiatanRka === target.kegiatanRka) ||
+            activeRkaList.flatMap((k) => k.DetailItemRKA).find((d) => d.kegiatanRka === target.kegiatanRka);
+          const matchedMonth = matchedKeg?.detail.find((d) => d.bulan === value);
+          if (matchedMonth) {
+            target.budgetRka = matchedMonth.budget;
+          }
+        }
+      }
 
       if (field === "nominalPengajuan" || field === "subtotal") {
         const val = Number(value) || 0;
@@ -213,6 +261,10 @@ export function usePengajuanForm(
         target.nominalPengajuan = target.subtotal;
       }
 
+      if (field === "detailItemLPJ") {
+        target.detailItemLPJ = value;
+      }
+
       updated[index] = target;
       return updated;
     });
@@ -220,8 +272,8 @@ export function usePengajuanForm(
 
   // Submit Handler
   const handleSubmit = async () => {
-    if (!nomorPengajuan.trim() || !selectedCoaCode || items.length === 0) {
-      alert("Mohon lengkapi nomor pengajuan, COA, dan minimal 1 rincian item.");
+    if (!nomorPengajuan.trim() || items.length === 0) {
+      alert("Mohon lengkapi nomor pengajuan dan minimal 1 rincian item.");
       return;
     }
 
@@ -231,7 +283,6 @@ export function usePengajuanForm(
         nomorPengajuan,
         judul: judul || nomorPengajuan,
         divisi,
-        coaCode: selectedCoaCode,
         tanggalPengajuan,
         tanggalKebutuhan,
         tanggalHarapan,
@@ -267,8 +318,6 @@ export function usePengajuanForm(
     setJudul,
     divisi,
     setDivisi,
-    selectedCoaCode,
-    setSelectedCoaCode,
     tanggalPengajuan,
     setTanggalPengajuan,
     tanggalKebutuhan,
@@ -294,9 +343,8 @@ export function usePengajuanForm(
     catatan,
     setCatatan,
     totalNominal,
-    coaOptions,
-    selectedCoa,
     isOverBudget,
+    kelompokRkaList,
     isRkaDrawerOpen,
     setIsRkaDrawerOpen,
     alasan,

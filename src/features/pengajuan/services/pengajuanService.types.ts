@@ -1,19 +1,11 @@
-import { PengajuanDanaItem } from "../types";
+import { PengajuanDanaItem, KelompokRKA } from "../types";
+import { DetailItemLPJ } from "@/features/lpj/types";
 
 export interface RKAItemMonthly {
   month: string; // "Jan", "Feb", ... "Des"
   budget: number;
   terpakai: number;
   sisa: number;
-}
-
-export interface COAOption {
-  code: string;
-  name: string;
-  category: string;
-  plafonTahunan: number;
-  sisaBulanIni: number;
-  monthlyBreakdown: RKAItemMonthly[];
 }
 
 export interface PengajuanItemDetail {
@@ -30,6 +22,7 @@ export interface PengajuanItemDetail {
   biaya?: number;
   subtotal?: number;
   keterangan?: string;
+  detailItemLPJ?: DetailItemLPJ[];
 }
 
 export interface PengajuanPayload {
@@ -37,7 +30,6 @@ export interface PengajuanPayload {
   kode?: string;
   nomorPengajuan?: string;
   divisi: string;
-  coaCode: string;
   judul: string;
   tanggalPengajuan?: string;
   tanggalKebutuhan?: string;
@@ -68,10 +60,10 @@ export interface PengajuanMetricsSummary {
 }
 
 export interface IPengajuanService {
-  getCOAOptions(): Promise<COAOption[]>;
   createPengajuan(payload: PengajuanPayload): Promise<{ id: string; kode: string }>;
   getPengajuanById(id: string): Promise<PengajuanPayload | null>;
   getDaftarPengajuan(): Promise<PengajuanDanaItem[]>;
+  getDataRKA(): Promise<KelompokRKA[]>;
   getMetricsSummary(): Promise<PengajuanMetricsSummary>;
   approvePengajuan(id: string, notes?: string): Promise<boolean>;
   rejectPengajuan(id: string, reason: string): Promise<boolean>;

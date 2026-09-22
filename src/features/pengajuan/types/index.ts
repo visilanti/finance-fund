@@ -1,9 +1,11 @@
+import { DetailItemLPJ } from "@/features/lpj/types";
+
 export interface DetailItemRKA {
   kelompok: string;
   kegiatanRka: string;
   bulan: string;
   budget: number;
-  nominal: number;
+  nominal?: number;
 }
 
 export interface DetailItemReimbursement {
@@ -11,10 +13,15 @@ export interface DetailItemReimbursement {
   volume: number;
   biaya: number;
   jumlah: number;
+  detailItemLPJ?: DetailItemLPJ[];
 }
 
-export type DetailItemInsidental = DetailItemReimbursement;
-
+export interface DetailItemInsidental {
+  keterangan: string;
+  volume: number;
+  biaya: number;
+  jumlah: number;
+}
 
 export interface RekeningTujuan {
   namaBank: string;
@@ -56,6 +63,7 @@ export interface PengajuanDanaBase {
   buktiLpjUrl?: string;
   buktiLpjNama?: string;
   tanggalUploadLpj?: string;
+  buktiUrl?: string | null;
 }
 
 export interface PengajuanDanaItemRKA extends PengajuanDanaBase {
@@ -74,10 +82,27 @@ export interface PengajuanDanaItemReimbursement extends PengajuanDanaBase {
   jenis: "Reimbursement";
   itemsReimbursement?: DetailItemReimbursement[];
   rekeningTujuan?: RekeningTujuan;
-  buktiPembayaranUrl?: string;
+  buktiPembayaranUrl?: string | null;
 }
 
 export type PengajuanDanaItem =
   | PengajuanDanaItemRKA
   | PengajuanDanaItemInsidental
   | PengajuanDanaItemReimbursement
+
+
+
+// UNTUK GET DATA TABEL LIST RKA
+export type KegiatanRKA = {
+  kegiatanRka: string;
+  detail: {
+    bulan: string;
+    budget: number;
+  }[];
+}
+//type untuk mock list kelompok dan kegiatan RKA
+export interface KelompokRKA {
+  id: string;
+  namaKelompok: string; //nama kelompok
+  DetailItemRKA: KegiatanRKA[]; //list kegiatan
+}
