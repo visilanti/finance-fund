@@ -28,22 +28,24 @@ export function FormCardSection({
       )}
     >
       {/* Step Header Bar */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex items-start sm:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3 min-w-0">
           {stepNumber !== undefined && (
-            <div className="w-8 h-8 rounded-lg bg-primary dark:bg-primary/60 text-white dark:text-white flex items-center justify-center font-bold text-xs shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-primary dark:bg-primary/60 text-white dark:text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 sm:mt-0">
               {stepNumber}
             </div>
           )}
-          <div>
+          <div className="min-w-0">
             <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">{title}</h2>
             {description && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-xl md:max-w-2xl leading-relaxed">
+                {description}
+              </p>
             )}
           </div>
         </div>
 
-        {action && <div>{action}</div>}
+        {action && <div className="shrink-0">{action}</div>}
       </div>
 
       {/* Card Form Body */}

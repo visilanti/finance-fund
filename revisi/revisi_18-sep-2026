@@ -201,3 +201,39 @@ flowchart TD
 
 Dokumen lengkap ini juga tersimpan di repositori pada berkas:  
 [`docs/REVISI_ALUR_PROSES_BISNIS.md`](file:///d:/finance-fund-main/docs/REVISI_ALUR_PROSES_BISNIS.md)
+
+---
+
+## 5. Checklist Implementasi
+
+| Status | Kategori | Item | File Terkait |
+| :---: | :--- | :--- | :--- |
+| ☐ | 🗂️ Tipe & Data | Tambah `buktiUrl` & `buktiNama` pada `DetailItemLPJ` | `lpj/types/index.ts` |
+| ☐ | 🗂️ Tipe & Data | Hapus `LpjUrl` dari top-level `LPJBase` | `lpj/types/index.ts`, `lpj.service.ts` |
+| ☐ | 🗂️ Tipe & Data | Tambah field `lampiran[]` opsional pada `PengajuanDanaBase` | `pengajuan/types/index.ts` |
+| ☐ | 🗂️ Tipe & Data | Tambah `SubItemReimbursement` dengan `buktiUrl` wajib | `pengajuan/types/index.ts` |
+| ☐ | 🗂️ Tipe & Data | Tambah `tandaTanganUrl` pada tipe profil pengguna | `auth/types` atau `profile/types` |
+| ☐ | 🗂️ Tipe & Data | Revisi `StepType` Reimbursement + flag parallel review | `pengajuan/types/index.ts` |
+| ☐ | 📄 Form Pengajuan | Tambah Dropzone upload lampiran opsional (PDF/Gambar) di semua form | `FormPengajuanLayout.tsx` |
+| ☐ | 📄 Form Pengajuan | Pasang `onPaste` pada semua area upload (Ctrl+V clipboard) | Komponen Dropzone / FileUpload |
+| ☐ | 📄 Form Pengajuan | Validasi cut-off time 15:00 — banner & kunci tombol submit | `FormPengajuanShell.tsx`, `lib/utils/cutoff.ts` |
+| ☐ | 📄 Form Pengajuan | Validasi pagu budget RKA — dialog peringatan jika over-budget | `usePengajuanForm.ts`, `RKATableSection.tsx` |
+| ☐ | 📄 Form Pengajuan | Tanda tangan otomatis dari profil akun aktif (tanpa kanvas manual) | `FormPengajuanShell.tsx`, Komponen Pengesahan |
+| ☐ | 🔄 Reimbursement | Form: tambah sub-tabel rincian item per kegiatan | `FormReimbursement.tsx` |
+| ☐ | 🔄 Reimbursement | Setiap baris sub-item: wajib upload bukti nota | `FormReimbursement.tsx` |
+| ☐ | 🔄 Reimbursement | Bypass modul LPJ sekunder — Reimbursement tidak buat LPJ terpisah | `lpj.service.ts`, `LPJTableSection.tsx` |
+| ☐ | 🔄 Reimbursement | Parallel-gate: Manager & Finance review bersamaan | `divisiPengajuan.service.ts` |
+| ☐ | 🔄 Reimbursement | Bendahara hanya dapat approve setelah Manager + Finance keduanya setuju | Service validasi step / approval hooks |
+| ☐ | 📋 Tabel LPJ | Hapus input bundle upload LPJ global dari header form | `FormLPJShell.tsx` |
+| ☐ | 📋 Tabel LPJ | Tambah kolom "Upload Bukti Nota" per baris item pengeluaran | `FormLPJItemsTable.tsx` |
+| ☐ | 📋 Tabel LPJ | Preview / link download bukti nota per baris di detail LPJ | `LPJDetailDrawer.tsx` |
+| ☐ | 🚫 Punishment LPJ | Helper `checkDivisiEligibility()` — cek LPJ > 2 bulan belum selesai | `lpj.service.ts` / `lib/utils/lpjPolicy.ts` |
+| ☐ | 🚫 Punishment LPJ | Halaman pengajuan: tampilkan Lockout Banner jika terkena punishment | `app/pengajuan/page.tsx` |
+| ☐ | 🚫 Punishment LPJ | Nonaktifkan tombol Tambah Pengajuan + link ke LPJ tertunggak | `PengajuanPageHeader.tsx` / toolbar |
+| ☐ | 📊 Laporan & Voucher | Buat komponen `PaymentVoucher` — format A4 voucher pengeluaran kas/bank | `laporan/components/PaymentVoucher.tsx` *(baru)* |
+| ☐ | 📊 Laporan & Voucher | Matriks audit trail pada voucher: Divisi, Manager, Bendahara, Finance + timestamp | `PaymentVoucher.tsx` |
+| ☐ | 📊 Laporan & Voucher | Tombol Cetak (Print View) & Ekspor PDF | `PaymentVoucher.tsx` |
+| ☐ | 📊 Laporan & Voucher | Halaman riwayat laporan / daftar voucher per divisi | `app/laporan/page.tsx` *(baru)* |
+| ☐ | 🔐 TTD & Profil | Halaman profil: upload & simpan spesimen tanda tangan digital | `app/profile/page.tsx` |
+| ☐ | 🔐 TTD & Profil | Komponen pengesahan: render TTD dari `currentUser.tandaTanganUrl` otomatis | Komponen Pengesahan |
+

@@ -2,7 +2,7 @@ import React from "react";
 import { Badge, BadgeVariant, BadgeType } from "@/components/ui/Badge";
 
 export interface StatusBadgeProps {
-  status?: "disetujui" | "ditolak" | "menunggu" | "diproses" | string;
+  status?: "disetujui" | "ditolak" | "revisi" | "menunggu" | "diproses" | string;
   label?: string;
   variant?: BadgeVariant;
   type?: BadgeType;
@@ -13,6 +13,7 @@ export interface StatusBadgeProps {
 const STATUS_MAP: Record<string, { variant: BadgeVariant; defaultLabel: string }> = {
   disetujui: { variant: "success", defaultLabel: "Disetujui" },
   ditolak: { variant: "error", defaultLabel: "Ditolak" },
+  revisi: { variant: "error", defaultLabel: "Revisi" },
   menunggu: { variant: "warning", defaultLabel: "Proses Approval" },
   diproses: { variant: "info", defaultLabel: "Diproses Finance" },
   selesai: { variant: "success", defaultLabel: "Selesai" },
