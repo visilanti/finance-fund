@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import { useProfileStore } from "@/features/profile/store/useProfileStore";
 
 interface UserProfileCardProps {
   userName?: string;
@@ -22,12 +24,14 @@ interface UserProfileCardProps {
 }
 
 export function UserProfileCard({
-  userName = "Budi Santoso",
+  userName = "Ahmad Hidayat",
   userRoleTitle,
   roleTitle = "Staf / Kadiv Operasional",
-  userEmail = "budi.santoso@saasfinance.com",
+  userEmail = "ahmad.hidayat@perusahaan.co.id",
   onLogout,
 }: UserProfileCardProps) {
+  const router = useRouter();
+  const { profile, loadProfile } = useProfileStore();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -35,7 +39,11 @@ export function UserProfileCard({
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    loadProfile();
+  }, [loadProfile]);
+
+  const effectiveName = profile?.fullName || userName;
+  const effectiveEmail = profile?.email || userEmail;
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -78,8 +86,8 @@ export function UserProfileCard({
         )}
       >
         <div className="relative shrink-0">
-          <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white font-bold text-sm">
-            {getInitials(userName)}
+          <div className="w-8 h-8 rounded-full bg-primary/90 flex items-center justify-center text-white font-bold text-xs">
+            {getInitials(effectiveName)}
           </div>
           <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
         </div>
@@ -87,7 +95,7 @@ export function UserProfileCard({
         <div className="hidden lg:block text-left min-w-0">
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-bold text-slate-800 dark:text-slate-100 leading-tight truncate">
-              {userName}
+              {effectiveName}
             </span>
           </div>
           <p className="text-[11px] text-slate-400 dark:text-slate-400 font-medium leading-none mt-0.5 truncate">
@@ -108,18 +116,18 @@ export function UserProfileCard({
         <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl dark:shadow-2xl z-50 py-2.5 animate-in fade-in zoom-in-95 duration-150">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800/80 flex items-start gap-3">
             <div className="relative shrink-0">
-              <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-sm">
-                {getInitials(userName)}
+              <div className="w-10 h-10 rounded-full bg-primary/90 flex items-center justify-center text-white font-bold text-sm">
+                {getInitials(effectiveName)}
               </div>
               <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
             </div>
 
             <div className="min-w-0 flex-1">
               <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                {userName}
+                {effectiveName}
               </h4>
               <p className="text-[11px] font-medium text-slate-400 dark:text-slate-400 truncate mt-0.5">
-                {userEmail}
+                {effectiveEmail}
               </p>
               <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
                 <ShieldCheck className="w-3 h-3 text-primary" />
@@ -165,7 +173,10 @@ export function UserProfileCard({
             {/* Profil Saya Item */}
             <button
               type="button"
-              onClick={() => alert("Membuka Pengaturan Profil Saya...")}
+              onClick={() => {
+                setIsOpen(false);
+                router.push("/profile");
+              }}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
             >
               <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
