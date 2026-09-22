@@ -52,8 +52,8 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
         return { variant: "warning" as const, label: "Belum LPJ" };
       case "submit":
         return { variant: "info" as const, label: "Submit" };
-      case "ditolak":
-        return { variant: "error" as const, label: "Ditolak" };
+      case "revisi":
+        return { variant: "error" as const, label: "Revisi" };
       case "disetujui":
         return { variant: "success" as const, label: "Disetujui" };
       default:
@@ -62,7 +62,7 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
   };
 
   const badgeProps = getStatusBadgeProps(item.status);
-  const isUploadAllowed = item.status === "belum_lpj" || item.status === "ditolak";
+  const isUploadAllowed = item.status === "belum_lpj" || item.status === "revisi";
 
   return (
     <Drawer
@@ -119,12 +119,12 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
       }
     >
       <div className="space-y-4 text-xs">
-        {/* Banner jika status ditolak */}
-        {item.status === "ditolak" && (
+        {/* Banner jika status revisi */}
+        {item.status === "revisi" && (
           <div className="flex items-start gap-2.5 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300">
             <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-xs">LPJ Ditolak / Perlu Revisi</p>
+              <p className="font-semibold text-xs">LPJ Perlu Revisi</p>
               <p className="text-[11px] text-rose-700 dark:text-rose-400 mt-0.5">
                 Terdapat ketidaksesuaian kwitansi atau bukti dukung. Silakan lakukan upload ulang berkas LPJ yang telah diperbaiki.
               </p>
@@ -216,12 +216,7 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
                     <th className="p-2.5 font-semibold text-right">Debit</th>
                     <th className="p-2.5 font-semibold text-right">Kredit</th>
                     <th className="p-2.5 font-semibold text-right">Saldo</th>
-                    <th className="p-2.5 font-semibold">
-                      <span className="flex items-center gap-1">
-                        <Paperclip className="w-3 h-3" />
-                        Bukti
-                      </span>
-                    </th>
+                    <th className="p-2.5 font-semibold">Bukti</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">

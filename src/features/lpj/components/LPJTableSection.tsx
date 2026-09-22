@@ -18,14 +18,13 @@ const LPJ_STATUS_OPTIONS = [
   { label: "Belum LPJ", value: "belum_lpj" },
   { label: "Submit", value: "submit" },
   { label: "Disetujui", value: "disetujui" },
-  { label: "Ditolak", value: "ditolak" },
+  { label: "Revisi", value: "revisi" },
 ];
 
 const JENIS_LPJ_OPTIONS = [
   { label: "Semua Jenis", value: "all" },
   { label: "RKA", value: "rka" },
   { label: "Insidental", value: "insidental" },
-  { label: "Reimbursement", value: "reimbursement" },
 ];
 
 function parseItemDate(dateStr?: string): Date | null {
@@ -86,8 +85,8 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
         return { variant: "warning" as const, label: "Belum LPJ" };
       case "submit":
         return { variant: "info" as const, label: "Submit" };
-      case "ditolak":
-        return { variant: "error" as const, label: "Ditolak" };
+      case "revisi":
+        return { variant: "error" as const, label: "Revisi" };
       case "disetujui":
         return { variant: "success" as const, label: "Disetujui" };
       default:
@@ -194,7 +193,7 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
         width: "130px",
         align: "center",
         cell: (item) => {
-          const isUploadActive = item.status === "belum_lpj" || item.status === "ditolak";
+          const isUploadActive = item.status === "belum_lpj" || item.status === "revisi";
           return (
             <div className="flex items-center justify-center gap-1.5">
               <button

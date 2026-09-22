@@ -36,7 +36,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     noPengajuan: "004/REIMB/MKT/2026",
     tanggalCair: "2026-03-07",
     tanggalPengajuan: "2026-03-01",
-    jenis: "Reimbursement",
+    jenis: "RKA",
     saldoAwal: 5100000,
     saldoAkhir: 0,
     status: "disetujui",
@@ -46,7 +46,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     noPengajuan: "005/REIMB/GA/2026",
     tanggalCair: "2026-03-11",
     tanggalPengajuan: "2026-03-03",
-    jenis: "Reimbursement",
+    jenis: "RKA",
     saldoAwal: 3750000,
     saldoAkhir: undefined,
     status: "belum_lpj",
@@ -59,7 +59,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     jenis: "Insidental",
     saldoAwal: 8600000,
     saldoAkhir: 450000,
-    status: "ditolak",
+    status: "revisi",
   },
   {
     id: "5e7b9a32-8f14-4dc5-9321-e490b6287707",
@@ -79,7 +79,7 @@ let MOCK_INFO_LPJ: InfoLPJ[] = [
     jenis: "Insidental",
     saldoAwal: 9800000,
     saldoAkhir: 200000,
-    status: "ditolak",
+    status: "revisi",
   },
 ];
 
@@ -172,7 +172,7 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     id: "6c1e5a82-f38b-4a57-bf91-b75d26390404",
     noPengajuan: "004/REIMB/MKT/2026",
     tanggalCair: "2026-03-07",
-    jenis: "Reimbursement",
+    jenis: "RKA",
     saldoAwal: 5100000,
     saldoAkhir: 0,
     silpa: 0,
@@ -204,7 +204,7 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     id: "9a4d8c71-2e53-4b6a-8f19-35c7e1905505",
     noPengajuan: "005/REIMB/GA/2026",
     tanggalCair: "2026-03-11",
-    jenis: "Reimbursement",
+    jenis: "RKA",
     saldoAwal: 3750000,
     saldoAkhir: undefined,
     silpa: undefined,
@@ -221,7 +221,7 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     saldoAwal: 8600000,
     saldoAkhir: 450000,
     silpa: 450000,
-    status: "ditolak",
+    status: "revisi",
     rincian: {
       item: [
         {
@@ -302,7 +302,7 @@ const MOCK_LPJ_DETAIL_MAP: Record<string, LPJBase> = {
     saldoAwal: 9800000,
     saldoAkhir: 200000,
     silpa: 200000,
-    status: "ditolak",
+    status: "revisi",
     rincian: {
       item: [
         {

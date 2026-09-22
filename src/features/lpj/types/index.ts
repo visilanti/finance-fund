@@ -1,5 +1,5 @@
-export type StatusLPJ = "belum_lpj" | "submit" | "ditolak" | "disetujui" | string;
-export type JenisLPJ = "RKA" | "Insidental" | "Reimbursement" | string;
+export type StatusLPJ = "belum_lpj" | "submit" | "ditolak" | "revisi" | "disetujui" | string;
+export type JenisLPJ = "RKA" | "Insidental" | string;
 
 //get info utama lpj untuk semua jenis
 export interface InfoLPJ {
