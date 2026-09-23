@@ -185,6 +185,18 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
             <div className="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 whitespace-nowrap">
               {item.silpa !== undefined ? formatIDR(item.silpa) : "-"}
             </div>
+            {item.buktiTransferSilpaUrl && (
+              <a
+                href={item.buktiTransferSilpaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={item.buktiTransferSilpaNama || "Bukti Transfer SILPA"}
+                className="inline-flex items-center gap-1 mt-1 text-[10px] font-semibold text-primary hover:underline truncate max-w-full"
+              >
+                <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                <span className="truncate">{item.buktiTransferSilpaNama || "Bukti Transfer"}</span>
+              </a>
+            )}
           </Card>
         </div>
 

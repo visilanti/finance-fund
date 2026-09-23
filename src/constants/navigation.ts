@@ -41,13 +41,13 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "MAIN",
     items: [
-      {
-        id: "dashboard",
-        label: "Dashboard",
-        icon: LayoutDashboard,
-        path: "/dashboard",
-        roles: ["bendahara", "finance"],
-      },
+      // {
+      //   id: "dashboard",
+      //   label: "Dashboard",
+      //   icon: LayoutDashboard,
+      //   path: "/dashboard",
+      //   roles: ["bendahara", "finance"],
+      // },
       {
         id: "rka-matrix",
         label: "Matriks RKA 12 Bulan",
@@ -132,19 +132,19 @@ export const NAV_GROUPS: NavGroup[] = [
           {
             id: "approval-rka",
             label: "Persetujuan RKA",
-            path: "/approval/rka",
+            path: "/approval?type=rka",
             roles: ["manager", "bendahara"],
           },
           {
             id: "approval-insidental",
             label: "Persetujuan Insidental",
-            path: "/approval/insidental",
+            path: "/approval?type=insidental",
             roles: ["manager", "bendahara"],
           },
           {
             id: "approval-reimbursement",
-            label: "Pencairan Finance",
-            path: "/pencairan",
+            label: "Persetujuan Reimbursement",
+            path: "/approval?type=reimbursement",
             roles: ["manager", "bendahara"],
           },
         ],
@@ -161,7 +161,7 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Laporan",
         icon: BarChart3,
         path: "/laporan",
-        roles: ["divisi", "finance"],
+        roles: ["finance"],
       },
     ],
   },

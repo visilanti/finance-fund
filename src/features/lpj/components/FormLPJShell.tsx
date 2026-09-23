@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/Button";
 import { formatIDR } from "@/lib/utils";
 import { FormLPJItemsTable } from "./FormLPJItemsTable";
 import { PernyataanModal } from "./PernyataanModal";
-import { AlertCircle, Send, ArrowLeft } from "lucide-react";
+import { FileUploadZone } from "@/components/shared/FileUploadZone";
+import { AlertCircle, Send, ArrowLeft, Building2, Copy, Check, Info } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormStickyFooter } from "@/components/shared/FormStickyFooter";
 
@@ -31,10 +32,38 @@ export function FormLPJShell({ lpj, onSave, isSubmitting = false }: FormLPJShell
   });
   const [isPernyataanOpen, setIsPernyataanOpen] = useState(false);
 
+  // Local state untuk bukti transfer SILPA jika silpa > 0
+  const [buktiTransferSilpaUrl, setBuktiTransferSilpaUrl] = useState<string | undefined>(
+    lpj.buktiTransferSilpaUrl
+  );
+  const [buktiTransferSilpaNama, setBuktiTransferSilpaNama] = useState<string | undefined>(
+    lpj.buktiTransferSilpaNama
+  );
+  const [isCopied, setIsCopied] = useState(false);
+
   // Real-time calculations: Pengeluaran kredit mengurangi saldo awal
   const totalKredit = items.reduce((acc, curr) => acc + (Number(curr.kredit) || 0), 0);
   const saldoAkhir = lpj.saldoAwal - totalKredit;
   const silpa = Math.max(0, saldoAkhir);
+
+  const handleCopyRekening = () => {
+    navigator.clipboard.writeText("138-00-2938102-4");
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  const handleSilpaFileSelect = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    const objectUrl = URL.createObjectURL(file);
+    setBuktiTransferSilpaUrl(objectUrl);
+    setBuktiTransferSilpaNama(file.name);
+  };
+
+  const handleSilpaFileRemove = () => {
+    setBuktiTransferSilpaUrl(undefined);
+    setBuktiTransferSilpaNama(undefined);
+  };
 
   const handleAddItem = () => {
     setItems((prev) => [
@@ -81,6 +110,8 @@ export function FormLPJShell({ lpj, onSave, isSubmitting = false }: FormLPJShell
       status: "submit",
       saldoAkhir,
       silpa,
+      buktiTransferSilpaUrl: silpa > 0 ? buktiTransferSilpaUrl : undefined,
+      buktiTransferSilpaNama: silpa > 0 ? buktiTransferSilpaNama : undefined,
       rincian: {
         item: [pencairanRow, ...items],
       },
@@ -169,6 +200,74 @@ export function FormLPJShell({ lpj, onSave, isSubmitting = false }: FormLPJShell
         onUpdateItem={handleUpdateItem}
       />
 
+      {/* KARTU 3: Upload Bukti Transfer & Panduan Transfer jika terdapat SILPA */}
+      {silpa > 0 && (
+        <FormCardSection
+          title="Pengembalian Sisa Dana (SILPA)"
+          description={`Terdapat sisa pengajuan dana sebesar ${formatIDR(silpa)} yang wajib dikembalikan ke rekening yayasan.`}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white dark:bg-slate-900 p-3.5 rounded-lg border border-slate-200/60 dark:border-slate-800 space-y-2.5 shadow-2xs">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Bank Tujuan</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">Bank Mandiri</span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Nomor Rekening</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-bold text-slate-900 dark:text-slate-100 text-sm">
+                    138-00-2938102-4
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopyRekening}
+                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    title="Salin No. Rekening"
+                  >
+                    {isCopied ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Atas Nama</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">
+                  Bendahara Utama LMS-EGS
+                </span>
+              </div>
+            </div>
+            {/* Form Upload Bukti Transfer */}
+            <div className="space-y-2">
+              <FileUploadZone
+                label="Klik atau seret file bukti transfer SILPA"
+                sublabel="Format PDF, JPG, PNG (Maks. 5MB)"
+                accept="image/*,.pdf"
+                multiple={false}
+                onFileSelect={handleSilpaFileSelect}
+                previewUrl={
+                  buktiTransferSilpaUrl?.startsWith("blob:") ||
+                    buktiTransferSilpaUrl?.startsWith("data:")
+                    ? buktiTransferSilpaUrl
+                    : null
+                }
+                files={
+                  buktiTransferSilpaNama
+                    ? [{ name: buktiTransferSilpaNama, url: buktiTransferSilpaUrl }]
+                    : []
+                }
+                onRemoveFile={handleSilpaFileRemove}
+                onClearPreview={handleSilpaFileRemove}
+              />
+            </div>
+          </div>
+        </FormCardSection>
+      )}
+
       {/* Sticky Bottom Summary & Submit Bar */}
       <FormStickyFooter
         totalLabel="Total Realisasi"
@@ -199,14 +298,14 @@ export function FormLPJShell({ lpj, onSave, isSubmitting = false }: FormLPJShell
           lpj.noPengajuan.includes("/IT/")
             ? "Divisi IT"
             : lpj.noPengajuan.includes("/HR/")
-            ? "Divisi HR"
-            : lpj.noPengajuan.includes("/MKT/")
-            ? "Divisi Marketing"
-            : lpj.noPengajuan.includes("/GA/")
-            ? "Divisi General Affairs"
-            : lpj.noPengajuan.includes("/BD/")
-            ? "Divisi Business Development"
-            : "Divisi IT"
+              ? "Divisi HR"
+              : lpj.noPengajuan.includes("/MKT/")
+                ? "Divisi Marketing"
+                : lpj.noPengajuan.includes("/GA/")
+                  ? "Divisi General Affairs"
+                  : lpj.noPengajuan.includes("/BD/")
+                    ? "Divisi Business Development"
+                    : "Divisi IT"
         }
         tanggalCair={lpj.tanggalCair}
         noPengajuan={lpj.noPengajuan}
@@ -214,6 +313,7 @@ export function FormLPJShell({ lpj, onSave, isSubmitting = false }: FormLPJShell
         saldoAwal={lpj.saldoAwal}
         saldoAkhir={saldoAkhir}
         silpa={silpa}
+        buktiTransferSilpaNama={buktiTransferSilpaNama}
         items={items}
       />
     </form>

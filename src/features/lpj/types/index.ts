@@ -32,6 +32,8 @@ export interface LPJBase {
   saldoAwal: number;
   saldoAkhir?: number;
   silpa?: number;
+  buktiTransferSilpaUrl?: string;
+  buktiTransferSilpaNama?: string;
   status: StatusLPJ;
   rincian: {
     item: DetailItemLPJ[];

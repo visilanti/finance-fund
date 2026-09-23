@@ -30,7 +30,7 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
 
           <div className="min-w-0 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+              <h1 className="text-lg md:text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
                 {profile.fullName}
               </h1>
               {/* Role Tags */}

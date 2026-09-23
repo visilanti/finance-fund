@@ -20,6 +20,7 @@ export interface PernyataanModalProps {
   saldoAwal: number;
   saldoAkhir: number;
   silpa: number;
+  buktiTransferSilpaNama?: string;
   items: DetailItemLPJ[];
 }
 
@@ -51,6 +52,7 @@ export function PernyataanModal({
   saldoAwal,
   saldoAkhir,
   silpa,
+  buktiTransferSilpaNama,
   items,
 }: PernyataanModalProps) {
   const [isAgreed, setIsAgreed] = useState(false);
@@ -180,6 +182,11 @@ export function PernyataanModal({
               <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
                 {formatIDR(silpa)}
               </div>
+              {silpa > 0 && (
+                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium truncate mt-1">
+                  {buktiTransferSilpaNama ? `✓ Resi: ${buktiTransferSilpaNama}` : "⚠ Resi belum diunggah"}
+                </div>
+              )}
             </div>
           </div>
         </div>

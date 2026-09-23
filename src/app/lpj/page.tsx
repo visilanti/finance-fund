@@ -1,6 +1,6 @@
 import React from "react";
 import { MainLayoutShell } from "@/components/layout/MainLayoutShell";
-import { LPJTableSection } from "@/features/lpj/components";
+import { LPJListShell } from "@/features/lpj/components";
 import { lpjService } from "@/features/lpj/services/lpj.service";
 
 export default async function Page() {
@@ -12,7 +12,7 @@ export default async function Page() {
       initialRole="divisi"
       activePath="/lpj"
     >
-      <LPJTableSection initialData={initialData} />
+      <LPJListShell initialData={initialData} />
     </MainLayoutShell>
   );
 }

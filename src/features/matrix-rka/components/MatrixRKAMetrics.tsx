@@ -33,7 +33,6 @@ export function MatrixRKAMetrics({ metrics }: MatrixRKAMetricsProps) {
       <MetricCard
         title="Belum Dicairkan"
         value={formatIDR(metrics.totalBelumCair)}
-        subtitle="Rencana bulan berjalan"
         icon={Clock}
       />
       <MetricCard

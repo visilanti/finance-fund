@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 
 interface LPJTableSectionProps {
   initialData?: InfoLPJ[];
+  statusFilter?: string;
+  onStatusFilterChange?: (status: string) => void;
 }
 
 const LPJ_STATUS_OPTIONS = [
@@ -39,15 +41,26 @@ function parseItemDate(dateStr?: string): Date | null {
   return isNaN(parsed.getTime()) ? null : parsed;
 }
 
-export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
+export function LPJTableSection({
+  initialData = [],
+  statusFilter: externalStatusFilter,
+  onStatusFilterChange,
+}: LPJTableSectionProps) {
   const router = useRouter();
   const [data, setData] = useState<InfoLPJ[]>(initialData);
   const [isLoading, setIsLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [internalStatusFilter, setInternalStatusFilter] = useState<string>("all");
   const [jenisFilter, setJenisFilter] = useState<string>("all");
   const [tanggalCairFilter, setTanggalCairFilter] = useState<DateRangeFilter>({ startDate: "", endDate: "" });
   const [tanggalPengajuanFilter, setTanggalPengajuanFilter] = useState<DateRangeFilter>({ startDate: "", endDate: "" });
   const [selectedItemDetail, setSelectedItemDetail] = useState<LPJBase | null>(null);
+
+  const statusFilter = externalStatusFilter !== undefined ? externalStatusFilter : internalStatusFilter;
+
+  const handleStatusChange = (val: string) => {
+    setInternalStatusFilter(val);
+    onStatusFilterChange?.(val);
+  };
 
   // Muat data jika initialData kosong
   const loadData = useCallback(async () => {
@@ -63,7 +76,9 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
   }, []);
 
   useEffect(() => {
-    if (initialData.length === 0) {
+    if (initialData.length > 0) {
+      setData(initialData);
+    } else {
       loadData();
     }
   }, [initialData, loadData]);
@@ -302,7 +317,7 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
               id: "status",
               title: "Status LPJ",
               value: statusFilter,
-              onChange: setStatusFilter,
+              onChange: handleStatusChange,
               options: LPJ_STATUS_OPTIONS,
             },
             {
@@ -314,7 +329,7 @@ export function LPJTableSection({ initialData = [] }: LPJTableSectionProps) {
             },
           ],
           onResetFilters: () => {
-            setStatusFilter("all");
+            handleStatusChange("all");
             setJenisFilter("all");
             setTanggalCairFilter({ startDate: "", endDate: "" });
             setTanggalPengajuanFilter({ startDate: "", endDate: "" });
