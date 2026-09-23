@@ -4,4 +4,4 @@ export * from "./DigitalSignatureSection";
 export * from "./ModalTtd";
 export * from "./ProfilePageContent";
 export * from "./ChipCardIcon";
-
+export * from "../../pengajuan/components/forms/BankCard";

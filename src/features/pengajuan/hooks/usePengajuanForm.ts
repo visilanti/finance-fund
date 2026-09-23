@@ -130,9 +130,17 @@ export function usePengajuanForm(
       const searchParams = new URLSearchParams(window.location.search);
       const editId = searchParams.get("editId") || searchParams.get("id");
       if (editId) {
-        setIsEditMode(true);
         service.getPengajuanById(editId).then((data) => {
           if (data) {
+            const statusLower = data.status?.toLowerCase();
+            const isEditable = statusLower === "ditolak" || statusLower === "draft";
+
+            if (!isEditable) {
+              window.location.href = "/pengajuan?type=rka";
+              return;
+            }
+
+            setIsEditMode(true);
             if (data.nomorPengajuan || data.kode) setNomorPengajuan(data.nomorPengajuan || data.kode || "");
             if (data.judul) setJudul(data.judul);
             if (data.divisi) setDivisi(data.divisi);
@@ -144,6 +152,8 @@ export function usePengajuanForm(
             if (data.namaPemilikRekening) setNamaPemilikRekening(data.namaPemilikRekening);
             if (data.catatan) setCatatan(data.catatan);
             if (data.alasan) setAlasan(data.alasan);
+          } else {
+            window.location.href = "/pengajuan?type=rka";
           }
         });
       }
@@ -274,6 +284,11 @@ export function usePengajuanForm(
   const handleSubmit = async () => {
     if (!nomorPengajuan.trim() || items.length === 0) {
       alert("Mohon lengkapi nomor pengajuan dan minimal 1 rincian item.");
+      return;
+    }
+
+    if (!namaBank.trim() || !noRekening.trim() || !namaPemilikRekening.trim()) {
+      alert("Mohon lengkapi informasi rekening bank tujuan transfer pencairan.");
       return;
     }
 

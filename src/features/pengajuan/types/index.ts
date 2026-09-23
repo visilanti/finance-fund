@@ -98,7 +98,9 @@ export type KegiatanRKA = {
   detail: {
     bulan: string;
     budget: number;
+    catatan?: string;
   }[];
+  isChildren?: boolean;
 }
 //type untuk mock list kelompok dan kegiatan RKA
 export interface KelompokRKA {

@@ -14,6 +14,7 @@ import { RKAMatrixDrawer } from "./RKAMatrixDrawer";
 
 import { AlertCircle } from "lucide-react";
 import { FormReimbursementItemsTable } from "./FormReimbursementItemsTable";
+import { FormTransferSection } from "./FormTransferSection";
 
 interface FormPengajuanShellProps {
   form: UsePengajuanFormReturn;
@@ -174,6 +175,8 @@ export function FormPengajuanShell({ form, type = "rka" }: FormPengajuanShellPro
         />
       </FormCardSection>
 
+      {/* Pilihan Transfer Rekening (Manual atau dari Profil) */}
+      <FormTransferSection form={form} type={type} />
       <FormStickyFooter
         totalNominal={form.totalNominal}
         isOverBudget={isRka && form.isOverBudget}

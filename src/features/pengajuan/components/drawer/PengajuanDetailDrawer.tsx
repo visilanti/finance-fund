@@ -34,6 +34,10 @@ export function PengajuanDetailDrawer({
   const displayItem = item;
 
   const handleEditRevisi = () => {
+    if (displayItem.currentStatus?.toLowerCase() !== "ditolak") {
+      window.location.href = "/pengajuan?type=rka";
+      return;
+    }
     if (onEditRevisi) {
       onEditRevisi(displayItem);
     } else {

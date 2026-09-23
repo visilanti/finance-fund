@@ -1,0 +1,267 @@
+# Rencana Implementasi: Redesain Struktur Data & Visualisasi Matriks RKA Multi-Tier
+
+Dokumen ini adalah cetak biru teknis implementasi struktur data RKA (Rencana Kerja dan Anggaran) multi-tier yang telah disepakati, format mock data JSON final, serta integrasi visualisasi tabel matriks bulanan dan formulir pengajuan dana.
+
+---
+
+## Ringkasan Keputusan Desain (Disepakati)
+
+1. **Format Alokasi Bulan: Array (`list_budget`)**
+   - Menggunakan format Array `list_budget: [{ bulan, budget, realisasi, status, catatan }]`.
+   - *Alasan:* Karena data bulan maksimal hanya 12 item per baris, perbedaan kecepatan antara Object vs Array tidak kentara sama sekali (kurang dari 0.001 ms). Format Array jauh lebih standar di REST API backend dan mudah dimanipulasi di frontend (`.map`, `.filter`, `.reduce`).
+2. **Tahun Disimpan di Root:**
+   - Properti `tahun: 2026` berada pada root dokumen RKA. Elemen `list_budget` murni menyebutkan nama bulan (`"Januari"`, `"Februari"`, dst.).
+3. **Penanda Budget: `isHasBudget`**
+   - Menggunakan properti `isHasBudget: boolean` (menggantikan istilah teknis `isLeaf`):
+     - `isHasBudget: false` $\rightarrow$ Parent / wadah pengelompokan (kegiatan yang memiliki sub-kegiatan), tidak memiliki alokasi budget langsung.
+     - `isHasBudget: true` $\rightarrow$ Item terendah yang memegang alokasi dana (`list_budget`).
+4. **Semua Data adalah Cash Out (Pengeluaran):**
+   - Seluruh item RKA adalah rencana pengeluaran dana (*cash out*).
+   - Baris subtotal di setiap group adalah **Subtotal Pengeluaran Group**.
+   - Baris paling bawah tabel adalah **TOTAL PENGELUARAN RKA (TOTAL CASH OUT)** per bulan.
+5. **Nama Group Bebas:**
+   - Level teratas (`category: "kelompok_group"`) memiliki nama bebas dinamis sesuai kebutuhan unit/sekolah (misal: `"KEGIATAN KURIKULUM"`, `"KEGIATAN HUMAS"`, `"OPERASIONAL IT"`, dll).
+6. **Hierarki Seragam:**
+   - Setiap node yang memiliki anak selalu menggunakan nama properti seragam: `children: [...]`.
+
+---
+
+## Format Mock Data JSON Final
+
+```json
+{
+  "id": "2a160650-db7e-41d9-8e02-902ba9dc743a",
+  "name": "RKA_SMA-BDG",
+  "tahun": 2026,
+  "unit": "Divisi IT",
+  "list_item": [
+    {
+      "id": "grp-1",
+      "name": "KEGIATAN KURIKULUM",
+      "category": "kelompok_group",
+      "children": [
+        {
+          "id": "kel-1",
+          "name": "KEGIATAN PEMBELAJARAN DAN PRAKTIKUM",
+          "category": "kelompok",
+          "children": [
+            {
+              "id": "keg-1",
+              "name": "Pembinaan Klub",
+              "category": "kegiatan",
+              "isHasBudget": false,
+              "children": [
+                {
+                  "id": "sub-1",
+                  "name": "Klub 1 Archery",
+                  "category": "sub-kegiatan",
+                  "isHasBudget": true,
+                  "list_budget": [
+                    { "bulan": "Januari", "budget": 1000000, "realisasi": 1000000, "status": "dicairkan", "catatan": "Target bantalan busa" },
+                    { "bulan": "Februari", "budget": 4780000, "realisasi": 0, "status": "belum_cair", "catatan": "Sewa pelatih berlisensi" }
+                  ]
+                },
+                {
+                  "id": "sub-2",
+                  "name": "Klub 2 Voli",
+                  "category": "sub-kegiatan",
+                  "isHasBudget": true,
+                  "list_budget": [
+                    { "bulan": "Februari", "budget": 1300000, "realisasi": 1300000, "status": "dicairkan", "catatan": "Bola voli Mikasa" },
+                    { "bulan": "September", "budget": 6780000, "realisasi": 0, "status": "belum_cair", "catatan": null }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "keg-2",
+              "name": "Workshop Kurikulum Merdeka (Kegiatan Langsung)",
+              "category": "kegiatan",
+              "isHasBudget": true,
+              "list_budget": [
+                { "bulan": "Januari", "budget": 5000000, "realisasi": 0, "status": "hangus", "catatan": "Dibatalkan karena jadwal bentrok" },
+                { "bulan": "Maret", "budget": 7500000, "realisasi": 7500000, "status": "dicairkan", "catatan": "Honor narasumber" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "grp-2",
+      "name": "KEGIATAN HUMAS",
+      "category": "kelompok_group",
+      "children": [
+        {
+          "id": "kel-2",
+          "name": "PERTEMUAN ORANG TUA DAN RAPOR",
+          "category": "kelompok",
+          "children": [
+            {
+              "id": "keg-3",
+              "name": "Konsumsi Pertemuan Orang Tua",
+              "category": "kegiatan",
+              "isHasBudget": true,
+              "list_budget": [
+                { "bulan": "Januari", "budget": 2500000, "realisasi": 2500000, "status": "dicairkan", "catatan": "Snack & makan siang rapat" },
+                { "bulan": "Juni", "budget": 3000000, "realisasi": 0, "status": "belum_cair", "catatan": null }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "kel-3",
+          "name": "KEHUMASAN",
+          "category": "kelompok",
+          "children": [
+            {
+              "id": "keg-4",
+              "name": "Publikasi Media & Brosur PPDB",
+              "category": "kegiatan",
+              "isHasBudget": true,
+              "list_budget": [
+                { "bulan": "Februari", "budget": 4000000, "realisasi": 4000000, "status": "dicairkan", "catatan": "Cetak brosur & spanduk PPDB" },
+                { "bulan": "Maret", "budget": 2000000, "realisasi": 0, "status": "belum_cair", "catatan": "Iklan media sosial" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "grp-3",
+      "name": "SARANA PRASARANA & OPERASIONAL IT",
+      "category": "kelompok_group",
+      "children": [
+        {
+          "id": "kel-4",
+          "name": "Pemeliharaan & Internet",
+          "category": "kelompok",
+          "children": [
+            {
+              "id": "keg-5",
+              "name": "Langganan Internet & Lisensi Software",
+              "category": "kegiatan",
+              "isHasBudget": true,
+              "list_budget": [
+                { "bulan": "Januari", "budget": 3500000, "realisasi": 3500000, "status": "dicairkan", "catatan": "Dedicated 100Mbps" },
+                { "bulan": "Februari", "budget": 3500000, "realisasi": 3500000, "status": "dicairkan", "catatan": null },
+                { "bulan": "Maret", "budget": 3500000, "realisasi": 3500000, "status": "dicairkan", "catatan": null },
+                { "bulan": "April", "budget": 3500000, "realisasi": 0, "status": "belum_cair", "catatan": null }
+              ]
+            },
+            {
+              "id": "keg-6",
+              "name": "ATK & Perlengkapan Kantor",
+              "category": "kegiatan",
+              "isHasBudget": true,
+              "list_budget": [
+                { "bulan": "Januari", "budget": 2000000, "realisasi": 2000000, "status": "dicairkan", "catatan": "Kertas & tinta printer" },
+                { "bulan": "Februari", "budget": 1500000, "realisasi": 1500000, "status": "dicairkan", "catatan": null },
+                { "bulan": "Maret", "budget": 1500000, "realisasi": 1500000, "status": "dicairkan", "catatan": null },
+                { "bulan": "April", "budget": 2000000, "realisasi": 0, "status": "belum_cair", "catatan": null }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## Proposed Changes
+
+### 1. Types & Data Contract
+
+#### [MODIFY] [types/index.ts](file:///d:/finance-fund-main/src/features/pengajuan/types/index.ts)
+* Memastikan tipe TypeScript mendefinisikan interface baru yang persis dengan struktur mock final di atas:
+  ```typescript
+  export type RKAStatusPencairan = "dicairkan" | "belum_cair" | "hangus";
+
+  export interface ItemBudgetBulan {
+    bulan: string;
+    budget: number;
+    realisasi?: number;
+    status?: RKAStatusPencairan;
+    catatan?: string | null;
+  }
+
+  export type RKACategory =
+    | "kelompok_group"
+    | "kelompok"
+    | "kegiatan"
+    | "sub-kegiatan"
+    | "sub_kegiatan";
+
+  export interface RKANode {
+    id: string;
+    name: string;
+    category: RKACategory;
+    isHasBudget?: boolean;
+    children?: RKANode[];
+    list_budget?: ItemBudgetBulan[];
+  }
+
+  export interface RKADocument {
+    id: string;
+    name: string;
+    tahun: number;
+    unit?: string;
+    list_item: RKANode[];
+  }
+  ```
+
+---
+
+### 2. Service & Mock Data
+
+#### [MODIFY] [divisiPengajuan.service.ts](file:///d:/finance-fund-main/src/features/pengajuan/services/divisiPengajuan.service.ts)
+* Menambahkan konstanta `MOCK_RKA_DOCUMENT: RKADocument` berisi data JSON final di atas.
+* Menambahkan helper flattening adapter `convertRkaDocumentToLegacy(doc: RKADocument): KelompokRKA[]` agar form dan komponen lama tetap berfungsi 100% tanpa error (*zero-breakage*).
+* Menambahkan fungsi utilitas agregasi:
+  - `calculateNodeMonthlyTotal(node: RKANode, bulan: string): number`
+  - `calculateNodeYearlyTotal(node: RKANode): number`
+* Menambahkan metode `getRKADocument()` pada service class `DivisiPengajuanService`.
+
+---
+
+### 3. Komponen Visualisasi Matriks
+
+#### [MODIFY] [RKAMatrixDrawer.tsx](file:///d:/finance-fund-main/src/features/pengajuan/components/forms/RKAMatrixDrawer.tsx)
+* Mengintegrasikan tampilan matriks tabel bulanan (*Cash Out Matrix*):
+  - **Kolom:** NO | KETERANGAN | Jan 2026 | Feb 2026 | Mar 2026 | Apr 2026 | Mei 2026 | Jun 2026 ...
+  - **Baris Kategori Group:** Berlatar abu-abu muda dengan teks kapital tebal (misal: `KEGIATAN KURIKULUM`).
+  - **Indentasi Hierarkis:** Menampilkan kegiatan dan sub-kegiatan berjenjang.
+  - **Titik Status:**
+    - 🟢 Hijau: `dicairkan`
+    - 🔴/🟠 Oranye/Pink: `belum_cair`
+    - 🟡 Abu-abu/Kuning: `hangus`
+    - `—` (strip abu-abu) untuk bulan yang tidak memiliki anggaran.
+  - **Baris Subtotal Group:** Otomatis menjumlahkan pengeluaran grup per bulan.
+  - **Baris Total Pengeluaran RKA:** Menjumlahkan seluruh pengeluaran bulanan di baris paling bawah.
+
+---
+
+### 4. Formulir Pengajuan & Validasi Plafon
+
+#### [MODIFY] [FormItemsRKATable.tsx](file:///d:/finance-fund-main/src/features/pengajuan/components/forms/FormItemsRKATable.tsx) & [usePengajuanForm.ts](file:///d:/finance-fund-main/src/features/pengajuan/hooks/usePengajuanForm.ts)
+* Memastikan dropdown memilih item kegiatan/sub-kegiatan yang valid dan mengambil `budget` bulan terkait sebagai patokan plafon maksimal.
+
+---
+
+## Verification Plan
+
+### Automated Checks
+- Verifikasi TypeScript compilation dan tidak ada type errors pada modul yang dimodifikasi.
+
+### Manual Verification
+1. **Drawer Cek Plafon RKA (Visualisasi Matriks):**
+   - Buka tombol "Cek Plafon RKA" di form pengajuan.
+   - Periksa rendering tabel matriks dengan baris kelompok_group, kegiatan, dan sub-kegiatan.
+   - Verifikasi dot warna hijau/oranye/kuning pada nominal.
+   - Verifikasi perhitungan subtotal per kelompok group dan total cash out di bagian bawah.
+2. **Form Pengajuan:**
+   - Tambah baris item kegiatan, verifikasi nominal plafon bulan muncul otomatis sesuai budget dari sub-kegiatan/kegiatan terpilih.

@@ -37,17 +37,17 @@ export interface PengajuanPayload {
   urgensi: "normal" | "urgent" | "emergency";
   items: PengajuanItemDetail[];
   totalNominal: number;
-  
+
   // Rekening Vendor / Penerima
   namaBank: string;
   noRekening: string;
   namaPemilikRekening: string;
   namaVendor: string;
-  
+
   // Dokumen Pendukung & Catatan
   catatan?: string;
   lampiranFiles?: string[];
-  
+
   status?: "draft" | "menunggu" | "disetujui" | "ditolak" | "diproses" | "selesai";
   alasan?: string;
 }
