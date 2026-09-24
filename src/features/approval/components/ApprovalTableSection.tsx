@@ -50,7 +50,11 @@ export function ApprovalTableSection({
     setActionType(type);
   };
 
-  const handleConfirmAction = async (payload: { status: "disetujui" | "ditolak"; catatan: string }) => {
+  const handleConfirmAction = async (payload: {
+    status: "disetujui" | "ditolak";
+    catatan: string;
+    danaDisetujui?: number;
+  }) => {
     if (!activeActionItem) return;
 
     setIsSubmittingAction(true);
@@ -59,13 +63,21 @@ export function ApprovalTableSection({
         id: activeActionItem.id,
         status: payload.status,
         catatan: payload.catatan,
+        danaDisetujui: payload.danaDisetujui,
       });
 
       // Update local state
       setData((prev) =>
         prev.map((it) =>
           it.id === activeActionItem.id
-            ? { ...it, currentStatus: payload.status }
+            ? {
+                ...it,
+                currentStatus: payload.status,
+                nominalDiterima:
+                  payload.danaDisetujui !== undefined
+                    ? payload.danaDisetujui
+                    : it.nominalDiterima,
+              }
             : it
         )
       );
@@ -216,7 +228,7 @@ export function ApprovalTableSection({
               <button
                 type="button"
                 onClick={() => handleOpenAction(item, "approve")}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
                 title="Setujui Pengajuan Ini"
               >
                 <Check className="w-3.5 h-3.5" />
@@ -226,7 +238,7 @@ export function ApprovalTableSection({
               <button
                 type="button"
                 onClick={() => handleOpenAction(item, "reject")}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-semibold transition-all cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 text-xs font-semibold transition-all cursor-pointer"
                 title="Tolak Pengajuan Ini"
               >
                 <X className="w-3.5 h-3.5" />

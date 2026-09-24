@@ -16,6 +16,7 @@ import { RejectionBanner } from "./RejectionBanner";
 import { ProgressLineChecklist } from "./ProgressLineChecklist";
 import { DrawerRkaContent } from "./DrawerRkaContent";
 import { DrawerReimbursementContent } from "./DrawerReimbursementContent";
+import { DrawerInsidentalContent } from "./DrawerInsidentalContent";
 
 export interface PengajuanDetailDrawerProps {
   item: PengajuanDanaItem | null;
@@ -89,10 +90,10 @@ export function PengajuanDetailDrawer({
         namaPemilikRekening: "Divisi " + displayItem.divisi,
       };
 
-  const pengesahan = displayItem.pengesahan || {
-    namaTerang: "Drs. Hendra Wijaya, M.M.",
-  };
+  const pengesahan = displayItem.pengesahan;
 
+
+  
   const buktiUrl =
     displayItem.jenis === "Reimbursement"
       ? displayItem.buktiPembayaranUrl
@@ -222,7 +223,6 @@ export function PengajuanDetailDrawer({
           )}
         </Card>
 
-        {/* Dynamic Item Content based on Jenis Pengajuan */}
         {displayItem.jenis === "RKA" && (
           <DrawerRkaContent
             items={rkaItems}
@@ -232,8 +232,19 @@ export function PengajuanDetailDrawer({
           />
         )}
 
-        {(displayItem.jenis === "Reimbursement" || displayItem.jenis === "Insidental") && (
+        {displayItem.jenis === "Reimbursement" && (
           <DrawerReimbursementContent
+            jenis={displayItem.jenis}
+            items={reimbItems}
+            rekening={rekening}
+            pengesahan={pengesahan}
+            itemId={displayItem.id}
+            buktiUrl={buktiUrl}
+          />
+        )}
+
+        {displayItem.jenis === "Insidental" && (
+          <DrawerInsidentalContent
             jenis={displayItem.jenis}
             items={reimbItems}
             rekening={rekening}

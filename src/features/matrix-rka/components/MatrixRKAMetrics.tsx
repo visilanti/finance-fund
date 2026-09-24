@@ -21,7 +21,7 @@ export function MatrixRKAMetrics({ metrics }: MatrixRKAMetricsProps) {
       <MetricCard
         title="Total RKA 2026"
         value={formatIDR(metrics.totalAnggaran)}
-        subtitle="Total pengeluaran"
+        subtitle="Total pengeluaran 2026"
         icon={Wallet}
       />
       <MetricCard
@@ -33,12 +33,13 @@ export function MatrixRKAMetrics({ metrics }: MatrixRKAMetricsProps) {
       <MetricCard
         title="Belum Dicairkan"
         value={formatIDR(metrics.totalBelumCair)}
+        subtitle="Perhitungan bulan ini"
         icon={Clock}
       />
       <MetricCard
         title="Hangus / Batal"
         value={formatIDR(metrics.totalHangus)}
-        subtitle="Tidak terserap"
+        subtitle="Perhitungan bulan lalu"
         icon={AlertOctagon}
         iconBgClass="bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400"
         valueClass="text-rose-600 dark:text-rose-400"

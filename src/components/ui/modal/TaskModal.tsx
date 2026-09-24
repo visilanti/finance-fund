@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { CheckSquare } from "lucide-react";
 import { Modal, ModalSize } from "./Modal";
 import { cn } from "@/lib/utils";
 
@@ -71,21 +70,29 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       closeOnBackdropClick={closeOnBackdropClick}
       closeOnEsc={closeOnEsc && !isLoading}
       showCloseButton={!isLoading}
-      className={cn("flex flex-col max-h-[90vh]", className)}
+      className={cn(
+        "flex flex-col max-h-[85vh] sm:max-h-[88vh] overflow-hidden",
+        className
+      )}
     >
-      {/* Task Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0 pr-12">
+      {/* Sticky Task Header */}
+      <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 pr-12">
         <div className="flex items-center gap-3">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center flex-wrap gap-2">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                 {title}
               </h3>
+              {taskCode && (
+                <span className="font-mono text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold border border-slate-200 dark:border-slate-700">
+                  {taskCode}
+                </span>
+              )}
             </div>
             {badgeLabel && (
               <span
                 className={cn(
-                  "inline-block mt-0.5 text-[10px] font-semibold px-2 py-0.5 rounded-full border",
+                  "inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border",
                   badgeVariants[badgeVariant]
                 )}
               >
@@ -97,11 +104,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       </div>
 
       {/* Task Body (Scrollable Content / Form Inputs) */}
-      <div className="p-6 overflow-y-auto space-y-4 flex-1">{children}</div>
+      <div className="p-6 overflow-y-auto space-y-4 flex-1 min-h-0">
+        {children}
+      </div>
 
-      {/* Task Footer Actions */}
+      {/* Sticky Task Footer Actions */}
       {actions && (
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-2xl shrink-0">
+        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-xs shrink-0">
           {actions}
         </div>
       )}

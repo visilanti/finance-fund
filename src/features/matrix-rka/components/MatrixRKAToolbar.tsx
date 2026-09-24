@@ -4,12 +4,28 @@ import React from "react";
 import { Search, RefreshCw, Download } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { RKAStatusPencairan } from "../types";
+import { Select } from "@/components/ui/Select";
+import { useSidebarStore } from "@/store/useSidebarStore";
+
+const DIVISI_OPTIONS = [
+  { value: "all", label: "Semua Divisi" },
+  { value: "IT & Infrastructure", label: "IT & Infrastructure" },
+  { value: "Cloud Engineering", label: "Cloud Engineering" },
+  { value: "Marketing & Business", label: "Marketing & Business" },
+  { value: "General Affairs", label: "General Affairs" },
+  { value: "HR & People Ops", label: "HR & People Ops" },
+  { value: "Pendidikan & Akademik", label: "Pendidikan & Akademik" },
+  { value: "Operasional", label: "Operasional" },
+  { value: "Keuangan & Bendahara", label: "Keuangan & Bendahara" },
+];
 
 interface MatrixRKAToolbarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   statusFilter?: "all" | RKAStatusPencairan;
   onStatusFilterChange?: (status: "all" | RKAStatusPencairan) => void;
+  selectedDivisi?: string;
+  onDivisiChange?: (divisi: string) => void;
   onExpandAll?: () => void;
   onCollapseAll?: () => void;
   allExpanded?: boolean;
@@ -20,9 +36,14 @@ interface MatrixRKAToolbarProps {
 export function MatrixRKAToolbar({
   searchQuery,
   onSearchChange,
+  selectedDivisi,
+  onDivisiChange,
   onRefresh,
   onExport,
 }: MatrixRKAToolbarProps) {
+  const currentRole = useSidebarStore((state) => state.currentRole);
+  const isBendaharaOrFinance = currentRole === "bendahara" || currentRole === "finance";
+
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-t-2xl shadow-subtle">
       {/* Search Input */}
@@ -48,6 +69,19 @@ export function MatrixRKAToolbar({
 
       {/* Actions */}
       <div className="flex items-center gap-2">
+        {isBendaharaOrFinance && (
+          <Select
+            options={DIVISI_OPTIONS}
+            value={selectedDivisi}
+            onChange={(val: any) => {
+              const v = typeof val === "string" ? val : val?.target?.value ?? "";
+              onDivisiChange?.(v);
+            }}
+            placeholder="Pilih Divisi.."
+            isSearchable
+            // className="min-w-[160px]"
+          />
+        )}
         {onRefresh && (
           <Button
             variant="outline"

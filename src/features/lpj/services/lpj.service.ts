@@ -1,4 +1,4 @@
-import { InfoLPJ, LPJBase } from "../types";
+import { InfoLPJ, LPJBase, StatusLPJ } from "../types";
 
 let MOCK_INFO_LPJ: InfoLPJ[] = [
   {
@@ -412,6 +412,39 @@ export class LPJService {
           data: { ...lpjData },
         });
       }, 250);
+    });
+  }
+
+  /**
+   * Update status verifikasi LPJ oleh Finance (misal: disetujui / revisi).
+   */
+  async updateStatusLPJ(id: string, status: StatusLPJ, catatan?: string): Promise<{ success: boolean }> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        MOCK_INFO_LPJ = MOCK_INFO_LPJ.map((item) => {
+          if (item.id === id || item.noPengajuan === id) {
+            return {
+              ...item,
+              status,
+            };
+          }
+          return item;
+        });
+
+        // Cari juga di detail map
+        let detail = MOCK_LPJ_DETAIL_MAP[id];
+        if (!detail) {
+          detail = Object.values(MOCK_LPJ_DETAIL_MAP).find(
+            (d) => d.id === id || d.noPengajuan === id
+          )!;
+        }
+
+        if (detail) {
+          detail.status = status;
+        }
+
+        resolve({ success: true });
+      }, 200);
     });
   }
 }

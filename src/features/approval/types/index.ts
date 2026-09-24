@@ -12,4 +12,5 @@ export interface ApprovalActionPayload {
   id: string;
   status: "disetujui" | "ditolak";
   catatan?: string;
+  danaDisetujui?: number;
 }

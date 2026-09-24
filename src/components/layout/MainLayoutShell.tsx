@@ -1,12 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { Sidebar, RoleType } from "./Sidebar";
 import { Header } from "./Header";
 import { BreadcrumbItem } from "@/components/shared/Breadcrumb";
+import { NAV_GROUPS } from "@/constants/navigation";
+import { useSidebarStore } from "@/store/useSidebarStore";
+
+export function isPathAllowedForRole(targetPath: string, role: RoleType): boolean {
+  const cleanPath = targetPath.split("?")[0];
+
+  if (cleanPath === "/profile" || cleanPath === "/matriks-rka" || cleanPath === "/") {
+    return true;
+  }
+
+  for (const group of NAV_GROUPS) {
+    for (const item of group.items) {
+      if (item.path) {
+        const itemCleanPath = item.path.split("?")[0];
+        if (cleanPath === itemCleanPath || cleanPath.startsWith(itemCleanPath + "/")) {
+          return item.roles.includes(role);
+        }
+      }
+
+      if (item.children) {
+        for (const child of item.children) {
+          const childCleanPath = child.path.split("?")[0];
+          if (cleanPath === childCleanPath || cleanPath.startsWith(childCleanPath + "/")) {
+            return child.roles.includes(role);
+          }
+        }
+      }
+    }
+  }
+
+  return true;
+}
 
 interface MainLayoutShellProps {
   children: React.ReactNode;
+  /**
+   * TODO (Next Development):
+   * `initialRole` saat ini digunakan sebagai fallback untuk fitur simulasi role.
+   * Ketika sistem autentikasi (NextAuth / JWT / session login) sudah diintegrasikan,
+   * prop ini bisa dihapus/digantikan dengan data role resmi dari session pengguna (misal: `useAuth()`).
+   */
   initialRole?: RoleType;
   activePath?: string;
   pageTitle?: string;
@@ -24,14 +63,43 @@ export function MainLayoutShell({
   breadcrumbs,
   headerActions,
 }: MainLayoutShellProps) {
-  const [role, setRole] = useState<RoleType>(initialRole);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const { currentRole, setRole } = useSidebarStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const effectivePath = activePath || pathname || "";
+  const activeRole = mounted ? currentRole : initialRole;
+
+  const handleRoleChange = (newRole: RoleType) => {
+    setRole(newRole);
+
+    const isAllowed = isPathAllowedForRole(effectivePath, newRole);
+    if (!isAllowed) {
+      router.push("/matriks-rka");
+    }
+  };
+
+  useEffect(() => {
+    if (mounted) {
+      const isAllowed = isPathAllowedForRole(effectivePath, currentRole);
+      if (!isAllowed) {
+        router.push("/matriks-rka");
+      }
+    }
+  }, [mounted, effectivePath, currentRole, router]);
 
   return (
     <div className="h-screen overflow-hidden bg-background flex text-slate-800 antialiased font-sans">
       {/* White Clean Sidebar */}
       <Sidebar
-        currentRole={role}
-        onRoleChange={setRole}
+        currentRole={activeRole}
+        onRoleChange={handleRoleChange}
         activePath={activePath}
       />
 
@@ -39,7 +107,7 @@ export function MainLayoutShell({
       <div className="flex-1 flex flex-col h-screen overflow-y-auto min-w-0">
         {/* Header with Breadcrumb and Page Title */}
         <Header
-          currentRole={role}
+          currentRole={activeRole}
           pageTitle={pageTitle}
           breadcrumbs={breadcrumbs}
         />
@@ -69,3 +137,4 @@ export function MainLayoutShell({
     </div>
   );
 }
+

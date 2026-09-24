@@ -5,7 +5,7 @@ import { DetailItemReimbursement, RekeningTujuan, Pengesahan } from "@/features/
 import { formatIDR } from "@/lib/utils";
 import { PengesahanCard } from "./PengesahanCard";
 
-interface DrawerReimbursementContentProps {
+interface DrawerInsidentalContentProps {
   jenis: string;
   items: DetailItemReimbursement[];
   rekening: RekeningTujuan;
@@ -14,14 +14,14 @@ interface DrawerReimbursementContentProps {
   buktiUrl?: string | null;
 }
 
-export function DrawerReimbursementContent({
+export function DrawerInsidentalContent({
   jenis,
   items,
   rekening,
   pengesahan,
   itemId,
   buktiUrl,
-}: DrawerReimbursementContentProps) {
+}: DrawerInsidentalContentProps) {
   const hasLpjItems = jenis === "Reimbursement" && items.some((it) => it.detailItemLPJ && it.detailItemLPJ.length > 0);
   const hasBuktiUrl = buktiUrl !== null;
   return (

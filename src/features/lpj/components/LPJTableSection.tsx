@@ -4,21 +4,31 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { MasterDataTableShell, ColumnDef, StatusBadge, DateRangeFilter } from "@/components/shared/MasterDataTableShell";
 import { InfoLPJ, LPJBase, StatusLPJ } from "@/features/lpj/types";
 import { LPJDetailDrawer } from "./LPJDetailDrawer";
+import { LPJActionModal } from "./LPJActionModal";
 import { formatIDR, cn } from "@/lib/utils";
-import { Eye, Upload } from "lucide-react";
+import { Eye, Upload, Check, RotateCcw } from "lucide-react";
 import { lpjService } from "../services/lpj.service";
 import { useRouter } from "next/navigation";
+import { useSidebarStore } from "@/store/useSidebarStore";
 
 interface LPJTableSectionProps {
   initialData?: InfoLPJ[];
   statusFilter?: string;
   onStatusFilterChange?: (status: string) => void;
+  onDataChange?: () => void;
 }
 
-const LPJ_STATUS_OPTIONS = [
+const LPJ_STATUS_OPTIONS_DIVISI = [
   { label: "Semua Status", value: "all" },
   { label: "Belum LPJ", value: "belum_lpj" },
   { label: "Submit", value: "submit" },
+  { label: "Disetujui", value: "disetujui" },
+  { label: "Revisi", value: "revisi" },
+];
+
+const LPJ_STATUS_OPTIONS_FINANCE = [
+  { label: "Semua Status", value: "all" },
+  { label: "Dalam Proses", value: "dalam_proses" },
   { label: "Disetujui", value: "disetujui" },
   { label: "Revisi", value: "revisi" },
 ];
@@ -45,15 +55,24 @@ export function LPJTableSection({
   initialData = [],
   statusFilter: externalStatusFilter,
   onStatusFilterChange,
+  onDataChange,
 }: LPJTableSectionProps) {
   const router = useRouter();
+  const currentRole = useSidebarStore((state) => state.currentRole);
+  const isFinance = currentRole === "finance";
+
   const [data, setData] = useState<InfoLPJ[]>(initialData);
   const [isLoading, setIsLoading] = useState(false);
   const [internalStatusFilter, setInternalStatusFilter] = useState<string>("all");
   const [jenisFilter, setJenisFilter] = useState<string>("all");
   const [tanggalCairFilter, setTanggalCairFilter] = useState<DateRangeFilter>({ startDate: "", endDate: "" });
   const [tanggalPengajuanFilter, setTanggalPengajuanFilter] = useState<DateRangeFilter>({ startDate: "", endDate: "" });
+  
+  // Drawer & Action Modal State
   const [selectedItemDetail, setSelectedItemDetail] = useState<LPJBase | null>(null);
+  const [activeActionItem, setActiveActionItem] = useState<InfoLPJ | null>(null);
+  const [actionType, setActionType] = useState<"approve" | "revisi" | null>(null);
+  const [isSubmittingAction, setIsSubmittingAction] = useState(false);
 
   const statusFilter = externalStatusFilter !== undefined ? externalStatusFilter : internalStatusFilter;
 
@@ -94,7 +113,62 @@ export function LPJTableSection({
     }
   };
 
+  const handleOpenAction = (item: InfoLPJ, type: "approve" | "revisi") => {
+    setActiveActionItem(item);
+    setActionType(type);
+  };
+
+  const handleConfirmAction = async (payload: {
+    status: "disetujui" | "revisi";
+    catatan: string;
+  }) => {
+    if (!activeActionItem) return;
+
+    setIsSubmittingAction(true);
+    try {
+      await lpjService.updateStatusLPJ(activeActionItem.id, payload.status, payload.catatan);
+
+      // Update state lokal
+      setData((prev) =>
+        prev.map((it) =>
+          it.id === activeActionItem.id || it.noPengajuan === activeActionItem.noPengajuan
+            ? { ...it, status: payload.status }
+            : it
+        )
+      );
+
+      if (selectedItemDetail && (selectedItemDetail.id === activeActionItem.id || selectedItemDetail.noPengajuan === activeActionItem.noPengajuan)) {
+        setSelectedItemDetail({ ...selectedItemDetail, status: payload.status });
+      }
+
+      setActiveActionItem(null);
+      setActionType(null);
+
+      if (onDataChange) {
+        onDataChange();
+      }
+    } catch (error) {
+      console.error("Gagal memperbarui status LPJ:", error);
+    } finally {
+      setIsSubmittingAction(false);
+    }
+  };
+
   const getStatusBadgeProps = (status: StatusLPJ) => {
+    if (isFinance) {
+      switch (status) {
+        case "disetujui":
+          return { variant: "success" as const, label: "Disetujui" };
+        case "revisi":
+          return { variant: "error" as const, label: "Revisi" };
+        case "submit":
+        case "belum_lpj":
+        default:
+          return { variant: "warning" as const, label: "Dalam Proses" };
+      }
+    }
+
+    // Role Divisi
     switch (status) {
       case "belum_lpj":
         return { variant: "warning" as const, label: "Belum LPJ" };
@@ -205,9 +279,47 @@ export function LPJTableSection({
       {
         key: "aksi",
         header: "Aksi",
-        width: "130px",
+        width: isFinance ? "170px" : "130px",
         align: "center",
         cell: (item) => {
+          // Tampilan Aksi untuk Finance: Setujui & Revisi
+          if (isFinance) {
+            const isPendingVerification = item.status === "submit" || item.status === "belum_lpj" || item.status === "dalam_proses";
+
+            if (!isPendingVerification) {
+              return (
+                <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500 italic">
+                  {item.status === "disetujui" ? "Telah Disetujui" : "Perlu Revisi"}
+                </span>
+              );
+            }
+
+            return (
+              <div className="flex items-center justify-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleOpenAction(item, "approve")}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+                  title="Setujui LPJ Ini"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Setujui</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleOpenAction(item, "revisi")}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 text-xs font-semibold transition-all cursor-pointer"
+                  title="Minta Revisi LPJ Ini"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Revisi</span>
+                </button>
+              </div>
+            );
+          }
+
+          // Tampilan Aksi untuk Divisi: Upload Berkas
           const isUploadActive = item.status === "belum_lpj" || item.status === "revisi";
           return (
             <div className="flex items-center justify-center gap-1.5">
@@ -237,17 +349,25 @@ export function LPJTableSection({
         },
       },
     ],
-    []
+    [isFinance, router]
   );
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
-      if (statusFilter !== "all" && item.status !== statusFilter) {
-        return false;
+      // Filter Status
+      if (statusFilter !== "all") {
+        if (statusFilter === "dalam_proses") {
+          const isPending = item.status === "submit" || item.status === "belum_lpj" || item.status === "dalam_proses";
+          if (!isPending) return false;
+        } else if (item.status !== statusFilter) {
+          return false;
+        }
       }
+
       if (jenisFilter !== "all" && item.jenis.toLowerCase() !== jenisFilter.toLowerCase()) {
         return false;
       }
+
       if (tanggalCairFilter.startDate || tanggalCairFilter.endDate) {
         const itemDate = parseItemDate(item.tanggalCair);
         if (itemDate) {
@@ -263,6 +383,7 @@ export function LPJTableSection({
           }
         }
       }
+
       if (tanggalPengajuanFilter.startDate || tanggalPengajuanFilter.endDate) {
         const itemDate = parseItemDate(item.tanggalPengajuan);
         if (itemDate) {
@@ -318,7 +439,7 @@ export function LPJTableSection({
               title: "Status LPJ",
               value: statusFilter,
               onChange: handleStatusChange,
-              options: LPJ_STATUS_OPTIONS,
+              options: isFinance ? LPJ_STATUS_OPTIONS_FINANCE : LPJ_STATUS_OPTIONS_DIVISI,
             },
             {
               id: "jenis",
@@ -343,7 +464,29 @@ export function LPJTableSection({
       <LPJDetailDrawer
         item={selectedItemDetail}
         onClose={() => setSelectedItemDetail(null)}
+        onApprove={(item) => {
+          setActiveActionItem(item as any);
+          setActionType("approve");
+        }}
+        onRevisi={(item) => {
+          setActiveActionItem(item as any);
+          setActionType("revisi");
+        }}
+      />
+
+      {/* Modal Aksi Verifikasi LPJ untuk Finance */}
+      <LPJActionModal
+        isOpen={!!activeActionItem}
+        onClose={() => {
+          setActiveActionItem(null);
+          setActionType(null);
+        }}
+        onConfirm={handleConfirmAction}
+        actionType={actionType}
+        item={activeActionItem}
+        isLoading={isSubmittingAction}
       />
     </>
   );
 }
+

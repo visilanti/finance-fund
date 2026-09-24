@@ -14,7 +14,7 @@ export default function Page() {
   return (
     <MainLayoutShell
       pageTitle="Matriks RKA Tahun 2026"
-      pageSubtitle={`Rencana alokasi dan realisasi anggaran pengeluaran (cash out) Tahun ${defaultRKA.tahun} — ${defaultRKA.unit}`}
+      pageSubtitle={`Alokasi dan realisasi anggaran pengeluaran (cash out) Tahun ${defaultRKA.tahun} — ${defaultRKA.unit}`}
       initialRole="divisi"
       activePath="/matriks-rka"
     >

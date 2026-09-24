@@ -8,7 +8,7 @@ import { PengesahanCard } from "./PengesahanCard";
 interface DrawerRkaContentProps {
   items: DetailItemRKA[];
   rekening: RekeningTujuan;
-  pengesahan: Pengesahan;
+  pengesahan?: Pengesahan;
   itemId: string;
 }
 
@@ -60,25 +60,40 @@ export function DrawerRkaContent({
           </table>
         </div>
       </Card>
+      <Card
+        variant="secondary"
+        title="Rekening Tujuan"
+        leftIcon={<Building2 className="w-3 h-3 text-slate-400" />}
+        className="p-3 space-y-1"
+        headerClassName="border-b-0 pb-0"
+      >
+        <div className="font-bold text-slate-800 dark:text-slate-200">{rekening.namaBank}</div>
+        <div className="font-mono text-slate-600 dark:text-slate-400 text-[11px]">{rekening.nomorRekening}</div>
+        <div className="text-slate-500 dark:text-slate-400 text-[10px]">a.n {rekening.namaPemilikRekening}</div>
+      </Card>
 
-      {/* Rekening Tujuan & Pengesahan */}
+      {/* Pengesahan Cards */}
       <div className="grid grid-cols-2 gap-3">
-        <Card
-          variant="secondary"
-          title="Rekening Tujuan"
-          leftIcon={<Building2 className="w-3 h-3 text-slate-400" />}
-          className="p-3 space-y-1"
-          headerClassName="border-b-0 pb-0"
-        >
-          <div className="font-bold text-slate-800 dark:text-slate-200">{rekening.namaBank}</div>
-          <div className="font-mono text-slate-600 dark:text-slate-400 text-[11px]">{rekening.nomorRekening}</div>
-          <div className="text-slate-500 dark:text-slate-400 text-[10px]">a.n {rekening.namaPemilikRekening}</div>
-        </Card>
+        <PengesahanCard
+          title="Yang Mengajukan"
+          namaTerang={pengesahan?.namaTerang}
+          tandaTanganUrl={pengesahan?.tandaTanganUrl}
+          digisignId={itemId}
+        />
 
         <PengesahanCard
-          namaTerang={pengesahan.namaTerang}
-          tandaTanganUrl={pengesahan.tandaTanganUrl}
-          digisignId={itemId || "8821"}
+          title="Mengetahui Direktorat"
+          digisignId={itemId}
+        />
+
+        <PengesahanCard
+          title="Menyetujui Bendahara"
+          digisignId={itemId}
+        />
+
+        <PengesahanCard
+          title="Menyetujui Finance"
+          digisignId={itemId}
         />
       </div>
     </div>

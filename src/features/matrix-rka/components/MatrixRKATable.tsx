@@ -32,10 +32,10 @@ export function MatrixRKATable({
       <div className="overflow-x-auto relative">
         <table className="w-full text-left border-collapse text-xs select-none">
           <thead>
-            <tr className="bg-[#b91c1c] text-white uppercase text-[11px] font-bold tracking-wider">
+            <tr className="bg-[#d2382e] text-white text-[11px] font-bold tracking-wider">
               {/* KETERANGAN Column - Sticky Left on SM+ */}
-              <th className="py-3 px-4 min-w-[260px] sm:min-w-[320px] sm:sticky sm:left-0 z-10 bg-[#b91c1c]">
-                KETERANGAN
+              <th className="py-3 px-4 min-w-[260px] sm:min-w-[320px] sm:sticky sm:left-0 z-10 bg-[#d2382e]">
+                Keterangan
               </th>
 
               {/* 12 Bulan Columns */}
@@ -44,13 +44,12 @@ export function MatrixRKATable({
                   key={m}
                   className="py-3 px-3 min-w-[110px] w-28 text-right font-bold whitespace-nowrap"
                 >
-                  {SHORT_MONTH_MAP[m] || m} {tahun}
+                  {m}
                 </th>
               ))}
 
-              {/* TOTAL Column */}
               <th className="py-3 px-4 min-w-[130px] text-right font-extrabold bg-[#991b1b] whitespace-nowrap">
-                TOTAL {tahun}
+                Total {tahun}
               </th>
             </tr>
           </thead>
@@ -115,7 +114,7 @@ export function MatrixRKATable({
                       className="bg-[#fef9c3]/70 dark:bg-amber-950/30 text-slate-900 dark:text-slate-100 font-bold"
                     >
                       {/* Subtotal Label */}
-                      <td className="py-2.5 px-4 uppercase text-[11px] tracking-wider font-extrabold sm:sticky sm:left-0 z-10 bg-[#fef9c3] dark:bg-amber-950 text-slate-900 dark:text-slate-100">
+                      <td className="py-2.5 px-4 text-[11px] tracking-wider font-extrabold sm:sticky sm:left-0 z-10 bg-[#fef9c3] dark:bg-amber-950 text-slate-900 dark:text-slate-100">
                         {row.name}
                       </td>
 
@@ -245,7 +244,7 @@ export function MatrixRKATable({
                                     <span className="truncate max-w-[200px]" title={row.name}>
                                       {row.name}
                                     </span>
-                                    <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] text-slate-600 dark:text-slate-400 font-semibold uppercase">
+                                    <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] text-slate-600 dark:text-slate-400 font-semibold">
                                       {SHORT_MONTH_MAP[m] || m} {tahun}
                                     </span>
                                   </div>
@@ -340,8 +339,8 @@ export function MatrixRKATable({
           <tfoot>
             <tr className="bg-[#fef08a]/80 dark:bg-amber-950/60 text-rose-700 dark:text-rose-400 font-extrabold">
               {/* Total Label */}
-              <td className="py-3 px-4 uppercase text-xs tracking-wider sm:sticky sm:left-0 z-10 bg-[#fef08a] dark:bg-amber-950 font-black">
-                TOTAL PENGELUARAN (CASH OUT)
+              <td className="py-3 px-4 text-xs tracking-wider sm:sticky sm:left-0 z-10 bg-[#fef08a] dark:bg-amber-950 font-black">
+                Total Pengeluaran
               </td>
 
               {/* Month Grand Totals */}

@@ -8,13 +8,21 @@ import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Card } from "@/components/ui/Card";
 
+import { useSidebarStore } from "@/store/useSidebarStore";
+import { Check, RotateCcw } from "lucide-react";
+
 export interface LPJDetailDrawerProps {
   item: LPJBase | null;
   onClose: () => void;
   onOpenUpload?: (item: LPJBase) => void;
+  onApprove?: (item: LPJBase) => void;
+  onRevisi?: (item: LPJBase) => void;
 }
 
-export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawerProps) {
+export function LPJDetailDrawer({ item, onClose, onOpenUpload, onApprove, onRevisi }: LPJDetailDrawerProps) {
+  const currentRole = useSidebarStore((state) => state.currentRole);
+  const isFinance = currentRole === "finance";
+
   if (!item) return null;
 
   const rawItems = item.rincian?.item || [];
@@ -47,6 +55,19 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
   });
 
   const getStatusBadgeProps = (status: string) => {
+    if (isFinance) {
+      switch (status) {
+        case "disetujui":
+          return { variant: "success" as const, label: "Disetujui" };
+        case "revisi":
+          return { variant: "error" as const, label: "Revisi" };
+        case "submit":
+        case "belum_lpj":
+        default:
+          return { variant: "warning" as const, label: "Dalam Proses" };
+      }
+    }
+
     switch (status) {
       case "belum_lpj":
         return { variant: "warning" as const, label: "Belum LPJ" };
@@ -62,7 +83,8 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
   };
 
   const badgeProps = getStatusBadgeProps(item.status);
-  const isUploadAllowed = item.status === "belum_lpj" || item.status === "revisi";
+  const isUploadAllowed = !isFinance && (item.status === "belum_lpj" || item.status === "revisi");
+  const isFinancePending = isFinance && (item.status === "submit" || item.status === "belum_lpj" || item.status === "dalam_proses");
 
   return (
     <Drawer
@@ -80,7 +102,40 @@ export function LPJDetailDrawer({ item, onClose, onOpenUpload }: LPJDetailDrawer
         </span>
       }
       footerActions={
-        isUploadAllowed ? (
+        isFinancePending && (onApprove || onRevisi) ? (
+          <div className="flex items-center justify-end gap-2 w-full">
+            <Button
+              variant="outline"
+              size="md"
+              leftIcon={<Printer className="w-3.5 h-3.5" />}
+              onClick={() => window.print()}
+            >
+              Print
+            </Button>
+            {onRevisi && (
+              <Button
+                variant="outline"
+                size="md"
+                leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+                onClick={() => onRevisi(item)}
+                className="text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950/60 cursor-pointer"
+              >
+                Revisi
+              </Button>
+            )}
+            {onApprove && (
+              <Button
+                variant="primary"
+                size="md"
+                leftIcon={<Check className="w-3.5 h-3.5" />}
+                onClick={() => onApprove(item)}
+                className="cursor-pointer"
+              >
+                Setujui LPJ
+              </Button>
+            )}
+          </div>
+        ) : isUploadAllowed ? (
           <div className="flex items-center justify-end gap-2 w-full">
             <Button
               variant="outline"

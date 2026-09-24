@@ -22,12 +22,12 @@ export const MOCK_RKA: RKADocument[] = [
     list_item: [
       {
         id: "grp-1",
-        name: "KEGIATAN KURIKULUM",
+        name: "Kegiatan Kurikulum",
         category: "kelompok_group",
         children: [
           {
             id: "kel-1",
-            name: "KEGIATAN PEMBELAJARAN DAN PRAKTIKUM",
+            name: "Kegiatan Pembelajaran dan Praktikum",
             category: "kelompok",
             children: [
               {
@@ -90,12 +90,12 @@ export const MOCK_RKA: RKADocument[] = [
       },
       {
         id: "grp-2",
-        name: "KEGIATAN HUMAS",
+        name: "Kegiatan Humas",
         category: "kelompok_group",
         children: [
           {
             id: "kel-2",
-            name: "PERTEMUAN ORANG TUA DAN RAPOR",
+            name: "Pertemuan Orang Tua dan Rapor",
             category: "kelompok",
             children: [
               {
@@ -141,7 +141,7 @@ export const MOCK_RKA: RKADocument[] = [
       },
       {
         id: "grp-3",
-        name: "SARANA PRASARANA & OPERASIONAL IT",
+        name: "Sarana Prasarana & Operasional IT",
         category: "kelompok_group",
         children: [
           {
@@ -481,7 +481,7 @@ export function buildMatrixTableRows(
     // Baris Subtotal per Group (kuning/amber background)
     rows.push({
       id: `subtotal-${group.id}`,
-      name: `SUBTOTAL ${group.name}`,
+      name: `Subtotal ${group.name}`,
       category: "kelompok_group",
       rowType: "subtotal",
       level: 0,

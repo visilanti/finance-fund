@@ -26,18 +26,25 @@ class ApprovalService {
     this.localCache = this.localCache.map((item) => {
       if (item.id === payload.id) {
         const updatedStatus = payload.status === "disetujui" ? "disetujui" : "ditolak";
-        const nextStep: StepType = payload.status === "disetujui" ? "selesai" : item.currentStep;
+        const currentStep = item.currentStep || "bendahara";
 
         return {
           ...item,
           currentStatus: updatedStatus,
+          nominalDiterima:
+            payload.danaDisetujui !== undefined
+              ? payload.danaDisetujui
+              : item.nominalDiterima,
           riwayatStep: [
             ...(item.riwayatStep || []),
             {
-              step: "manager",
+              step: currentStep,
               status: updatedStatus,
               tanggalUpdate: new Date().toISOString(),
-              diupdateOleh: "Manager / Verifikator",
+              diupdateOleh:
+                currentStep === "bendahara" || item.divisi === "bendahara"
+                  ? "Bendahara Yayasan"
+                  : "Verifikator",
               catatan: payload.catatan,
             },
           ],

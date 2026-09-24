@@ -39,6 +39,7 @@ export default async function Page() {
 
   return (
     <MainLayoutShell
+      // TODO (Next Development): Hapus atau ganti `initialRole` dengan data role dari session login user (misal `user.role`).
       initialRole="divisi"
       activePath="/dashboard"
     >
