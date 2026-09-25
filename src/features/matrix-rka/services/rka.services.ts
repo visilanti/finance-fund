@@ -12,12 +12,12 @@ export const MOCK_RKA: RKADocument[] = [
     id: "2a160650-db7e-41d9-8e02-902ba9dc743a",
     name: "RKA_SMA-BDG",
     tahun: 2026,
-    unit: "Divisi IT",
+    unit: "Divisi IT & Operasional Sekolah",
     statistic: {
-      totalAnggaran: 119800000,
-      totalDicairkan: 91380000,
-      totalBelumCair: 22980000,
-      totalHangus: 5000000
+      totalAnggaran: 96860000, 
+      totalDicairkan: 54800000, 
+      totalBelumCair: 10780000, 
+      totalHangus: 31280000
     },
     list_item: [
       {
@@ -35,7 +35,6 @@ export const MOCK_RKA: RKADocument[] = [
                 name: "Pembinaan Klub",
                 category: "kegiatan",
                 isHasBudget: false,
-                // Tidak memiliki metadata karena isHasBudget = false
                 children: [
                   {
                     id: "sub-1",
@@ -49,7 +48,7 @@ export const MOCK_RKA: RKADocument[] = [
                     },
                     list_budget: [
                       { bulan: "Januari", budget: 1000000, realisasi: 1000000, status: "dicairkan", catatan: "Target bantalan busa" },
-                      { bulan: "Februari", budget: 4780000, realisasi: 0, status: "belum_cair", catatan: "Sewa pelatih berlisensi" }
+                      { bulan: "Februari", budget: 4780000, realisasi: 0, status: "hangus", catatan: "Sewa pelatih dibatalkan/waktu lewat" }
                     ]
                   },
                   {
@@ -64,7 +63,7 @@ export const MOCK_RKA: RKADocument[] = [
                     },
                     list_budget: [
                       { bulan: "Februari", budget: 1300000, realisasi: 1300000, status: "dicairkan", catatan: "Bola voli Mikasa" },
-                      { bulan: "September", budget: 6780000, realisasi: 0, status: "belum_cair", catatan: null }
+                      { bulan: "September", budget: 6780000, realisasi: 0, status: "belum_cair", catatan: "Persiapan turnamen antar sekolah" }
                     ]
                   }
                 ]
@@ -110,7 +109,7 @@ export const MOCK_RKA: RKADocument[] = [
                 },
                 list_budget: [
                   { bulan: "Januari", budget: 2500000, realisasi: 2500000, status: "dicairkan", catatan: "Snack & makan siang rapat" },
-                  { bulan: "Juni", budget: 3000000, realisasi: 0, status: "belum_cair", catatan: null }
+                  { bulan: "Juni", budget: 3000000, realisasi: 0, status: "hangus", catatan: "Sisa dana rapat kelulusan tidak terserap" }
                 ]
               }
             ]
@@ -132,7 +131,7 @@ export const MOCK_RKA: RKADocument[] = [
                 },
                 list_budget: [
                   { bulan: "Februari", budget: 4000000, realisasi: 4000000, status: "dicairkan", catatan: "Cetak brosur & spanduk PPDB" },
-                  { bulan: "Maret", budget: 2000000, realisasi: 0, status: "belum_cair", catatan: "Iklan media sosial" }
+                  { bulan: "Maret", budget: 2000000, realisasi: 0, status: "hangus", catatan: "Vendor iklan tidak tersedia, dana hangus" }
                 ]
               }
             ]
@@ -163,7 +162,7 @@ export const MOCK_RKA: RKADocument[] = [
                   { bulan: "Januari", budget: 3500000, realisasi: 3500000, status: "dicairkan", catatan: "Dedicated 100Mbps" },
                   { bulan: "Februari", budget: 3500000, realisasi: 3500000, status: "dicairkan", catatan: null },
                   { bulan: "Maret", budget: 3500000, realisasi: 3500000, status: "dicairkan", catatan: null },
-                  { bulan: "April", budget: 3500000, realisasi: 0, status: "belum_cair", catatan: null }
+                  { bulan: "April", budget: 3500000, realisasi: 0, status: "hangus", catatan: "Subsidi internet gagal ditagihkan tepat waktu" }
                 ]
               },
               {
@@ -180,7 +179,68 @@ export const MOCK_RKA: RKADocument[] = [
                   { bulan: "Januari", budget: 2000000, realisasi: 2000000, status: "dicairkan", catatan: "Kertas & tinta printer" },
                   { bulan: "Februari", budget: 1500000, realisasi: 1500000, status: "dicairkan", catatan: null },
                   { bulan: "Maret", budget: 1500000, realisasi: 1500000, status: "dicairkan", catatan: null },
-                  { bulan: "April", budget: 2000000, realisasi: 0, status: "belum_cair", catatan: null }
+                  { bulan: "April", budget: 2000000, realisasi: 0, status: "hangus", catatan: "Pembelian ATK dialihkan ke bulan lain" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "grp-4",
+        name: "Kegiatan Kesiswaan",
+        category: "kelompok_group",
+        children: [
+          {
+            id: "kel-5",
+            name: "Pengembangan Karakter Siswa",
+            category: "kelompok",
+            children: [
+              {
+                id: "keg-7",
+                name: "Latihan Dasar Kepemimpinan (LDKS)",
+                category: "kegiatan",
+                isHasBudget: true,
+                metadata: {
+                  jurnal_code: "JRN-5401",
+                  jurnal_name: "Beban Kesiswaan",
+                  cource_fund: "Dana Komite"
+                },
+                list_budget: [
+                  { bulan: "Juli", budget: 10000000, realisasi: 10000000, status: "dicairkan", catatan: "Sewa tempat dan logistik panitia" },
+                  { bulan: "Agustus", budget: 2000000, realisasi: 0, status: "hangus", catatan: "Kelebihan dana tidak terserap" },
+                  { bulan: "September", budget: 5000000, realisasi: 5000000, status: "dicairkan", catatan: "Cetak sertifikat dan dokumentasi akhir" },
+                  { bulan: "Oktober", budget: 5000000, realisasi: 0, status: "belum_cair", catatan: "Rencana reward untuk kelompok terbaik (Waktu telah lewat)" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "grp-5",
+        name: "Pengembangan SDM",
+        category: "kelompok_group",
+        children: [
+          {
+            id: "kel-6",
+            name: "Sertifikasi dan Pelatihan Eksternal",
+            category: "kelompok",
+            children: [
+              {
+                id: "keg-8",
+                name: "Sertifikasi IT Guru dan Staf",
+                category: "kegiatan",
+                isHasBudget: true,
+                metadata: {
+                  jurnal_code: "JRN-5502",
+                  jurnal_name: "Beban Peningkatan Mutu SDM",
+                  cource_fund: "Dana Yayasan"
+                },
+                list_budget: [
+                  { bulan: "Mei", budget: 8000000, realisasi: 8000000, status: "dicairkan", catatan: "Pendaftaran sertifikasi Microsoft" },
+                  { bulan: "September", budget: 4000000, realisasi: 0, status: "belum_cair", catatan: "Pendaftaran batch 2" },
+                  { bulan: "November", budget: 4000000, realisasi: 0, status: "belum_cair", catatan: "Pendaftaran batch 3 (Waktu telah lewat)" }
                 ]
               }
             ]

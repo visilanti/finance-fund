@@ -27,28 +27,44 @@ export function MatrixRKATable({
   grandTotalPerMonth,
   grandTotalYear,
 }: MatrixRKATableProps) {
+  const now = new Date();
+  const currentMonthName = months[now.getMonth()];
+  const isCurrentYear = tahun === now.getFullYear();
+  const isCurrentMonth = (m: string) => isCurrentYear && m === currentMonthName;
+
   return (
     <div className="w-full overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-card">
-      <div className="overflow-x-auto relative">
+      <div className="overflow-auto relative max-h-[calc(100vh-260px)] sm:max-h-[78vh]">
         <table className="w-full text-left border-collapse text-xs select-none">
-          <thead>
+          <thead className="sticky top-0 z-20">
             <tr className="bg-[#d2392e] dark:bg-slate-800 text-white dark:text-slate-100 text-[11px] font-bold tracking-wider border-b border-[#b91c1c] dark:border-slate-700">
-              {/* KETERANGAN Column - Sticky Left on SM+ */}
-              <th className="py-3 px-4 min-w-[260px] sm:min-w-[320px] sm:sticky sm:left-0 z-10 bg-[#d2392e] dark:bg-slate-800 text-white dark:text-slate-100">
+              {/* KETERANGAN Column - Sticky Top & Left */}
+              <th className="py-3 px-4 min-w-[260px] sm:min-w-[320px] sticky top-0 sm:left-0 z-30 bg-[#d2392e] dark:bg-slate-800 text-white dark:text-slate-100 shadow-[1px_0_0_0_rgba(0,0,0,0.06)]">
                 Keterangan
               </th>
 
-              {/* 12 Bulan Columns */}
-              {months.map((m) => (
-                <th
-                  key={m}
-                  className="py-3 px-3 min-w-[110px] w-28 text-right font-bold whitespace-nowrap text-white dark:text-slate-200"
-                >
-                  {m}
-                </th>
-              ))}
+              {/* 12 Bulan Columns - Sticky Top */}
+              {months.map((m) => {
+                const isCurrent = isCurrentMonth(m);
+                return (
+                  <th
+                    key={m}
+                    className={cn(
+                      "py-3 px-3 min-w-[110px] w-28 text-right font-bold whitespace-nowrap text-white dark:text-slate-200 transition-colors sticky top-0 z-20",
+                      isCurrent
+                        ? "bg-[#991b1b] dark:bg-slate-700/90 font-extrabold"
+                        : "bg-[#d2392e] dark:bg-slate-800"
+                    )}
+                  >
+                    <div className="inline-flex items-center justify-end gap-1.5">
+                      <span>{m}</span>
+                    </div>
+                  </th>
+                );
+              })}
 
-              <th className="py-3 px-4 min-w-[130px] text-right font-extrabold bg-[#991b1b] dark:bg-slate-900/90 whitespace-nowrap text-white dark:text-slate-100">
+              {/* Total Column - Sticky Top */}
+              <th className="py-3 px-4 min-w-[130px] text-right font-extrabold bg-[#991b1b] dark:bg-slate-900/90 whitespace-nowrap text-white dark:text-slate-100 sticky top-0 z-20">
                 Total {tahun}
               </th>
             </tr>
@@ -93,12 +109,18 @@ export function MatrixRKATable({
                       </td>
 
                       {/* Month Columns: Kosong di baris Header Group */}
-                      {months.map((m) => (
-                        <td
-                          key={m}
-                          className="py-2.5 px-3 text-right"
-                        />
-                      ))}
+                      {months.map((m) => {
+                        const isCurrent = isCurrentMonth(m);
+                        return (
+                          <td
+                            key={m}
+                            className={cn(
+                              "py-2.5 px-3 text-right",
+                              isCurrent && "bg-slate-200/50 dark:bg-slate-700/40"
+                            )}
+                          />
+                        );
+                      })}
 
                       {/* Total Year Group */}
                       <td className="py-2.5 px-4 text-right" />
@@ -122,10 +144,14 @@ export function MatrixRKATable({
                       {months.map((m) => {
                         const cell = row.months[m];
                         const val = cell?.budget || 0;
+                        const isCurrent = isCurrentMonth(m);
                         return (
                           <td
                             key={m}
-                            className="py-2.5 px-3 text-right font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap"
+                            className={cn(
+                              "py-2.5 px-3 text-right font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap",
+                              isCurrent && "bg-[#fef08a] dark:bg-amber-900/50"
+                            )}
                           >
                             {val > 0 ? formatMatrixNumber(val) : "—"}
                           </td>
@@ -212,11 +238,16 @@ export function MatrixRKATable({
                       const cell = row.months[m];
                       const val = cell?.budget || 0;
                       const hasBudget = isLeafBudget && val > 0;
+                      const isCurrent = isCurrentMonth(m);
 
                       return (
                         <td
                           key={m}
-                          className="py-2 px-3 text-right whitespace-nowrap"
+                          className={cn(
+                            "py-2 px-3 text-right whitespace-nowrap transition-colors",
+                            isCurrent &&
+                              "bg-primary/[0.04] dark:bg-primary/[0.08]"
+                          )}
                         >
                           {hasBudget ? (
                             <HoverCard openDelay={150} closeDelay={150}>
@@ -346,10 +377,15 @@ export function MatrixRKATable({
               {/* Month Grand Totals */}
               {months.map((m) => {
                 const total = grandTotalPerMonth[m] || 0;
+                const isCurrent = isCurrentMonth(m);
                 return (
                   <td
                     key={m}
-                    className="py-3 px-3 text-right font-black text-xs whitespace-nowrap"
+                    className={cn(
+                      "py-3 px-3 text-right font-black text-xs whitespace-nowrap",
+                      isCurrent &&
+                        "bg-[#fde047] dark:bg-amber-900/90 text-rose-900 dark:text-rose-200 ring-1 ring-inset ring-amber-500/30"
+                    )}
                   >
                     {total > 0 ? formatMatrixNumber(total) : "—"}
                   </td>

@@ -64,7 +64,7 @@ export function LPJActionModal({
       title={
         isApprove
           ? "Setujui Laporan Pertanggungjawaban (LPJ)"
-          : "Minta Revisi Berkas LPJ"
+          : "Revisi Berkas LPJ"
       }
       description={
         isApprove
