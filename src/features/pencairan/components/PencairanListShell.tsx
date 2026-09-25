@@ -5,9 +5,6 @@ import { PencairanItem } from "../types";
 import { PencairanRKATableSection } from "./tables/PencairanRKATableSection";
 import { PencairanInsidentalTableSection } from "./tables/PencairanInsidentalTableSection";
 import { PencairanReimbursementTableSection } from "./tables/PencairanReimbursementTableSection";
-import { formatIDR, cn } from "@/lib/utils";
-import { Clock, CheckCircle2, ListFilter, Banknote, Wallet } from "lucide-react";
-import { MetricCard } from "@/components/shared/MetricCard";
 
 export interface PencairanListShellProps {
   initialData?: PencairanItem[];

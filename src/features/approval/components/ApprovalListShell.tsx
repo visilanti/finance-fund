@@ -6,6 +6,8 @@ import { ApprovalTableSection } from "./ApprovalTableSection";
 import { approvalService } from "../services/approval.service";
 import { formatIDR, cn } from "@/lib/utils";
 
+import { APPROVAL_STATUS_PILLS } from "../constants";
+
 interface ApprovalListShellProps {
   initialData?: PengajuanDanaItem[];
   jenis?: string;
@@ -55,18 +57,11 @@ export function ApprovalListShell({ initialData = [], jenis = "rka" }: ApprovalL
     return stats;
   }, [data]);
 
-  const pills = [
-    { key: "all", label: "Semua Status", color: "bg-slate-500" },
-    { key: "pending", label: "Menunggu Verifikasi", color: "bg-amber-500" },
-    { key: "disetujui", label: "Disetujui", color: "bg-emerald-500" },
-    { key: "ditolak", label: "Ditolak", color: "bg-rose-500" },
-  ];
-
   return (
     <div className="space-y-6">
       {/* Filter Status Pills & Total Ringkasan */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 [ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {pills.map((pill) => {
+        {APPROVAL_STATUS_PILLS.map((pill) => {
           const isActive = statusFilter === pill.key;
           const stat = statusStats[pill.key] || { count: 0, total: 0 };
 
