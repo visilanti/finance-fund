@@ -8,7 +8,6 @@ import { Select } from "@/components/ui/Select";
 import { useSidebarStore } from "@/store/useSidebarStore";
 
 const DIVISI_OPTIONS = [
-  { value: "all", label: "Semua Divisi" },
   { value: "IT & Infrastructure", label: "IT & Infrastructure" },
   { value: "Cloud Engineering", label: "Cloud Engineering" },
   { value: "Marketing & Business", label: "Marketing & Business" },

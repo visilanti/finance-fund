@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Modal } from "@/components/ui/modal/Modal";
+import { TaskModal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/Button";
 import { FileUploadZone } from "@/components/shared/FileUploadZone";
 import { formatIDR } from "@/lib/utils";
@@ -109,29 +109,36 @@ export function PencairanActionModal({
   const nominalCair = item.nominalDiterima || item.nominalPengajuan;
 
   return (
-    <Modal
+    <TaskModal
       isOpen={isOpen}
       onClose={onClose}
+      title="Pencairan Dana & Upload Bukti Transfer"
+      description="Unggah bukti transfer perbankan untuk menyelesaikan pencairan dana pengajuan ini."
       size="lg"
-      closeOnBackdropClick={!isLoading}
+      isLoading={isLoading}
+      actions={
+        <>
+          <Button
+            type="button"
+            variant="outline"
+            size="md"
+            onClick={onClose}
+            disabled={isLoading}
+          >
+            Batal
+          </Button>
+          <Button
+            type="submit"
+            size="md"
+            isLoading={isLoading}
+            className="bg-primary hover:bg-primary-dark text-white border-none cursor-pointer"
+          >
+            Kirim Bukti Transfer
+          </Button>
+        </>
+      }
     >
-      <form onSubmit={handleSubmit} className="p-6 space-y-5">
-        {/* Header Icon & Title */}
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-2xl shrink-0 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60">
-            <CreditCard className="w-6 h-6" />
-          </div>
-
-          <div className="min-w-0 flex-1 pt-0.5">
-            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-              Pencairan Dana & Upload Bukti Transfer
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-              Unggah bukti transfer perbankan untuk menyelesaikan pencairan dana pengajuan ini.
-            </p>
-          </div>
-        </div>
-
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Ringkasan Rekening Penerima & Nominal yang Harus Ditransfer */}
         <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-3 text-xs">
           <div className="flex items-center justify-between pb-2 border-b border-slate-200/60 dark:border-slate-700/50">
@@ -263,30 +270,8 @@ export function PencairanActionModal({
             <p className="font-medium">{errorText}</p>
           </div>
         )}
-
-        {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <Button
-            type="button"
-            variant="outline"
-            size="md"
-            onClick={onClose}
-            disabled={isLoading}
-          >
-            Batal
-          </Button>
-
-          <Button
-            type="submit"
-            size="md"
-            isLoading={isLoading}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white border-none cursor-pointer"
-          >
-            Konfirmasi & Selesaikan Pencairan
-          </Button>
-        </div>
       </form>
-    </Modal>
+    </TaskModal>
   );
 }
 

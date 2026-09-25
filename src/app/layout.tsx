@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 

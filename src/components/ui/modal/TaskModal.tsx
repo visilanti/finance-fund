@@ -9,8 +9,7 @@ export interface TaskModalProps {
   onClose: () => void;
   title: string;
   taskCode?: string;
-  badgeLabel?: string;
-  badgeVariant?: "warning" | "info" | "success" | "danger" | "neutral";
+  description?: string;
   size?: ModalSize;
   children: React.ReactNode;
   /**
@@ -51,8 +50,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   onClose,
   title,
   taskCode,
-  badgeLabel,
-  badgeVariant = "info",
+  description,
   size = "lg",
   children,
   actions,
@@ -89,15 +87,10 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 </span>
               )}
             </div>
-            {badgeLabel && (
-              <span
-                className={cn(
-                  "inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border",
-                  badgeVariants[badgeVariant]
-                )}
-              >
-                {badgeLabel}
-              </span>
+            {description && (
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                {description}
+              </p>
             )}
           </div>
         </div>

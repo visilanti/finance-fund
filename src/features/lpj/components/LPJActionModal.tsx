@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Modal } from "@/components/ui/modal/Modal";
+import { TaskModal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/Button";
 import { formatIDR } from "@/lib/utils";
 import { InfoLPJ, LPJBase } from "../types";
@@ -45,7 +45,9 @@ export function LPJActionModal({
     e.preventDefault();
 
     if (!isApprove && !catatan.trim()) {
-      setErrorText("Catatan / alasan revisi wajib diisi agar divisi dapat memperbaiki berkas LPJ.");
+      setErrorText(
+        "Catatan / alasan revisi wajib diisi agar divisi dapat memperbaiki berkas LPJ."
+      );
       return;
     }
 
@@ -56,64 +58,81 @@ export function LPJActionModal({
   };
 
   return (
-    <Modal
+    <TaskModal
       isOpen={isOpen}
       onClose={onClose}
+      title={
+        isApprove
+          ? "Setujui Laporan Pertanggungjawaban (LPJ)"
+          : "Minta Revisi Berkas LPJ"
+      }
+      description={
+        isApprove
+          ? "Jika anda menyetujui, saldo dan transaksi akan diverifikasi sebagai sah."
+          : "Berikan rincian koreksi agar divisi pengaju dapat melakukan perbaikan."
+      }
       size="md"
-      closeOnBackdropClick={!isLoading}
-    >
-      <form onSubmit={handleSubmit} className="p-6 space-y-5">
-        {/* Header Icon & Title */}
-        <div className="flex items-start gap-4">
-          <div
-            className={`p-3 rounded-2xl shrink-0 ${
-              isApprove
-                ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60"
-                : "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60"
-            }`}
+      isLoading={isLoading}
+      actions={
+        <>
+          <Button
+            type="button"
+            variant="outline"
+            size="md"
+            onClick={onClose}
+            disabled={isLoading}
           >
-            {isApprove ? (
-              <CheckCircle2 className="w-6 h-6" />
-            ) : (
-              <RotateCcw className="w-6 h-6" />
-            )}
-          </div>
+            Batal
+          </Button>
 
-          <div className="min-w-0 flex-1 pt-0.5">
-            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-              {isApprove ? "Setujui Laporan Pertanggungjawaban (LPJ)" : "Minta Revisi Berkas LPJ"}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-              {isApprove
-                ? "Apakah Anda yakin ingin menyetujui LPJ ini? Saldo dan transaksi akan diverifikasi sebagai sah."
-                : "Berikan rincian koreksi atau bukti yang belum lengkap agar divisi pengaju dapat melakukan perbaikan."}
-            </p>
-          </div>
-        </div>
-
+          <Button
+            type="submit"
+            form="lpj-action-form"
+            size="md"
+            isLoading={isLoading}
+            className={
+              isApprove
+                ? "bg-emerald-600 hover:bg-emerald-700 text-white border-none cursor-pointer"
+                : "bg-amber-600 hover:bg-amber-700 text-white border-none cursor-pointer"
+            }
+          >
+            {isApprove ? "Ya, Setujui LPJ" : "Kirim Permintaan Revisi"}
+          </Button>
+        </>
+      }
+    >
+      <form id="lpj-action-form" onSubmit={handleSubmit} className="space-y-4">
         {/* Ringkasan Item LPJ */}
         <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-2 text-xs">
           <div className="flex items-center justify-between">
-            <span className="text-slate-500 dark:text-slate-400 font-medium">Nomor Pengajuan</span>
+            <span className="text-slate-500 dark:text-slate-400 font-medium">
+              Nomor Pengajuan
+            </span>
             <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
               {item.noPengajuan}
             </span>
           </div>
           <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
-            <span className="text-slate-500 dark:text-slate-400 font-medium">Jenis Pengajuan</span>
+            <span className="text-slate-500 dark:text-slate-400 font-medium">
+              Jenis Pengajuan
+            </span>
             <span className="font-semibold text-slate-800 dark:text-slate-200">
               {item.jenis}
             </span>
           </div>
           <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
-            <span className="text-slate-500 dark:text-slate-400 font-medium">Saldo Awal (Dana Cair)</span>
+            <span className="text-slate-500 dark:text-slate-400 font-medium">
+              Saldo Awal (Dana Cair)
+            </span>
             <span className="font-extrabold text-slate-900 dark:text-slate-100">
               {formatIDR(item.saldoAwal)}
             </span>
           </div>
           {item.saldoAkhir !== undefined && (
             <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/50 pt-2">
-              <span className="text-slate-500 dark:text-slate-400 font-medium">Saldo Akhir / SiLPA</span>
+              <span className="text-slate-500 dark:text-slate-400 font-medium">
+                Saldo Akhir / SiLPA
+              </span>
               <span className="font-bold text-emerald-600 dark:text-emerald-400">
                 {formatIDR(item.saldoAkhir)}
               </span>
@@ -124,7 +143,8 @@ export function LPJActionModal({
         {/* Input Catatan Verifikator */}
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200">
-            Catatan Verifikator Finance {!isApprove && <span className="text-rose-500">*</span>}
+            Catatan Verifikator Finance{" "}
+            {!isApprove && <span className="text-rose-500">*</span>}
           </label>
           <textarea
             rows={3}
@@ -147,33 +167,8 @@ export function LPJActionModal({
             </p>
           )}
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <Button
-            type="button"
-            variant="outline"
-            size="md"
-            onClick={onClose}
-            disabled={isLoading}
-          >
-            Batal
-          </Button>
-
-          <Button
-            type="submit"
-            size="md"
-            isLoading={isLoading}
-            className={
-              isApprove
-                ? "bg-emerald-600 hover:bg-emerald-700 text-white border-none cursor-pointer"
-                : "bg-amber-600 hover:bg-amber-700 text-white border-none cursor-pointer"
-            }
-          >
-            {isApprove ? "Ya, Setujui LPJ" : "Kirim Permintaan Revisi"}
-          </Button>
-        </div>
       </form>
-    </Modal>
+    </TaskModal>
   );
 }
+

@@ -32,9 +32,9 @@ export function MatrixRKATable({
       <div className="overflow-x-auto relative">
         <table className="w-full text-left border-collapse text-xs select-none">
           <thead>
-            <tr className="bg-[#d2382e] text-white text-[11px] font-bold tracking-wider">
+            <tr className="bg-[#d2392e] dark:bg-slate-800 text-white dark:text-slate-100 text-[11px] font-bold tracking-wider border-b border-[#b91c1c] dark:border-slate-700">
               {/* KETERANGAN Column - Sticky Left on SM+ */}
-              <th className="py-3 px-4 min-w-[260px] sm:min-w-[320px] sm:sticky sm:left-0 z-10 bg-[#d2382e]">
+              <th className="py-3 px-4 min-w-[260px] sm:min-w-[320px] sm:sticky sm:left-0 z-10 bg-[#d2392e] dark:bg-slate-800 text-white dark:text-slate-100">
                 Keterangan
               </th>
 
@@ -42,13 +42,13 @@ export function MatrixRKATable({
               {months.map((m) => (
                 <th
                   key={m}
-                  className="py-3 px-3 min-w-[110px] w-28 text-right font-bold whitespace-nowrap"
+                  className="py-3 px-3 min-w-[110px] w-28 text-right font-bold whitespace-nowrap text-white dark:text-slate-200"
                 >
                   {m}
                 </th>
               ))}
 
-              <th className="py-3 px-4 min-w-[130px] text-right font-extrabold bg-[#991b1b] whitespace-nowrap">
+              <th className="py-3 px-4 min-w-[130px] text-right font-extrabold bg-[#991b1b] dark:bg-slate-900/90 whitespace-nowrap text-white dark:text-slate-100">
                 Total {tahun}
               </th>
             </tr>

@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Modal } from "@/components/ui/modal/Modal";
 import { Button } from "@/components/ui/Button";
 import { formatIDR } from "@/lib/utils";
 import { PengajuanDanaItem } from "@/features/pengajuan/types";
 import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { Input } from "@/components/ui/Input";
+import { TaskModal } from "@/components/ui/modal";
 
 export interface ApprovalActionModalProps {
   isOpen: boolean;
@@ -70,41 +70,43 @@ export function ApprovalActionModal({
   };
 
   return (
-    <Modal
+    <TaskModal
       isOpen={isOpen}
       onClose={onClose}
+      title={isApprove ? "Setujui Pengajuan Dana" : "Tolak Pengajuan Dana"}
+      description={
+        isApprove
+          ? "Apakah Anda yakin ingin menyetujui pengajuan dana ini?"
+          : "Harap berikan alasan penolakan agar pemohon dapat melakukan penyesuaian."
+      }
       size="md"
-      closeOnBackdropClick={!isLoading}
-    >
-      <form onSubmit={handleSubmit} className="p-6 space-y-5">
-        {/* Header Icon & Title */}
-        <div className="flex items-start gap-4">
-          <div
-            className={`p-3 rounded-2xl shrink-0 ${
-              isApprove
-                ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60"
-                : "bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/60"
-            }`}
+      actions={
+        <>
+          <Button
+            type="button"
+            variant="outline"
+            size="md"
+            onClick={onClose}
+            disabled={isLoading}
           >
-            {isApprove ? (
-              <CheckCircle2 className="w-6 h-6" />
-            ) : (
-              <XCircle className="w-6 h-6" />
-            )}
-          </div>
-
-          <div className="min-w-0 flex-1 pt-0.5">
-            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-              {isApprove ? "Setujui Pengajuan Dana" : "Tolak Pengajuan Dana"}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-              {isApprove
-                ? "Apakah Anda yakin ingin menyetujui pengajuan dana ini?"
-                : "Harap berikan alasan penolakan agar pemohon dapat melakukan penyesuaian."}
-            </p>
-          </div>
-        </div>
-
+            Batal
+          </Button>
+          <Button
+            type="submit"
+            size="md"
+            isLoading={isLoading}
+            className={
+              isApprove
+                ? "bg-emerald-600 hover:bg-emerald-700 text-white border-none cursor-pointer"
+                : "bg-rose-600 hover:bg-rose-700 text-white border-none cursor-pointer"
+            }
+          >
+            {isApprove ? "Ya, Setujui" : "Ya, Tolak Pengajuan"}
+          </Button>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Ringkasan Item Pengajuan */}
         <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-2 text-xs">
           <div className="flex items-center justify-between">
@@ -174,33 +176,7 @@ export function ApprovalActionModal({
             </p>
           )}
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-2.5 pt-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="md"
-            onClick={onClose}
-            disabled={isLoading}
-          >
-            Batal
-          </Button>
-
-          <Button
-            type="submit"
-            size="md"
-            isLoading={isLoading}
-            className={
-              isApprove
-                ? "bg-emerald-600 hover:bg-emerald-700 text-white border-none cursor-pointer"
-                : "bg-rose-600 hover:bg-rose-700 text-white border-none cursor-pointer"
-            }
-          >
-            {isApprove ? "Ya, Setujui" : "Ya, Tolak Pengajuan"}
-          </Button>
-        </div>
       </form>
-    </Modal>
+    </TaskModal>
   );
 }

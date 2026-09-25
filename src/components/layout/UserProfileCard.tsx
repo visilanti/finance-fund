@@ -11,7 +11,7 @@ import {
   Settings
 } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/context/ThemeContext";
 import { useRouter } from "next/navigation";
 import { useProfileStore } from "@/features/profile/store/useProfileStore";
 
@@ -34,7 +34,7 @@ export function UserProfileCard({
   const { profile, loadProfile } = useProfileStore();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,10 +56,10 @@ export function UserProfileCard({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const isDarkMode = mounted ? (resolvedTheme === "dark" || theme === "dark") : false;
+  const isDarkMode = mounted ? theme === "dark" : false;
 
   const toggleDarkMode = () => {
-    setTheme(isDarkMode ? "light" : "dark");
+    toggleTheme();
   };
 
   const handleLogoutClick = () => {
@@ -68,7 +68,7 @@ export function UserProfileCard({
       onLogout();
     } else {
       alert("Proses logout berhasil. Mengalihkan ke halaman login...");
-      window.location.href = "/";
+      window.location.href = "/signin";
     }
   };
 
